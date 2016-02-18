@@ -9,13 +9,13 @@ description:
 
 email: guijihe@163.com
 #blog logo
-#logo: "/assets/images/author.jpg"
+logo: "/assets/images/author.jpg"
 # blog cover
 #cover: "/assets/images/cA4aKEIPQrerBnp1yGHv_IMG_9534-3-2.jpg"
 
 name: 'PathBox'
 author: 'PathBox'
-#author_image: "/assets/images/author.jpg"
+author_image: "/assets/images/author.jpg"
 
 paginate:	10
 
