@@ -2,10 +2,9 @@
 layout: post
 title: 操作系统原理－进程线程
 date:   2016-02-21 17:56:00
-categories: 进程－线程
+categories: thread_precessor
 image: /assets/images/post.jpg
 ---
-
 <h2>{{ page.title }}</h2>
 一直对高并发的ｗｅｂ系统感兴趣，看了很多文章和资料，发现很多东西还理解的不清楚，特别是多线程和多进程方面的知识。
 这样不行，所以回归原理，用了周末的时间，把操作系统原理的进程和线程的知识内容好好的温习了。突然发现，上学时不懂，不明白的问题，一下就明白了。
@@ -73,7 +72,7 @@ Linux 是各类服务器的最佳选择之一，在相同硬件条件下，系�
 
 
 
-
+<p>{{ page.date | date_to_string }}}</p>
 
 
 
