@@ -3,6 +3,7 @@ layout: post
 title: 操作系统原理－进程线程
 date:   2016-02-18 11:47:06
 categories: thread_precessor
+tag: thread
 image: /assets/images/post.jpg
 ---
 <h2>{{ page.title }}</h2>
