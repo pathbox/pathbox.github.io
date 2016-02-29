@@ -29,5 +29,6 @@ image: /assets/images/post.jpg
   和数据结构，就不再对此深入学习和研究。我的观点与此相反。就像开头的joke，事实上这不仅是一个joke。
   算法和数据结构，是打开成为优秀程序员的钥匙。是让程序员能更好的明白程序，
   融入程序设计和软件思想的 “key”。让你沉浸于编程的世界。
+  <br>
   So now， I decide to get the “key” !
 </p>
