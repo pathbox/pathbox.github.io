@@ -37,6 +37,7 @@ Event Loop就是为了解决这个问题而提出的
 	
 	"Event Loop是一个程序结构，用于等待和发送消息和事件。(a programming construct that waits for and dispatches events or messages in a program.)"
 简单说，就是在程序中设置两个线程：一个负责程序本身的运行，称为"主线程"；另一个负责主线程与其他进程（主要是各种I/O操作）的通信，被称为"Event Loop线程"（可以译为"消息线程"）。
+
 ![event loop]( /assets/images/event-loop/4.jpg "Optional title")
 
 上图主线程的绿色部分，还是表示运行时间，而橙色部分表示空闲时间。每当遇到I/O的时候，主线程就让Event Loop线程去通知相应的I/O程序，然后接着往后运行，所以不存在红色的等待时间。等到I/O程序完成操作，Event Loop线程再把结果返回主线程。主线程就调用事先设定的回调函数，完成整个任务。
