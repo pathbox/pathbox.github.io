@@ -25,33 +25,33 @@ Another interesting quirk is that in every rails app, all directories under app/
 
 
 
-####If you add a dir directly under app/
+#### If you add a dir directly under app/
 
 Do nothing. All files in this dir are eager loaded in production and lazy loaded in development by default.
 
-####If you add a dir under app/something/
+#### If you add a dir under app/something/
 
 (e.g. app/models/concerns/, app/models/products/)
 
 Ask: do I want to namespace modules and classes inside my new dir? For example in app/models/products/ you would need to wrap your class in module Products.
 
-####If the answer is yes, do nothing. It will just work.
+#### If the answer is yes, do nothing. It will just work.
 
 If the answer is no, add config.autoload_paths += %W( #{config.root}/app/models/products ) to your application.rb.
 
 In either case, everything will be eager loaded in production.
 
-####If you add code in your lib/ directory
+#### If you add code in your lib/ directory
 
-#####Option 1
+##### Option 1
 
 If you put something in the lib/ dir, what you are saying is: "I wrote this library, and I want to depend on it where I decide." This means that if you use your library in a rake task, but not in a rails app, you just require it in your rake task. If you need this library to always be loaded for your rails app, you require it in an initializer. If you need this library for some of your models or controllers, you require_dependency (see below why) it in those files, and since everything under your app/ dir is already auto- and eager- loaded as needed, your library will only be "pulled-in" if something that requires it from app/ or rake, or your custom script, actually gets loaded.
 
-#####Option 2 (bad)
+##### Option 2 (bad)
 
 Another option is to add your whole lib dir into autoload_paths: config.autoload_paths += %W( #{config.root}/lib ). This means you shouldn't explicitly require your lib anywhere. As soon as you hit the namespace of your dir in other classes, rails will require it. The problem with this is that in Rails 3 if you just add something to your autoload paths it won't get eager loaded in production. You would need to add it to eager_load_paths instead, which causes a different problem (see below). And in ruby 1.9 autoload is not threadsafe. You probably want eager loading in production. Requiring your lib explicitly, like in option 1, is akin to eager loading it, which is threadsafe.
 
-#####Option 3 (meh)
+##### Option 3 (meh)
 
 All the different things under your lib dir should be placed into their own directories, and those directories should be individually added to eager_load_paths.
 
