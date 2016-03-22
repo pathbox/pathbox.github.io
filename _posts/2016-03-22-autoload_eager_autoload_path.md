@@ -1,7 +1,7 @@
 ---
 layout: post
 title: autoload_paths vs eager_load_paths
-date:   2016-03-22 10:01:06
+date: 2016-03-22 10:00:00
 categories: rails
 tag: rails
 image: /assets/images/post.jpg
