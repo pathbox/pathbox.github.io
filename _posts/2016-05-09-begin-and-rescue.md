@@ -1,3 +1,4 @@
+---
 layout: post
 title: begin and rescue 异常处理机制示例
 date:   2016-05-09 14:37:06
