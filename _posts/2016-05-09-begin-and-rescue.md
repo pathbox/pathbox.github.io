@@ -1,6 +1,6 @@
 layout: post
-title: begin and rescue
-date:   2016-03-11 15:04:06
+title: begin and rescue 异常处理机制示例
+date:   2016-05-09 14:37:06
 categories: ruby
 tag: ruby
 image: /assets/images/post.jpg
