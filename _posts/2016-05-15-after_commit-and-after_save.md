@@ -122,7 +122,9 @@ Awesome, the after_commit callback is only triggered after the record is persist
 
 中文解释: 在这个例子中，当触发回调的create操作外层包裹了transaction时候，使用after_save操作，如果transaction有异常保存失败，
 即使book对象先是create成功了(即save操作完成过一次)，但是由于后面的代码报错，触发了transaction的rollback，使得create操作撤销。
-使得book对象没有create一个新的对象，这是正确的。但是，after_save操作由于book有save操作完成过一次，仍然会触发。这样ReviewQueue就新建了一个
+使得book对象没有create一个新的对象，这是正确的。但是，after_save操作由于book有save操作完成过一次，在save操作完成时就触发了回调
+(那时候raise代码还没执行到,rollback操作还没完全执行。可以认为after_save在save操作后触发回调极快，比遇到异常触发rollback回调还快，使得after_save的回调方法被执行了，但其实新建的book对象由于异常又回滚了)。
+这样ReviewQueue就新建了一个
 对象。然而，ReviewQueue对象所对应的book_id(book对象)已经由于transaction的异常而rollback回滚撤销保存了，数据库里是没有这个book对象。
 也就使得ReviewQueue 的book_id 在Book中是不存在的。如果有相关的操作就会报根据这个book_id 找不到book对象
 而用 after_commit 操作就解决这个问题了。after_commit 操作会监听最外层的transaction范围内都正常执行完，才会触发回调。如果在最外层的
@@ -130,7 +132,7 @@ transaction范围内有异常发生，都会发生回滚。而after_save只会�
 总结: 如果方法外层有transaction包裹进行的需要触发的回调，请务必使用after_commit。这样保证after_commit监听的异常代码范围最大
 
 你还可以看另一个例子: [Use after_commit instead of active record callbacks to avoid unexpected errors](http://codebeerstartups.com/2012/11/use-after_commit-instead-of-active-record-callbacks-to-avoid-unexpected-errors/)
-这篇文章大概的意思是: create操作的速度
+这篇文章大概的意思是:
 
 1. main process
 2. worker process
@@ -148,7 +150,7 @@ return id 10 for newly-created notification
 COMMIT
 SELECT * FROM notifications WHERE id = 10
 
-You won’t see any issue in development, as local db can commit fast. But in production server, db traffic might be huge, worker probably finish faster than transaction commit. e.g
+> You won’t see any issue in development, as local db can commit fast. But in production server, db traffic might be huge, worker probably finish faster than transaction commit. e.g
 
 > In this case, the worker process query the newly-created notification before main process commits the transaction,it will raise NotFoundError, because transaction in worker process can’t read uncommitted notification from transaction in main process.
 
