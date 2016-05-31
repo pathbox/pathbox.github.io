@@ -26,6 +26,7 @@ gem 'rack-ssl-enforcer'
 gem 'kramdown'
 ```
 执行 
+
 ##### bundle
 
 在 app 目录下新建api文件夹，在下面新建三个文件
@@ -51,7 +52,6 @@ root_app.rb
 require 'grape'
 
 class RootApp < Grape::API
-
 
 	include AppDefault
 	desc 'API Root'
@@ -148,29 +148,28 @@ end
 ```ruby
 
 module EntitiesApp
+  class BaseEntity < Grape::Entity
+	format_with(:null) {|v| (v != false && v.blank?) ? "" : v }
+	format_with(:null_int) {|v| v.blank? ? 0 : v}
+	format_with(:null_bool) { |v| v.blank? ? false : v }
+    format_with(:short_dt) { |v| v.blank? ? "" : v.strftime("%Y-%m-%d %H:%M:%S") }
+	format_with(:short_t) { |v| v.blank? ? "" : v.strftime("%Y-%m-%d %H:%M") }
+  end
 
-		class BaseEntity < Grape::Entity
-		 format_with(:null) {|v| (v != false && v.blank?) ? "" : v }
-		 format_with(:null_int) {|v| v.blank? ? 0 : v}
-		 format_with(:null_bool) { |v| v.blank? ? false : v }
-	   format_with(:short_dt) { |v| v.blank? ? "" : v.strftime("%Y-%m-%d %H:%M:%S") }
-	   format_with(:short_t) { |v| v.blank? ? "" : v.strftime("%Y-%m-%d %H:%M") }
-		end
+  class BaseError < Grape::Entity
+	expose :error, documentation: {required: true, type: 'String', desc: '错误信息'}
+  end
 
-		class BaseError < Grape::Entity
-			expose :error, documentation: {required: true, type: 'String', desc: '错误信息'}
-		end
+  class Error < BaseError
+    expose :field, documentation: {required: true, type: "String", desc: "错误字段"}
+  end
 
-		class Error < BaseError
-	    expose :field, documentation: {required: true, type: "String", desc: "错误字段"}
-	  end
-
-	  class Post < BaseEntity
-	  	expose :id, documentation: {required: true, type: "Integer", desc: "文章ID"}, format_with: :null_int
-	  	expose :title, documentation: {type: "String", desc: "文章title"}, format_with: :null
-	  	expose :body, documentation: {type: "String", desc: "文章内容"}, format_with: :null
-	  end
-	end
+  class Post < BaseEntity
+    expose :id, documentation: {required: true, type: "Integer", desc: "文章ID"}, format_with: :null_int
+    expose :title, documentation: {type: "String", desc: "文章title"}, format_with: :null
+    expose :body, documentation: {type: "String", desc: "文章内容"}, format_with: :null
+  end
+end
 ```
 修改 post_app.rb文件
 
