@@ -10,7 +10,7 @@ image: /assets/images/post.jpg
 
 > grape: An opinionated framework for creating REST-like APIs in Ruby. http://www.ruby-grape.org
 
-这是一篇快速用grape挂载在rails中进行API开发的文章。
+这是一篇快速用grape挂载在rails中进行API开发的文章,不知不觉也用grape开发接口半年多了.
 
 首先在Gemfile中加入
 
@@ -25,7 +25,7 @@ gem 'rack-contrib', '~> 1.1.0' # for JSONP
 gem 'rack-ssl-enforcer'
 gem 'kramdown'
 ```
-执行 
+执行
 
 ##### bundle
 
@@ -152,7 +152,7 @@ module EntitiesApp
 	format_with(:null) {|v| (v != false && v.blank?) ? "" : v }
 	format_with(:null_int) {|v| v.blank? ? 0 : v}
 	format_with(:null_bool) { |v| v.blank? ? false : v }
-    format_with(:short_dt) { |v| v.blank? ? "" : v.strftime("%Y-%m-%d %H:%M:%S") }
+  format_with(:short_dt) { |v| v.blank? ? "" : v.strftime("%Y-%m-%d %H:%M:%S") }
 	format_with(:short_t) { |v| v.blank? ? "" : v.strftime("%Y-%m-%d %H:%M") }
   end
 
