@@ -8,7 +8,7 @@ image: /assets/images/post.jpg
 
 ### Processing large CSV files with Ruby(翻译)
 
-原文的链接: http://dalibornasevic.com/posts/68-processing-large-csv-files-with-ruby
+原文链接： [Processing large CSV files with Ruby](http://dalibornasevic.com/posts/68-processing-large-csv-files-with-ruby)
 
 处理大文件内存密集型操作,可能导致服务器的内存和交换到磁盘。让我们来看看一些方法来处理CSV文件使用Ruby和测量内存消耗和速度性能
 
