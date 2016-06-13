@@ -44,8 +44,8 @@ module AppDefault
 	default_error_status 401
   end
 end
-
 ```
+
 root_app.rb
 
 ```ruby
@@ -56,14 +56,12 @@ class RootApp < Grape::API
 	include AppDefault
 	desc 'API Root'
 	mount PostApp
-
 	add_swagger_documentation(
 
     hide_documentation_path: true,
 		format: :json,
 		hide_format: true,
 		markdown: GrapeSwagger::Markdown::KramdownAdapter.new,
-
 		api_version: '1.0',
 		hide_documentation_path: true,
 
@@ -72,12 +70,10 @@ class RootApp < Grape::API
 			description: "使用基本身份验证"
 		}
 	)
-
 	route :any, 'path' do
 		error!({error: '错误的接口地址',field: 404, with: Entities::Error}, 404)
 	end
 end
-
 ```
 
 post_app.rb
@@ -106,15 +102,12 @@ class PostApp < Grape::API
     end
   end
 end
-
 ```
 在config/routes.r文件挂载上路由
 
 ```ruby
-
  mount GrapeSwaggerRails::Engine => '/docs'
  mount RootApp => '/'
-
 ```
 根据 app_default.rb 中定义的 prefix :api，和post_app.rb中version 'v1', using: :path。可以知道接口的url为: localhost:3000/api/v1/posts
 
@@ -180,7 +173,6 @@ present :posts, posts
 改为
 
 ```ruby
-
 present :posts, posts, with: EntitiesApp::Post
 ```
 这样返回的JSON数据的field的内容就会是对应entity中配置的字段。这样就能方便的配置需要返回什么字段，就返回什么字段。grape-entity还有更高级的用法，具体可以在GitHub上查阅资料文档。
