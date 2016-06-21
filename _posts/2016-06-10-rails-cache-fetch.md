@@ -17,12 +17,15 @@ Rails中使用的缓存方式有很多种，推荐的缓存策略是"套娃缓�
 
 首先介绍 ActiveSupport::Cache::Store中的ActiveSupport::Cache::MemoryStore。它会将数据存储在内存中(没有存在redis中)
 This cache store keeps entries in memory in the same Ruby process. The cache store has a bounded size specified by the :size options to the initializer (default is 32Mb). When the cache exceeds the allotted size, a cleanup will occur and the least recently used entries will be removed.
+
 ```ruby
 config.cache_store = :memory_store, { size: 64.megabytes }
 ```
+
 If you're running multiple Ruby on Rails server processes (which is the case if you're using mongrel_cluster or Phusion Passenger), then your Rails server process instances won't be able to share cache data with each other. This cache store is not appropriate for large application deployments,
 but can work well for small,low traffic sites with only a couple of server processes or for development and test environments.
 它适合小的web application。中大型的application不合适了。
+
 ```ruby
 cache = ActiveSupport::Cache::MemoryStore.new
 cache.read('city')   # => nil
@@ -30,9 +33,11 @@ cache.write('city', "Duckburgh")
 cache.read('city')   # => "Duckburgh"
 cache.read('city') == cache.read(:city)   # => true 可以使用symbol存储key
 ```
+
 Nil values can be cached.
 
 其他操作
+
 ```ruby
 cache.delete('city') #=> true
 cache.read('city') #=> nil
@@ -52,6 +57,7 @@ cache.fetch('city')   # => "Duckburgh"
 about expires_in 过期时间
 Setting :expires_in will set an expiration time on the cache. All caches support auto-expiring content after a specified number of seconds. This value can be specified as an option to the constructor (in which case all entries will be affected),
 or it can be supplied to the fetch or write method to effect just one entry.
+
 ```ruby
 cache = ActiveSupport::Cache::MemoryStore.new(expires_in: 5.minutes)
 cache.write(key, value, expires_in: 1.minute) # Set a lower value for one entry
@@ -89,6 +95,7 @@ Rails.cache.fetch('first_user_cache')
 ```
 
 Rails.cache.fetch的方法
+
 ```ruby
 Rails.cache.fetch('first_user_cache', expires_in: 2.minute){User.first}
 
@@ -105,10 +112,12 @@ Rails.cache.fetch('all_user_cache', expires_in: 2.minute){User.all.load}(实际�
 
 下面一段内容来自 http://xguox.me/rails-cache-fetch-scope.html
 
-> ActiveRecord::Relation 究竟是什么鬼?
-  [7] pry(main)> User.where(id: 1)
-  User Load (6.9ms)  SELECT `users`.* FROM `users` WHERE `users`.`id` = 1
-  => [<User:0x007fb96ee98b88 id: 1, email: "test@test.com">]
+ActiveRecord::Relation 究竟是什么鬼?
+
+```
+[7] pry(main)> User.where(id: 1)
+User Load (6.9ms)  SELECT `users`.* FROM `users` WHERE `users`.`id` = 1
+=> [<User:0x007fb96ee98b88 id: 1, email: "test@test.com">]
   看上去返回的结果很像是数组, 实际上, 却不是数组.
   [8] pry(main)> _.class
   => User::ActiveRecord_Relation(Rails 4)
@@ -127,6 +136,7 @@ Rails.cache.fetch('all_user_cache', expires_in: 2.minute){User.all.load}(实际�
   再去执行(假设 view 里面有使用到 @posts)
   Post Load (47.2ms) SELECT `posts`.* FROM `posts`
   所以, Rails.cache.fetch('cache_all_posts', expires_in: 2.minute) { Post.all } 缓存的只是 Relation 对象而不是查询结果. 其实分开来, 使用 Rails.cache.read 和 Rails.cache.write 也是这样的.
+```
 
 ActiveRecord::Relation只有真正在使用的时候才会返回数组的结果集。要不只是一个对象。所以，缓存ActiveRecord::Relation并没有把实际的结果集缓存下来。这样每次真正使用到ActiveRecord::Relation的时候，都会再进行
 sql的查询(缓存的作用没有达到) 加上load就会事先把ActiveRecord::Relation的数组结果集查询出来，然后保存在缓存中，就达到了缓存的作用。或者是Post.all.to_a、Post.all.order('server_index DESC').map(&:attributes)、干脆Post.all.pluck(:id,:title)这样缓存需要的字段值
