@@ -199,13 +199,13 @@ end
 ary = [3,6,7,1,2,9,5,8,1,4]
 
 sorter = SevenSort.new
-
 # puts sorter.bubble_sort(ary)
 # puts sorter.select_sort(ary)
 # puts sorter.insert_sort(ary)
 # puts sorter.shell_sort(ary)
 # puts sorter.quick_sort(ary,0,ary.size)
 puts sorter.heap_sort(ary)
+
 ```ruby
 
 
