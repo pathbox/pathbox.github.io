@@ -10,6 +10,7 @@ image: /assets/images/post.jpg
 
 
 ```ruby
+
 class SevenSort
 
     #............................................................
@@ -195,6 +196,7 @@ class SevenSort
         a > b ? true : false
     end
 end
+
 #ary = [3,6,7,1,2,9,5,8,1,4]
 #sorter = SevenSort.new
 #puts sorter.bubble_sort(ary)
