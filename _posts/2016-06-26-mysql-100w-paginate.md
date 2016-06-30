@@ -131,6 +131,7 @@ SELECT * FROM test_products a JOIN (select id from test_products limit 900000, 3
 ```
 
 rails中一种简单的分页优化：
+
 ```ruby
 @postids = Post.paginate(:page => params[:page]).order('created_at DESC').pluck(:id)
 @posts = Post.where('posts.id' => @postids).order('posts.created_at DESC').eager_load [:user]
