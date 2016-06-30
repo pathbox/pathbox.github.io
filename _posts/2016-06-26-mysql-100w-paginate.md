@@ -43,8 +43,7 @@ end
 用ruby创建一个100w个id数的txt文件
 
 ```
-ruby -e "(1..1000000).each{|i| puts i.to_s+',good name,1000000,nice product,food,field1,field2,field3,field4,field5,
-field6,field7,field8,field9,field10,'+Time.now.strftime('%Y-%m-%d %H:%M:%S')+','+Time.now.strftime('%Y-%m-%d %H:%M:%S')}" > 100w.txt
+ruby -e "(1..1000000).each{|i| puts i.to_s+',good name,1000000,nice product,food,field1,field2,field3,field4,field5,field6,field7,field8,field9,field10,'+Time.now.strftime('%Y-%m-%d %H:%M:%S')+','+Time.now.strftime('%Y-%m-%d %H:%M:%S')}" > 100w.txt
 ```
 用了7秒创建了100w.txt文件
 
