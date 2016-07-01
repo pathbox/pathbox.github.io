@@ -206,7 +206,7 @@ image: /assets/images/post.jpg
 #puts sorter.quick_sort(ary,0,ary.size)
 #puts sorter.heap_sort(ary)
 
-```ruby
+```
 
 
 
