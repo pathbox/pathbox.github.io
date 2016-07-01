@@ -11,7 +11,7 @@ image: /assets/images/post.jpg
 
 ```ruby
 
-class SevenSort
+  class SevenSort
 
     #............................................................
     # 1.冒泡排序
@@ -119,26 +119,26 @@ class SevenSort
     # 可以利用数组的特点快速定位指定索引的元素。堆分为大根堆和小根堆，是完全二叉树。
 
     def heap_sort(arr)
-   (arr.length - 1).downto(0).each do |i|
-     arr[i], arr[0] = arr[0], arr[i]
-     min_heap_fixdown(arr, 0, i)
-   end
-   arr
+     (arr.length - 1).downto(0).each do |i|
+       arr[i], arr[0] = arr[0], arr[i]
+       min_heap_fixdown(arr, 0, i)
+     end
+     arr
     end
+
     def min_heap_fixdown(arr, i, n)
-   left = 2 * i + 1
-   while(left < n)
-     if left + 1 < n and arr[left] > arr[left + 1]
-       left += 1
-     end
-     if arr[left] < arr[i]
-      arr[left], arr[i] = arr[i], arr[left]
-      i = left
       left = 2 * i + 1
-     else
-      break
-     end
-   end
+      while(left < n)
+       if left + 1 < n and arr[left] > arr[left + 1]
+       left += 1
+      end
+      if arr[left] < arr[i]
+        arr[left], arr[i] = arr[i], arr[left]
+        i = left
+        left = 2 * i + 1
+      else
+        break
+      end
     end
 
     #............................................................
@@ -195,7 +195,7 @@ class SevenSort
     def less(a , b)
         a > b ? true : false
     end
-end
+  end
 
 #ary = [3,6,7,1,2,9,5,8,1,4]
 #sorter = SevenSort.new
