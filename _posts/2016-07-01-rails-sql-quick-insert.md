@@ -154,6 +154,44 @@ puts bench = Benchmark.measure { activerecord_import(true)  }
 puts sprintf("  %2.2fx faster than base", base.real / bench.real)
 ```
 
+### results:
+
+```ruby
+"Testing various insert methods for 10000 inserts\n"
+"ActiveRecord without transaction:"
+50.000000   3.770000  53.770000 (196.480882)
+
+
+"ActiveRecord with transaction:"
+30.970000   1.020000  31.990000 ( 57.738721)
+3.40x faster than base
+
+"Raw SQL without transaction:"
+5.940000   1.550000   7.490000 ( 46.789605)
+4.20x faster than base
+
+"Raw SQL with transaction:"
+5.940000   1.550000   7.490000 ( 46.789605)
+4.20x faster than base
+
+"Single mass insert:"
+0.010000   0.030000   0.040000 (  6.096222)
+31.48x faster than base
+
+"ActiveRecord::Extensions mass insert:"
+4.010000   0.100000   4.110000 (  9.682448)
+20.29x faster than base
+
+"ActiveRecord::Extensions mass insert without validations:"
+10.590000   0.230000  10.820000 ( 14.055478)
+13.98x faster than base
+```
+
+不同的电脑结果会有偏差.不过可以很明显的看到那种方式是高效的了.
+
+ActiveRecord is not alaways best. Sometimes we need to come back to the nature of SQL.
+
+
 
 
 
