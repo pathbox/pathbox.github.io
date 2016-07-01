@@ -21,7 +21,7 @@ image: /assets/images/post.jpg
     # 性能：极低。 倒序是最糟糕的情况
     # 示例解释：两层循环，内层循环随每次比较减少一次(因为每次比较都得到了一个有序确定的数,下一次比较就不需要再参与排序了)，两两比较，将较大的数交换到后面
     def bubble_sort(a)
-        len = a.size
+      len = a.size
       flag = len
       loop do
         break if flag.zero?
@@ -45,23 +45,23 @@ image: /assets/images/post.jpg
     # 和冒泡排序对比: 循环次数一样,交换次数减少。
     # 示例解释：这种方法类似我们人为的排序习惯：从数据中选择最小的同第一个值交换，在从省下的部分中, 选择最小的与第二个交换，这样往复下去。
     def select_sort(a)
-        temp = 0
-        pos = 0
-        len = a.length
-        (0...len-1).each do |i|
-            temp = a[i]
-            pos = i
-            j = i + 1
-            (j...len).each do |j|
-                if less(temp, a[j])
-                    temp = a[j]
-                    pos = j
-                end
-            end
-            a[pos] = a[i]
-            a[i] = temp
+      temp = 0
+      pos = 0
+      len = a.length
+      (0...len-1).each do |i|
+        temp = a[i]
+        pos = i
+        j = i + 1
+        (j...len).each do |j|
+          if less(temp, a[j])
+            temp = a[j]
+            pos = j
+          end
         end
-        a
+        a[pos] = a[i]
+        a[i] = temp
+      end
+      a
     end
 
     #............................................................
@@ -70,19 +70,19 @@ image: /assets/images/post.jpg
     # 特点：所需时间取决于输入中元素的初始顺序。很大且其中的元素已经有序的数组进行插入排序将会比对随机顺序的数组或是逆序数组进行排序要快得多
     # 插入排序对于小数组,排序性能很高。比如 长度为 5-15位的数组
     def insert_sort(a)
-        len = a.size
-        (1...len).each do |i|
-            j = i
-            while(j>0)
-                if less(a[j-1], a[j])
-                    tmp = a[j]
-                    a[j] = a[j-1]
-                    a[j-1] = tmp
-                end
-                j -= 1
-            end
+      len = a.size
+      (1...len).each do |i|
+        j = i
+        while(j>0)
+          if less(a[j-1], a[j])
+            tmp = a[j]
+            a[j] = a[j-1]
+            a[j-1] = tmp
+          end
+          j -= 1
         end
-        a
+      end
+      a
     end
 
     #............................................................
@@ -95,21 +95,21 @@ image: /assets/images/post.jpg
     # 希尔排序通过将比较的全部元素分为几个区域来提升插入排序的性能。这样可以让一个元素可以一次性地朝最终位置前进一大步。然后算法再取越来越小的步长进行排序，
     # 算法的最后一步就是普通的插入排序，但是到了这步，需排序的数据几乎是已排好的了（此时插入排序较快）
     def shell_sort(a)
-        len = a.size
-        d = len / 2
-        while(d >=1 )
-            (d...len).each do |i|
-                j = i - d
-                tmp = a[i]
-                while( j >= 0 && a[j] > tmp)
-                    a[j+d] = a[j]
-                    j -= d;
-                end
-                a[j+d] = tmp if j != i - d #j+d = old(j)因为前面j-=d　所以现在j+d回来得到的是最开始的j的索引
-            end
-            d = d/2
+      len = a.size
+      d = len / 2
+      while(d >=1 )
+        (d...len).each do |i|
+          j = i - d
+          tmp = a[i]
+          while( j >= 0 && a[j] > tmp)
+            a[j+d] = a[j]
+            j -= d;
+          end
+          a[j+d] = tmp if j != i - d #j+d = old(j)因为前面j-=d　所以现在j+d回来得到的是最开始的j的索引
         end
-        a
+        d = d/2
+      end
+      a
     end
 
     #............................................................
@@ -152,9 +152,9 @@ image: /assets/images/post.jpg
     # 复杂度: O(NlogN)
     # 非常高效的排序算法
     def quick_sort(a)
-        return a if a.size < 2
-    left, right = a[1..-1].partition{ |y| y <= a.first }  # 以第一个元素为第一次的比较元素x
-        quick_sort2(left) + [ a.first ] + quick_sort2(right)  # 左边部分继续递归排序, 右边部分继续递归排序。直到 a.size < 2.即直到a.size 为 1
+      return a if a.size < 2
+      left, right = a[1..-1].partition{ |y| y <= a.first }  # 以第一个元素为第一次的比较元素x
+      quick_sort2(left) + [ a.first ] + quick_sort2(right)  # 左边部分继续递归排序, 右边部分继续递归排序。直到 a.size < 2.即直到a.size 为 1
     end
 
     #更详细的解释方法
@@ -193,7 +193,7 @@ image: /assets/images/post.jpg
     private
 
     def less(a , b)
-        a > b ? true : false
+      a > b ? true : false
     end
   end
 
