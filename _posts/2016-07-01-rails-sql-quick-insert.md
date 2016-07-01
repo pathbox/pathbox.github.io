@@ -39,6 +39,7 @@ end
 ```
 
 和上面多个请求一次事务提交一样的效果
+
 ```ruby
 Foo.transaction do
   1000.times do |i|
@@ -161,7 +162,6 @@ puts sprintf("  %2.2fx faster than base", base.real / bench.real)
 "ActiveRecord without transaction:"
 50.000000   3.770000  53.770000 (196.480882)
 
-
 "ActiveRecord with transaction:"
 30.970000   1.020000  31.990000 ( 57.738721)
 3.40x faster than base
@@ -187,7 +187,7 @@ puts sprintf("  %2.2fx faster than base", base.real / bench.real)
 13.98x faster than base
 ```
 
-不同的电脑结果会有偏差.不过可以很明显的看到那种方式是高效的了.
+不同的电脑结果会有偏差.不过可以很明显的看到哪种方式是高效的了.
 
 ActiveRecord is not alaways best. Sometimes we need to come back to the nature of SQL.
 
