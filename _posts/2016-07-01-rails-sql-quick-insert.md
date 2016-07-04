@@ -189,7 +189,11 @@ puts sprintf("  %2.2fx faster than base", base.real / bench.real)
 
 不同的电脑结果会有偏差.不过可以很明显的看到哪种方式是高效的了.
 
-ActiveRecord is not alaways best. Sometimes we need to come back to the nature of SQL.
+> ActiveRecord is great, but sometimes it'll hold you back.
+Finding the balance between ease of use (full ActiveRecord) and performance (bare metal mass inserts)
+can have a profound effect on the performance of your app
+
+ActiveRecord is not always best. Sometimes we need to come back to the nature of SQL.
 
 
 
