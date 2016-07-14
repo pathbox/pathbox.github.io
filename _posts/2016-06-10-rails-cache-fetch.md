@@ -34,7 +34,7 @@ cache.read('city')   # => "Duckburgh"
 cache.read('city') == cache.read(:city)   # => true 可以使用symbol存储key
 ```
 
-Nil values can be cached.
+nil values can be cached.
 
 其他操作
 
@@ -72,6 +72,7 @@ Rails.cache #=> #<ActiveSupport::Cache::RedisStore:0x007ffc2daf1ac8 @data=#<Redi
 Rails.cache 同样哟 read write fetch 等方法操作。非常方便使用的是fetch
 
 ##### 使用
+
 ```ruby
 Rails.cache.write('first_user_cache', User.first, expires_in: 2.minute)
 User Load (0.4ms)  SELECT  `users`.* FROM `users`  ORDER BY `users`.`id` ASC LIMIT 1
@@ -106,6 +107,7 @@ end
 可以把yield中的最后一句的返回值存储到key的缓存中
 
 当想要Rails.cache.fetch 缓存像 User.all , User.where 这样的ActiveRecord::Relation结果集时，需要加上load。
+
 ```ruby
 Rails.cache.fetch('all_user_cache', expires_in: 2.minute){User.all.load}(实际中不缓存all数据,很有爆内存的危险)
 ```
