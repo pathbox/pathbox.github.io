@@ -96,7 +96,7 @@ UserNodeScore.import columns, values
 写一个简单的脚本代码
 
 ```ruby
-CONN = Activerecord::Base.connection
+CONN = ActiveRecord::Base.connection
 
 TIMES = 10000
 
