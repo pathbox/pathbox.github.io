@@ -12,7 +12,7 @@ image: /assets/images/post.jpg
 加密的作用就是为了防止他人得到真实的数据，从而进行一些操作，使得用户或项目收到损失。
 
 ###### Ruby库中提供的加密方法
-Ruby库中提供了比较全的加密方法。比如简单的md5、SHA1等。
+Ruby库中提供了比较全的加密方法。比如简单的MD5、SHA1等。
 
 ```ruby
 
@@ -68,7 +68,7 @@ sha256.hexdigest
 
 testfile 文件里是 "hello world"字符串。这里只是把这个字符串内容取出来了，然后加密显示出来，并没有真正改变文件的属性。
 
-关于SHA2(Secure Hash Algorithm 2)，其实是这样的。SHA2 family => [SHA256, SHA384, SHA512] 有三种加密方式。这三种方法的区别：简单的说，就是
+关于SHA2(Secure Hash Algorithm 2)，其实是这样的: SHA2 family => [SHA256, SHA384, SHA512] 有三种加密方式。这三种方法的区别：简单的说，就是
 后面的数字越大，加密得到的结果位数越大，结果也越复杂。
 
 MD5 的加密或是SHA 的加密都是不可逆的加密。就是理论上来说，得到的加密结果(一定位数的随机性字符串)是没法反推回真正的值。而由于计算机的发展，可以用计算机进行不断的
@@ -77,7 +77,7 @@ MD5 的加密或是SHA 的加密都是不可逆的加密。就是理论上来说
 所以，MD5的加密方式其实已经不够安全了。如果数据不是安全性很高，可以简单的使用MD5，不然选择SHA256及以上的加密方法，加密效果会更有效。
 不过MD5可以得到随机且几乎不相同的字符串(已经证实MD5中有碰撞)。使用MD5 可以构造不重复的随机字符串。比如用来做数据库的唯一索引等。
 
-######An experimental implementation of HMAC keyed-hashing algorithm
+###### An experimental implementation of HMAC keyed-hashing algorithm
 
 ```ruby
 
