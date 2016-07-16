@@ -69,7 +69,7 @@ mysql提供了多种导入txt文件的条件,如果txt文件是这样的
  3
 
 ```
-    mysql> load data infile '/Users/path/code/say_morning/1000.txt' into table test_products
+    mysql> load data local infile '/Users/path/code/say_morning/1000.txt' into table test_products
         -> lines terminated by'\n'
         -> (id);
 ```
