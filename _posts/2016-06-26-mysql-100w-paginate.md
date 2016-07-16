@@ -50,7 +50,9 @@ ruby -e "(1..1000000).each{|i| puts i.to_s+',good name,1000000,nice product,food
 进入mysql客户端进行导入操作。
 
 ```
- mysql> load data infile 'd.txt' into table tt
+mysql -uroot -p --local-infile
+
+ mysql> load data local infile 'd.txt' into table tt
         -> fields terminated by','
         -> lines terminated by'\n'
  Query OK, 1000000 rows affected (52.86 sec)
@@ -59,8 +61,11 @@ ruby -e "(1..1000000).each{|i| puts i.to_s+',good name,1000000,nice product,food
 
 mysql提供了多种导入txt文件的条件,如果txt文件是这样的
 文件d.txt的内容示例:
+ 
  1
+ 
  2
+ 
  3
 
 ```
@@ -68,6 +73,7 @@ mysql提供了多种导入txt文件的条件,如果txt文件是这样的
         -> lines terminated by'\n'
         -> (id);
 ```
+
 导出到txt文件示例：
 
 ```
