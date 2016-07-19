@@ -27,7 +27,7 @@ rvm use 2.3.0
 rvm list
 rvm use 2.3.0 --default
 rvm remove 2.0.0
-which ruby  # 顯示目前環境使用的 ruby 程式位置
+which ruby  # 显示目前环境使用的ruby位置
 ```
 
 工作原理
@@ -109,6 +109,7 @@ rvm 2.3.0@rails-5.0.0
 ```
 
 清空这个gemset
+
 ```
 rvm gemset empty rails-5.0.0
 ```
