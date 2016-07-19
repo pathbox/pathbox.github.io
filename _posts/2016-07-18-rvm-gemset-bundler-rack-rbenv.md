@@ -20,6 +20,7 @@ Rvm是ruby开发环境的管理工具。能够帮助开发者在不同的ruby版
 不同的项目配不同的开发环境。
 
 基本命令
+
 ```
 rvm install 2.3.0
 rvm use 2.3.0
@@ -30,6 +31,7 @@ which ruby  # 顯示目前環境使用的 ruby 程式位置
 ```
 
 工作原理
+
 ```
 我现在用的是ruby 2.3.0版本
 echo $PATH
@@ -62,7 +64,9 @@ gemsets for ruby-2.3.0 (found in /Users/path/.rvm/gems/ruby-2.3.0)
 => (default)
    global
 ```
+
 上面说明我的gemset是用的 default 并且用的global。
+
 ```
 在我的 /Users/path/.rvm/gems  pwd
 drwxr-xr-x   2 path  staff    68B 10 21  2015 cache
@@ -73,6 +77,7 @@ lrwxr-xr-x   1 path  staff    54B  7  5 09:15 ruby-2.3.0@global -> /Users/path/.
 ```
 
 我进行下面的操作
+
 ```
 rvm gemset create rails-5.0.0
 /Users/path/.rvm/gems 就变成了
@@ -98,6 +103,7 @@ rvm gemset use rails-5.0.0 就是使用这个gemset配置
 互不干扰。
 
 如果你要从別的版本的Ruby直接切换到指定的gemset：
+
 ```
 rvm 2.3.0@rails-5.0.0
 ```
