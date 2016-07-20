@@ -2,16 +2,12 @@
 layout: post
 title: RVM Gemset Bundler Rbenv Rack Capistrano原理总结
 date:   2016-07-18 15:47:06
-categories: Go
+categories: Ruby
 image: /assets/images/post.jpg
 ---
 
 ### RVM Gemset Bundler Rbenv Rack Capistrano原理总结
 
-最近有个面试，面试官问我是否知道RVM Gemset Bundler Rbenv Capistrano 的原理。我当时想，原理，难道是
-具体代码是怎么实现的吗？平时都在用这些工具，不过具体代码如何实现这个真的没有研究过。我回答了：“不知道”。回来后，便开始查
-这些工具的原理是什么，然后，就是有种“原来如此”的感觉。所以，这篇文章就是对这些原理的一个自我总结。并没有从代码层面去分析，而
-只是从他们的功能作用进行总结。
 
 ### RVM
 
@@ -113,6 +109,8 @@ rvm 2.3.0@rails-5.0.0
 ```
 rvm gemset empty rails-5.0.0
 ```
+
+### Rbenv
 
 
 
