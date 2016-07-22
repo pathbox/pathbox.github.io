@@ -7,7 +7,7 @@ tag: ruby
 image: /assets/images/post.jpg
 ---
 
-### ruby 异常处理机制示例
+
 
 ##### 使用异常处理机制会停止本次block代码的执行，但是本次block之后的代码可以继续执行。不使用异常处理，遇到异常时就会停止，并且之后的代码不会执行
 

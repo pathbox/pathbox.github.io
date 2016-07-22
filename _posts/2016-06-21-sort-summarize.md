@@ -6,7 +6,6 @@ categories: algorithm
 image: /assets/images/post.jpg
 ---
 
-### 基本排序的总结
 
 
 ```ruby

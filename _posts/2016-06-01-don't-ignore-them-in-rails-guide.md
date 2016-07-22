@@ -6,5 +6,6 @@ categories: rails
 image: /assets/images/post.jpg
 ---
 
-### Don't ignore them in rails guide
+
+
 还在笔记中，待总结

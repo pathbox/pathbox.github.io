@@ -7,7 +7,7 @@ tag: event
 image: /assets/images/post.jpg
 ---
 
-### Event Loop总结
+
 
 Event Loop是计算机系统的一种运行机制。Javascript就采用这种机制，Nodejs也是采用这种机制，来解决单进程运行时带来的一些问题。
 

@@ -9,8 +9,6 @@ image: /assets/images/post.jpg
 
 
 
-### after_commit vs after_save
-
 在rails中使用after_ 或before_ 的回调方法，能方便的帮我们处理代码逻辑。
 after_save方法：顾名思义就是在save 之后进行操作。
 rails guide中的一句：[after_save runs both on create and update, but always after the more specific callbacks after_create and after_update, no matter the order in which the macro calls were executed.](http://guides.rubyonrails.org/active_record_callbacks.html)

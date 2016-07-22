@@ -6,7 +6,7 @@ categories: rails
 image: /assets/images/post.jpg
 ---
 
-### Processing large CSV files with Ruby(翻译)
+
 
 原文链接： [Processing large CSV files with Ruby](http://dalibornasevic.com/posts/68-processing-large-csv-files-with-ruby)
 

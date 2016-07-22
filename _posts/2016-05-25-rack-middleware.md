@@ -6,7 +6,8 @@ categories: rails
 image: /assets/images/post.jpg
 ---
 
-### 理解rack中间件
+
+
 找到一篇讲解rack中间件的好文章，讲解的通俗易懂。于是便转载过来了。
 
 #### 1. 介绍与原理

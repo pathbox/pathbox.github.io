@@ -6,7 +6,7 @@ categories: rails
 image: /assets/images/post.jpg
 ---
 
-### Hessian in ruby
+
 
 简单介绍:
 Hessian is a binary web service protocol  that makes web services usable without requiring a large framework, and without learning a new set of protocols.

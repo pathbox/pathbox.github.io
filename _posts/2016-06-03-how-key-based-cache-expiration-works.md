@@ -6,7 +6,7 @@ categories: rails
 image: /assets/images/post.jpg
 ---
 
-### How key-based cache expiration works
+
 
 原文链接： [How key-based cache expiration works](https://signalvnoise.com/posts/3113-how-key-based-cache-expiration-works)
 

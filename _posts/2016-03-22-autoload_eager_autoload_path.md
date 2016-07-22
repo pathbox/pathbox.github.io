@@ -7,9 +7,7 @@ tag: rails
 image: /assets/images/post.jpg
 ---
 
-### autoload_paths vs eager_load_paths
 
-<br>
 
 In Ruby you have to require every .rb file in order to have its code run. However, notice how in Rails you never specifically require any of your models, controllers, or other files in the app/ dir. Why is that? That's because in Rails app/* is in autoload_paths. This means that when you run your rails app in development (for example via rails console) — none of the models and controllers are actually required by ruby yet. Rails uses special magical feature of ruby to actually wait until the code mentions a constant, say Book, and only then it would run require 'book'which it finds in one of the autoload_paths. This gives you faster console and server startup in development, because nothing gets required when you start it, only when code actually needs it.
 

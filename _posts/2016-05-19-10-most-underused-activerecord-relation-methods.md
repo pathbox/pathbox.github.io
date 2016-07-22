@@ -9,8 +9,6 @@ image: /assets/images/post.jpg
 
 
 
-## 10 most underused activerecord relation methods(转)
-
 ### 10.first_or_create with a block
 常用的first_or_create:
 

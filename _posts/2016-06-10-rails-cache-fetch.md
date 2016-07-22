@@ -6,7 +6,7 @@ categories: rails
 image: /assets/images/post.jpg
 ---
 
-### Rails的底层cache
+
 
 Rails中使用的缓存方式有很多种，推荐的缓存策略是"俄罗斯套娃缓存"。不过使用这种缓存方式只能缓存html的片段，还是会进行sql查询。
 一种方式，可以直接使用redis，rails中redis的gem也有不少，而且封装的功能足够使用。可以直接操作redis进行数据缓存。

@@ -6,7 +6,6 @@ categories: Ruby
 image: /assets/images/post.jpg
 ---
 
-### RVM Gemset Bundler Rbenv Rack Capistrano原理总结
 
 
 ### RVM

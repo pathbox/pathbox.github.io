@@ -6,7 +6,7 @@ categories: rails
 image: /assets/images/post.jpg
 ---
 
-### 通过class_eval and instance_eval理解单例类
+
 
 ##### 例子1.
 

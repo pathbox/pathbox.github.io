@@ -6,7 +6,7 @@ categories: code warning
 image: /assets/images/post.jpg
 ---
 
-### Record for note
+
 
 只有在数据足够多的情况下,才能最好的暴漏问题。
 所以，数据不多的测试都是耍流氓。

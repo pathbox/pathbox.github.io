@@ -6,7 +6,8 @@ categories: rails
 image: /assets/images/post.jpg
 ---
 
-### The Encryption In Ruby And Rails
+
+
 在一个项目中会有很多数据是需要加密的，以保证数据不会泄露。
 比如: 密码的保存。登入时，cookie保存的值。做支付接口的时候，对参数进行加密后传递等待。
 加密的作用就是为了防止他人得到真实的数据，从而进行一些操作，避免用户或项目受到损失。

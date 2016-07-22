@@ -6,7 +6,7 @@ categories: rails
 image: /assets/images/post.jpg
 ---
 
-### rails中快速插入简单总结
+
 
 > ActiveRecord makes interface to the DB very easy, but it doesn't necessarily make it fast.
 

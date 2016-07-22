@@ -6,7 +6,7 @@ categories: rails
 image: /assets/images/post.jpg
 ---
 
-### rails + grape 快速API简单搭建
+
 
 > grape: An opinionated framework for creating REST-like APIs in Ruby. http://www.ruby-grape.org
 

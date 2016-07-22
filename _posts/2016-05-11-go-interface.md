@@ -9,9 +9,6 @@ image: /assets/images/post.jpg
 
 
 
-### go interface 简单实例分析
-
-
 ```
 
 package main
