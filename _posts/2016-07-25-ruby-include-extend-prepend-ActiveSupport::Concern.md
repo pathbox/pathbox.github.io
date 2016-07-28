@@ -177,6 +177,7 @@ include有一个叫included的钩子，正是通过这个钩子，我们可以�
   end
   # A included in A_include
   # => A_include
+
 ```
 
 included类方法作用域self为Module A，并传入include A的receiver Class A_include。
@@ -184,7 +185,8 @@ included类方法作用域self为Module A，并传入include A的receiver Class 
  ### Mixin的尖兵利器 ActiveSupport::Concern
 
 改造上面的例子
- ```ruby
+
+```ruby
   require 'active_support/concern'
   module ProductInfo
     extend ActiveSupport::Concern
@@ -218,7 +220,7 @@ included类方法作用域self为Module A，并传入include A的receiver Class 
     include ProductInfo
   end
 
- ```
+```
 
 ActiveSupport::Concern 代码解析。
 
@@ -235,9 +237,9 @@ module ActiveSupport
     def self.extended(base) #:nodoc:  当发现 extend ActiveSupport::Concern
       base.instance_variable_set(:@_dependencies, [])  #定义了@_dependencies 数组
     end
+
     #include一个module的时候，会先调用append_features，在调用included，base为外层发起调用的module或class
     def append_features(base)
-      #第一眼真心看不出下面的逻辑是做什么的，后面会写代码说明逻辑
       if base.instance_variable_defined?(:@_dependencies)
         base.instance_variable_get(:@_dependencies) << self
         return false
@@ -262,7 +264,7 @@ module ActiveSupport
         super
       end
     end
-    
+
     def class_methods(&class_methods_module_definition)
       mod = const_defined?(:ClassMethods, false) ?
         const_get(:ClassMethods) :
