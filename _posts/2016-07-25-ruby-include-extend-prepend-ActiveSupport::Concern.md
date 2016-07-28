@@ -1,6 +1,6 @@
 ---
 layout: post
-title: include extend prepend ActiveSupport::Concern(Mixin)总结
+title: include extend prepend ActiveSupport::Concern(Mixin)
 date:   2016-07-25 12:13:06
 categories: Ruby
 image: /assets/images/post.jpg
