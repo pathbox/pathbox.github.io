@@ -182,7 +182,7 @@ include有一个叫included的钩子，正是通过这个钩子，我们可以�
 
 included类方法作用域self为Module A，并传入include A的receiver Class A_include。
 
- ### Mixin的尖兵利器 ActiveSupport::Concern
+### Mixin的尖兵利器 ActiveSupport::Concern
 
 改造上面的例子
 
@@ -233,7 +233,8 @@ module ActiveSupport
         super "Cannot define multiple 'included' blocks for a Concern"
       end
     end
-    #扩展这个module的时候注意使用extend，而不是include
+    # 扩展这个module的时候注意使用extend，而不是include
+    # 如果当前类extend了ActiveSupport::Concern,则@_dependencies会被定义。
     def self.extended(base) #:nodoc:  当发现 extend ActiveSupport::Concern
       base.instance_variable_set(:@_dependencies, [])  #定义了@_dependencies 数组
     end
@@ -241,10 +242,12 @@ module ActiveSupport
     #include一个module的时候，会先调用append_features，在调用included，base为外层发起调用的module或class
     def append_features(base)
       if base.instance_variable_defined?(:@_dependencies)
+        # 这里判断当前类(base)是否定义了@_dependencies，如果被定义，则把当前module加入@_dependencies。怎么说呢？
         base.instance_variable_get(:@_dependencies) << self
         return false
       else
         return false if base < self
+        # 模块通过依赖加载
         @_dependencies.each { |dep| base.send(:include, dep) }
         #base 就是include ActiveSupport::Concern module的class或module。这里相当于 base 从@_dependencies数组中，逐个include 对象。比如: include 其中定义的各种module
         super
@@ -276,6 +279,8 @@ module ActiveSupport
 end
 
 ```
+
+append_features也是module的一个callback，会在include之后，为当前class添加module的变量，常量，方法等。append_features 会先与included 被调用，详见：[append_features](http://www.thecodingforums.com/threads/append_features-vs-include.834205/)
 
 Reference: https://ruby-china.org/topics/21501
            https://ruby-china.org/topics/26208
