@@ -195,7 +195,7 @@ prepend 与 include 类似，首先都是添加实例方法的，不同的是扩
        end
 
       #  include InstanceMethods
-     end
+   end
 
      module ClassMethods
        include ProductInfo::InstanceMethods
