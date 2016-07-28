@@ -116,9 +116,77 @@ prepend 与 include 类似，首先都是添加实例方法的，不同的是扩
 
 ```
 
+### 多个include加载
+
+```ruby
+  module One
+    def my_method
+      "Here is One"
+    end
+  end
+  module Two
+    def my_method
+      "Here is Two"
+    end
+  end
+  module Three
+    def my_method
+      "Here is Three"
+    end
+  end
+  module Four
+    def my_method
+      "Here is Four"
+    end
+  end
+
+  class Num
+    include One
+    include Two
+    include Three
+  end
+  Num.new.my_method
+  # "Here is Three"
+  Num.ancestors
+  # Num
+  # Three
+  # Two
+  # One
+  # Object
+  # Kernel
+  # BasicObject
+
+  # include 是栈结构的加载，”后进先出”。所以，最后被include的 Three会先被查找。想起了before_action
+  # 是 队列 结构的加载，最先的 before_action 条件会先被执行
+
+  class Num
+    prepend Four
+    include One
+    include Two
+    include Three
+  end
+
+  Num.new.my_method
+  # "Here is Three"
+  Num.ancestors
+  # Four
+  # Num
+  # Three
+  # Two
+  # One
+  # Object
+  # Kernel
+  # BasicObject
+
+  # 由于 Four 是 prepend的加载，所以，无论prepend Four的顺序如何，总是第一个被查找
+
+```
+
+
 ### Ruby没有interface，but 我们有 Mixin
 
- ```ruby
+```ruby
+
    module ProductInfo
      def self.included(base)
        base.extend ClassMethods
