@@ -350,6 +350,10 @@ end
 
 append_features也是module的一个callback，会在include之后，为当前class添加module的变量，常量，方法等。append_features 会先与included 被调用，详见：[append_features](http://www.thecodingforums.com/threads/append_features-vs-include.834205/)
 
-Reference: https://ruby-china.org/topics/21501
-           https://ruby-china.org/topics/26208
-           https://github.com/rails/rails/blob/master/activesupport/lib/active_support/concern.rb
+Reference:
+
+  https://ruby-china.org/topics/21501
+
+  https://ruby-china.org/topics/26208
+
+  https://github.com/rails/rails/blob/master/activesupport/lib/active_support/concern.rb
