@@ -70,6 +70,9 @@ ruby方法调用中的lookup:
 
 ```
 
+关于include module背后的原理，这篇文章还是讲的很清楚的:
+
+https://ruby-china.org/topics/30378
 
 
 ### prepend and include
