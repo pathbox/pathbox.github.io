@@ -70,6 +70,24 @@ ruby方法调用中的lookup:
 
 ```
 
+```ruby
+module MyModule
+  def my_method
+    "hello"
+  end
+end
+
+class MyClass
+  class << self
+    include MyModule
+  end
+end
+
+MyClass.method  #=> "hello"
+```
+
+上面简单演示了通过ｉｎｃｌｕｄｅ来扩展类方法，但这种方法一般不使用
+
 关于include module背后的原理，这篇文章还是讲的很清楚的:
 
 https://ruby-china.org/topics/30378
