@@ -70,24 +70,6 @@ ruby方法调用中的lookup:
 
 ```
 
-```ruby
-module MyModule
-  def my_method
-    "hello"
-  end
-end
-
-class MyClass
-  class << self
-    include MyModule
-  end
-end
-
-MyClass.method  #=> "hello"
-```
-
-上面简单演示了通过ｉｎｃｌｕｄｅ来扩展类方法，但这种方法一般不使用
-
 关于include module背后的原理，这篇文章还是讲的很清楚的:
 
 https://ruby-china.org/topics/30378
@@ -245,16 +227,17 @@ prepend 与 include 类似，首先都是添加实例方法的，不同的是扩
    puts Shop.provider  #=>  "I am a provider"
    puts shop.price     #=>  "100.00"
    puts shop.desc      #=>  "Here are desc for product"
-
  ```
 
- 这里有两种方法定义实例方法。一种直接定义实例方法，入方法 desc。 另一种，在module InstanceMethods
- 中定义实例方法，然后在def self.included(base) 中加载 “base.include InstanceMethods”,或者是
- 在ClassMethods中 include ProductInfo::InstanceMethods 加载。这样 price方法就会被Shop加载为实例方法。
+
+这里有两种方法定义实例方法。一种直接定义实例方法，入方法 desc。 另一种，在module InstanceMethods
+中定义实例方法，然后在def self.included(base) 中加载 “base.include InstanceMethods”,或者是在ClassMethods中 include ProductInfo::InstanceMethods 加载。这样 price方法就会被Shop加载为实例方法。
 
 include有一个叫included的钩子，正是通过这个钩子，我们可以用include实现添加类方法和实例方法。我们来看看included这个钩子到底做了什么：
 
+
 ```ruby
+
   module A
     def self.included(mod)
       puts "#{self} included in #{mod}"
