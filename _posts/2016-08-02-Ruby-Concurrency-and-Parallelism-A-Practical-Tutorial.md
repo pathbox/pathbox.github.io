@@ -93,3 +93,105 @@ puts Benchmark.measure{
 
 图
 
+用多进程的Ruby解决方案实例：
+
+Resque：一个基于redis存储的Ruby库，用于创建后台job任务，把jobs任务放入多个队列，然后执行。
+
+Unicorn： 用于服务Rack 应用的HTTP服务器。能服务快速的客户端，特点是低延迟，高带宽的连接，在Unix-like核心服务器上有不错的性能
+
+用多线程的Ruby解决方案实例：
+
+Sidekiq：一个全功能的后台处理Ruby框架。它的目标是简单的与任何现代Rails应用程序集成和更高的性能比其他现有的解决方案
+
+Puma：一个支持并发的Ruby web服务器。
+
+Thin：一个快速简单的Ruby web服务器。
+
+### 多进程
+
+在我们看着Ruby多线程选择之前,让我们探索简单生成多进程的方法。
+
+在Ruby中，fork() 系统调用是用于创建一个当前进程的“复制”。这个新的进程将在操作系统级别，所以它可以并发运行与
+原来的程序，就像任何其他的独立过程。(注意： fork()是一个POSIX系统调用，因此在windows平台是不可用的)
+
+OK，让我们运行测试例子，但是 这次用fork()去启动多进程：
+
+```ruby
+puts Benchmark.measure{
+  100.times do |i|
+    fork do     
+      Mailer.deliver do 
+        from    "eki_#{i}@eqbalq.com"
+        to      "jill_#{i}@example.com"
+        subject "Threading and Forking (#{i})"
+        body    "Some content"
+      end
+    end
+  end
+  Process.waitall
+}
+```
+Process.waitall 等待所有的子进程退出和返回进程状态的数组。
+
+代码执行结果：
+
+```ruby
+	0.000000   0.030000  27.000000 (  3.788106)
+```
+不是太寒酸!我们使Mailer快了5倍,只需要修改几行代码(即：使用fork())。
+
+不要过于兴奋。虽然尝试使用forking 是一个简单的Ruby并发解决方式，但是它有意个主要的缺陷是：
+这样消耗的内存数量。使用fork有点昂贵，特别是一个一个 Copy-on-Write 不是利用你的Ruby解释器。
+如果你的app应用使用20mb的内存，fork 100次，就需要消耗2GB的内存！
+
+### Ruby的多线程
+
+OK，现在让我们尝试用Ruby的多线程技术来处理这个程序。
+
+多个线程在一个过程开销大大低于相应数量的进程因为他们共享地址空间和内存
+
+考虑到这一点,让我们重新审视我们的测试用例,但这一次使用Ruby的线程类:
+
+```ruby
+threads = []
+
+puts Benchmark.measure{
+  100.times do |i|
+    threads << Thread.new do     
+      Mailer.deliver do 
+        from    "eki_#{i}@eqbalq.com"
+        to      "jill_#{i}@example.com"
+        subject "Threading and Forking (#{i})"
+        body    "Some content"
+      end
+    end
+  end
+  threads.map(&:join)
+}
+```
+
+代码执行结果：
+
+```
+13.710000   0.040000  13.750000 ( 13.740204)
+```
+
+这肯定不是令人印象深刻!那么发生了什么?为什么这个生产几乎相同的结果正如我们当我们跑了代码同步?
+
+答案,存在许多Ruby程序员的克星，全局解释器锁(GIL)。由于GIL，CRuby(MRI实现)并不支持并行线程。
+
+全局解释器锁是一种机制中使用计算机语言翻译同步线程的执行这一次只有一个线程可以执行。解释器使用GIL将
+允许在某个时刻只有一个线程在执行。即使是在多核处理器上运行。Ruby MRI和CPython的两个最常见的例子是流行的解释器,，拥有GIL。
+回到我们的问题,我们如何利用多线程在Ruby中提高性能的GIL?
+
+在MRI(CRuby)，不幸的答案是,基本上你只能有很少的,多线程可以为你做的。
+
+Ruby并发没有并行性仍然可以是非常有用的，虽然，对于IO密集型任务。所以，线程任然是有用的在MRI中，用于IO-heavy任务。
+显存是有原因的，毕竟，发明和使用多核服务器之前就很常见。
+
+但说,如果你选择使用成为CRuby以外的一个版本,您可以使用另一个Ruby实现,例如JRuby或Rubinius,因为他们没有一个GIL和真正支持Ruby线程并行。
+
+图
+
+### 线程不是安全的
+
