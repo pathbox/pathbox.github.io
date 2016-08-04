@@ -193,5 +193,187 @@ Ruby并发没有并行性仍然可以是非常有用的，虽然，对于IO密�
 
 图
 
-### 线程不是安全的
+### 线程不是免费的
 
+提高性能的多个线程可能会让人相信我们可以继续添加更多的线程-基本上无限继续使我们的代码运行得越来越快。
+这确实会好如果它是真的,但现实是,线程不是免费的,迟早,你会耗尽资源。
+
+例如,我们想要运行示例Mailer不是100次,10000次。让我们看看会发生什么:
+
+```ruby
+threads = []
+
+puts Benchmark.measure{
+  10_000.times do |i|
+    threads << Thread.new do     
+      Mailer.deliver do 
+        from    "eki_#{i}@eqbalq.com"
+        to      "jill_#{i}@example.com"
+        subject "Threading and Forking (#{i})"
+        body    "Some content"
+      end
+    end
+  end
+  threads.map(&:join)
+}
+```
+
+Boom!我在OS X 10.8系统下有一个错误当产生了2000个线程:
+
+```
+can't create Thread: Resource temporarily unavailable (ThreadError)
+```
+
+正如预期的那样,迟早我们开始抖动或完全耗尽资源。所以这种方法的可伸缩性显然是有限的。
+
+### 线程池
+幸运的是,有一个更好的办法,即线程池
+
+线程池是一组预先实例化可重用线程可用来执行工作。线程池尤其有用,当有大量的短期任务要执行,而不是一个小数量的时间任务。
+这可以防止不得不承担创建一个线程的多次创建的开销。
+
+池递给一个任务执行时,它分配任务当前的空闲线程。如果没有空闲线程(并且已经创建的线程的最大数量)它等待一个线程完成工作并成为空闲线程,
+然后分配任务。
+
+图
+
+回到我们的例子中,我们将首先使用队列(因为它是线程安全的数据类型)和使用一个简单的线程池的实现:
+
+```ruby
+POOL_SIZE = 10
+
+jobs = Queue.new
+
+10_0000.times{ |i| jobs.push i}
+
+workers = (POOL_SIZE).times.map do
+	Thread.new do
+		begin
+			while x = jobs.pop(true)
+				Mailer.deliver do
+					from    "eki_#{x}@eqbalq.com"
+          to      "jill_#{x}@example.com"
+          subject "Threading and Forking (#{x})"
+          body    "Some content"
+        end
+      end
+    rescue ThreadError
+    end
+	end
+end
+
+workers.map(&:join)
+```
+
+在上面的代码中,我们开始通过创建一个工作队列需要执行的工作。
+为此我们使用队列因为它是线程安全的(如果多个线程同时访问它,它将保持一致性),
+避免了需要一个更复杂的实现需要使用互斥锁。
+
+之后我们把邮件的IDs 放入jobs 队列，和创建了10个worker线程。
+
+在每个worker线程中，我们从jobs队列中pop取出每个item
+
+因此,一个工作线程的生命周期不断等待任务放入作业队列并执行。
+
+好消息是，这个工作和扩展没有任何问题。不幸的是，虽然这是相当复杂的，即使对于我这个简单的教程。
+
+### Celluloid
+
+多亏了Ruby Gem 的生态系统，很多复杂的多线程被封装在了一个易于使用的Ruby Gem中，而且开箱即用。
+
+一个很好的例子是Celluloid,我最喜欢的一个ruby gems。赛璐珞框架是一个基于actor，在Ruby中简单干净地方法来实现并发系统。
+Celluloid使人们构建并发程序的并发对象一样容易他们建造顺序程序的顺序对象
+
+在我们的讨论的背景下在这篇文章中,我特别关注池功能,但帮自己一个忙,更详细地检查一下。
+使用赛璐珞你将能够构建多线程Ruby程序而不用担心讨厌的死锁问题,你会发现它容易使用其他更复杂的功能,如期货和承诺。
+
+这里就是简单的多线程版本的Mailer使用赛璐珞程序:
+
+```ruby
+require "./lib/mailer"
+require "benchmark"
+require "celluloid"
+
+class MailWorker
+  include Celluloid
+
+  def send_email(id)
+    Mailer.deliver do 
+      from    "eki_#{id}@eqbalq.com"
+      to      "jill_#{id}@example.com"
+      subject "Threading and Forking (#{id})"
+      body    "Some content"
+    end       
+  end
+end
+
+mailer_pool = MailWorker.pool(size: 10)
+10_0000.times do |i|
+	mailer_pool.async.send_email(i)
+end
+```
+
+干净，简单，可扩展和健壮的。你还想要什么？
+
+### Background Jobs
+
+当然,另一个潜在可行的选择,这取决于您的业务需求和约束将雇佣背景的工作。许多Ruby Gems支持后台处理(即存在。在一个队列,节省工作和处理以后没有阻塞当前线程)。
+著名的例子包括Sidekiq,Resque,Delayed Job,Beanstalkd。
+
+在这篇文章中,我将使用Sidekiq和redis(一个开源的键值缓存和存储)。
+
+```ruby
+	require_relative "../lib/mailer"
+  require "sidekiq"
+
+  class MailWorker
+  	include Sidekiq::Worker
+
+  	def perform(id)
+	    Mailer.deliver do 
+	      from    "eki_#{id}@eqbalq.com"
+	      to      "jill_#{id}@example.com"
+	      subject "Threading and Forking (#{id})"
+	      body    "Some content"
+	    end  
+	  end
+	end
+```
+
+我们可以触发Sidekiq mail_worker.rb文件:
+
+```
+sidekiq  -r ./mail_worker.rb
+```
+
+And then from IRB:
+
+```
+⇒  irb
+>> require_relative "mail_worker"
+=> true
+>> 100.times{|i| MailWorker.perform_async(i)}
+2014-12-20T02:42:30Z 46549 TID-ouh10w8gw INFO: Sidekiq client with redis options {}
+=> 100
+```
+
+这可不简单。它可以很容易通过改变工人的数量规模。
+
+另一个选择是使用SuckerPunch,我最喜欢的一个异步RoR处理库。实现使用出其不意将是非常相似的。
+我们只需要包括SuckerPunch::工作而不是Sidekiq::Worker,MailWorker.new.async.perform(),
+而MailWorker.perform_async()。
+
+### 结论
+
+在Ruby高并发性不仅是可行的,而且比你想象的简单。
+
+一个可行的方法是简单地叉一个运行的进程将其处理能力。另一种方法是利用多线程。虽然线程更轻比进程,需要较少的开销,你仍然可以耗尽的资源如果你开始同时太多的线程。
+在某种程度上,你可能会发现有必要使用一个线程池。
+幸运的是,许多复杂的多线程更容易利用任何可用的Ruby,如Celluloid和Actor模型。
+
+处理耗时的过程的另一种方法是通过使用后台处理。
+有很多库和服务,允许您在应用程序中实现后台作业。一些流行的工具包括数据库支持的工作框架和消息队列。
+
+分叉、线程和后台处理都是可行的选择。
+决定使用哪一个取决于您的应用程序的本质,你的操作环境,和要求。
+希望本教程提供了一个有用的介绍可用的选项。
