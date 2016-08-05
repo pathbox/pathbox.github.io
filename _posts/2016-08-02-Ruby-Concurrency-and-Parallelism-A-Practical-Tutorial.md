@@ -10,7 +10,7 @@ image: /assets/images/post.jpg
 不过,这并不意味着他们都是运行在同一瞬间(比如：多个线程在单核机上运行)
 与此形成鲜明对比的是，并行是指：两个任务运行在相同的时间。(比如：多线程运行在多核心的处理器上)
 
-图
+![1]( /assets/images/20160802/1.png "Optional title")
 
 这个关键点是并发的线程或进程不是必须的要并行的运行。
 本教程提供了一个实用的(而不是理论)在Ruby中适用的各种技术和方法可用于并发和并行性。
@@ -91,7 +91,7 @@ puts Benchmark.measure{
 ### Multiple Processes vs. Multithreading
 没有“一刀切”答案的时候决定是否使用多个进程或者Ruby应用程序多流。下面的表总结了需要考虑的一些关键因素
 
-图
+![2]( /assets/images/20160802/2.png "Optional title")
 
 用多进程的Ruby解决方案实例：
 
@@ -191,7 +191,7 @@ Ruby并发没有并行性仍然可以是非常有用的，虽然，对于IO密�
 
 但说,如果你选择使用成为CRuby以外的一个版本,您可以使用另一个Ruby实现,例如JRuby或Rubinius,因为他们没有一个GIL和真正支持Ruby线程并行。
 
-图
+![3]( /assets/images/20160802/3.jpg "Optional title")
 
 ### 线程不是免费的
 
@@ -235,7 +235,7 @@ can't create Thread: Resource temporarily unavailable (ThreadError)
 池递给一个任务执行时,它分配任务当前的空闲线程。如果没有空闲线程(并且已经创建的线程的最大数量)它等待一个线程完成工作并成为空闲线程,
 然后分配任务。
 
-图
+![4]( /assets/images/20160802/4.jpg "Optional title")
 
 回到我们的例子中,我们将首先使用队列(因为它是线程安全的数据类型)和使用一个简单的线程池的实现:
 
