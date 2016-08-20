@@ -6,6 +6,8 @@ categories: Rails
 image: /assets/images/post.jpg
 ---
 
+
+
 这是一篇在Ruby和Rails中使用代理模式各种方法的总结文章。
 
 ##### delegate in Ruby
@@ -65,7 +67,9 @@ end
 现在，使用了: delegate :name, to: :user, prefix: true, allow_nil: true
 @blog可以直接调用: @blog.user_name 就表示@blog.user.name 。这就是delegate 的作用。
 
+
 再看下面的例子:
+
 ```ruby
 class Greeter < ActiveRecord::Base
   def hello
@@ -86,6 +90,7 @@ Foo.new.hello   # => "hello"
 Foo.new.goodbye # => NoMethodError: undefined method `goodbye' for #<Foo:0x1af30c>
 
 ```
+
 按照道理来说， Foo 没有定义hello 实例方法， 而Foo.new.hello 确没有报错。这就是delegate的作用了。
 
 其实 Foo.new.hello 等价于 Foo.new.greeter.hello。 调用的正式Greeter的 hello 实例方法。
@@ -99,6 +104,7 @@ delegate :name, :address, to: :client, prefix: :customer
 就变为 @blog.customer_name、@blog.customer_address
 
 OK，我们继续看例子：
+
 ```ruby
 class Foo
   CONSTANT_ARRAY = [0,1,2,3]
@@ -142,3 +148,155 @@ Foo.new.hello # => "world"
 
 ```
 还能直接代理类方法。
+
+Struct的例子
+
+```ruby
+Person = Struct.new(:name, :address)
+# => Person
+class Invoice < Struct.new(:client)
+ delegate :name, :address, :to => :client
+end
+#=> [:name, :address]
+john_doe = Person.new("John Doe", "Vimmersvej 13")
+#=> #<struct Person name="John Doe", address="Vimmersvej 13">
+invoice = Invoice.new(john_doe)
+#=> #<struct Invoice client=#<struct Person name="John Doe", address="Vimmersvej 13"invoice.name
+#=> John Doe
+invoice.address
+#=>Vimmersvej 13
+```
+
+##### Forwardable
+
+```ruby
+require 'forwardable'
+
+class RecordCollection
+  attr_accessor :records
+  extend Forwardable
+  def_delegator :@records, :[], :record_number
+  def_delegator :@records, :sum, :my_sum
+  def_delegators :@records, :sum
+end
+
+r = RecordCollection.new
+r.records = [4,5,6]
+r.record_number(0)  # => 4
+r.my_sum # => 15
+r.sum # => NoMethodError: undefined method `sum' for #<RecordCollection:0x0000000dc3ee90 @records=[4, 5, 6]>
+
+```
+
+r 为 RecordCollection 的实例。RecordCollection的实例有一个属性 records.
+
+```ruby
+  def_delegator :@records, :[], :record_number
+  def_delegator :@records, :sum, :my_sum
+```
+这样就表示， 对records(@records)这个属性的[]、sum 的方法分别用 record_number、my_sum代替表示。原方法表示去除。
+所以就出现了：
+
+```ruby
+r.sum # => NoMethodError: undefined method `sum' for #<RecordCollection:0x0000000dc3ee90 @records=[4, 5, 6]>
+```
+如果我们也不想让 sum方法被my_sum 代替而去除。 想要sum 和 my_sum两个方法都能起作用，ruby页考虑道了这点。
+
+```ruby
+
+require 'forwardable'
+
+class RecordCollection
+  attr_accessor :records
+  extend Forwardable
+  def_delegator :@records, :[], :record_number
+  def_delegator :@records, :sum, :my_sum
+  def_delegators :@records, :sum
+end
+
+r = RecordCollection.new
+r.records = [4,5,6]
+r.record_number(0)  # => 4
+r.my_sum # => 15
+r.sum # => 15
+
+```
+
+用def_delegators 将sum方法 加回来就可以了。
+
+官方另一个例子：
+
+```ruby
+
+class Queue
+  extend Forwardable
+
+  def initialize
+    @q = [ ]    # prepare delegate object
+  end
+
+  # setup preferred interface, enq() and deq()...
+  def_delegator :@q, :push, :enq
+  def_delegator :@q, :shift, :deq
+
+  # support some general Array methods that fit Queues well
+  def_delegators :@q, :clear, :first, :push, :shift, :size
+end
+
+q = Queue.new
+q.enq 1, 2, 3, 4, 5
+q.push 6
+
+q.shift    # => 1
+while q.size > 0
+  puts q.deq
+end
+
+q.enq "Ruby", "Perl", "Python"
+puts q.first
+q.clear
+puts q.first
+
+```
+
+##### delegate method form rails API documentation
+
+```ruby
+class Module
+  # Delegate method
+  # It expects an array of arguments that contains the methods to be delegated
+  # and a hash of options
+  def delegate(*methods)
+    # Pop up the options hash from arguments array
+    options = methods.pop
+    # Check the availability of the options hash and more specifically the :to option
+    # Raises an error if one of them is not there
+    unless options.is_a?(Hash) && to = options[:to]
+      raise ArgumentError, "Delegation needs a target. Supply an options hash with a :to key as the last argument (e.g. delegate :hello, :to => :greeter)."
+    end
+
+    # Make sure the :to option follows syntax rules for method names
+    if options[:prefix] == true && options[:to].to_s =~ /^[^a-z_]/
+      raise ArgumentError, "Can only automatically set the delegation prefix when delegating to a method."
+    end
+
+    # Set the real prefix value
+    prefix = options[:prefix] && "#{options[:prefix] == true ? to : options[:prefix]}_"
+
+   # Here comes the magic of ruby :)
+   # Reflection techniques are used here:
+   # module_eval is used to add new methods on the fly which:
+   # expose the contained methods' objects
+    methods.each do |method|
+      module_eval("def #{prefix}#{method}(*args, &block)\n#{to}.__send__(#{method.inspect}, *args, &block)\nend\n", "(__DELEGATION__)", 1)
+    end
+  end
+end
+```
+
+links：
+
+```
+http://ruby-doc.org/stdlib-2.3.1/libdoc/forwardable/rdoc/Forwardable.html
+http://blog.khd.me/ruby/delegation-in-ruby/
+```
