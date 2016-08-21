@@ -3,7 +3,7 @@ layout: post
 title: Delegation in Ruby and Rails
 date:   2016-08-20 10:35:06
 categories: Rails
-image: /assets/images/post.jpg
+image: /assets/images/top/20150322.jpg
 ---
 
 
