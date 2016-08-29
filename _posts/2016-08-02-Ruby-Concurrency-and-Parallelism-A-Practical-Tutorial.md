@@ -3,7 +3,7 @@ layout: post
 title: Ruby Concurrency and Parallelism A Practical Tutorial(翻译)
 date:   2016-08-02 21:30:06
 categories: Ruby
-image: /assets/images/post.jpg
+image: /assets/images/top/20150404.jpg
 ---
 
 特别的，Ruby并发指的是：两个任务可以在重叠的时间段启动、运行和完成。
@@ -27,7 +27,7 @@ image: /assets/images/post.jpg
     mail.send_mail
   end
 
-  Mail = Struct.new(:from, :to, :subject, :body) do 
+  Mail = Struct.new(:from, :to, :subject, :body) do
     def send_mail
       fib(30)
       puts "Email from: #{from}"
@@ -46,7 +46,7 @@ image: /assets/images/post.jpg
       @mail = Mail.new
       instance_eval(&block)
     end
-    
+
     attr_reader :mail
 
     %w(from to subject body).each do |m|
@@ -61,7 +61,7 @@ end
 我们可以调用这个 Mailer类发送邮件如下:
 
 ```ruby
-Mailer.deliver do 
+Mailer.deliver do
   from    "eki@eqbalq.com"
   to      "jill@example.com"
   subject "Threading and Forking"
@@ -73,7 +73,7 @@ end
 ```ruby
 puts Benchmark.measure{
   100.times do |i|
-    Mailer.deliver do 
+    Mailer.deliver do
       from    "eki_#{i}@eqbalq.com"
       to      "jill_#{i}@example.com"
       subject "Threading and Forking (#{i})"
@@ -120,7 +120,7 @@ OK，让我们运行测试例子，但是 这次用fork()去启动多进程：
 puts Benchmark.measure{
   100.times do |i|
     fork do     
-      Mailer.deliver do 
+      Mailer.deliver do
         from    "eki_#{i}@eqbalq.com"
         to      "jill_#{i}@example.com"
         subject "Threading and Forking (#{i})"
@@ -158,7 +158,7 @@ threads = []
 puts Benchmark.measure{
   100.times do |i|
     threads << Thread.new do     
-      Mailer.deliver do 
+      Mailer.deliver do
         from    "eki_#{i}@eqbalq.com"
         to      "jill_#{i}@example.com"
         subject "Threading and Forking (#{i})"
@@ -206,7 +206,7 @@ threads = []
 puts Benchmark.measure{
   10_000.times do |i|
     threads << Thread.new do     
-      Mailer.deliver do 
+      Mailer.deliver do
         from    "eki_#{i}@eqbalq.com"
         to      "jill_#{i}@example.com"
         subject "Threading and Forking (#{i})"
@@ -298,7 +298,7 @@ class MailWorker
   include Celluloid
 
   def send_email(id)
-    Mailer.deliver do 
+    Mailer.deliver do
       from    "eki_#{id}@eqbalq.com"
       to      "jill_#{id}@example.com"
       subject "Threading and Forking (#{id})"
@@ -330,7 +330,7 @@ end
   	include Sidekiq::Worker
 
   	def perform(id)
-	    Mailer.deliver do 
+	    Mailer.deliver do
 	      from    "eki_#{id}@eqbalq.com"
 	      to      "jill_#{id}@example.com"
 	      subject "Threading and Forking (#{id})"
