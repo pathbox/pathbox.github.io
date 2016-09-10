@@ -33,3 +33,7 @@ git 的rebase　操作就较好的解决了merge操作带来的分支混乱的�
 git rebase xxx　也会带来冲突，这时往往需要解决冲突,　git add .之后，进行git rebase --continue 操作，如果不想git rebase 了，就git rebase --abort进行中断。git rebase 操作后经常需要强push,也就是　git push -f 。这个操作会带来的后果是，会覆盖之前的代码。如果有人的分支和远端分支不一样，被另一个人强推操作到该分支后，很可能会导致其提交的丢失。而merge操作则可以不带来强推导致某个提交丢失的问题。merge的逻辑很简单，合并，有冲突解决冲突，提交代码，形成新的提交，不会把之前的提交丢失。(至少在我的使用中，没出现commit丢失的情况，而rebase出现过)
 
 git cherry-pick 真的是个很好用，很灵活的合并方法。它不是要合并分支，而是合并某次commit的代码。这样就更不会担心某个分支之前代码的不同，而只选择某次commit，取其合并。合并的粒度更小，也许就避免了之前分支中代码的干扰。git cherry-pick　就是这样的作用。
+
+git reflog 可以查看git 操作行为的日志.
+
+可以看见commit 有HEAD@{n}这样的标记。你可以利用这个标记，进行代码的回退
