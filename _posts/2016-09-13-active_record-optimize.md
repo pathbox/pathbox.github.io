@@ -56,6 +56,16 @@ first其实用到了order by　id　没用到company_id,email的联合索引,而
 count(*) 通常比count(id) 的效果在各种情况下更好。 count(*) from tables 效率最高， count(*) from tables where 会进行全表扫描，
 所以最好给where 的字段建立索引。在本次优化中就遇到这种情况，加上联合索引后，原本需要6秒的count操作只需要0.1秒了
 
+##### count group by 的复杂查询
+C.where(o_g_id: o_g_ids,
+         c_id: c.id,
+         deleted: 0)
+  .group(:o_g_id)
+  .count
+SELECT COUNT( * ) AS count_all, o_g_id AS o_g_id FROM `cs` WHERE `c`.`o_g_id` IN (1, 3, 1731, 9860, 9929, 15805, 15806, 15810, 15937, 15940, 15941, 15942, 15946, 15997, 16007, 19453, 19519, 19732, 20603, 20946, 20956, 22279, 23697, 25003, 25009, 25018, 25170, 26086, 26289, 26655, 26656, 27507, 28301) AND `cs`.`c_id` = 26 AND `cs`.`deleted` = 0 GROUP BY o_g_id
+
+为 c_id, deleted, o_g_id 加上联合索引，这样优化就非常明显了。直接原来需要5秒的查询变为了0.6秒
+
 ##### 另一种思路的比较，尽量让MySQL做更多事情，而不是转为数组
 
 > 有一个查询是这样的 if　cs.pluck(:email).uniq.include? email
@@ -74,5 +84,15 @@ present? 方法还可以用　exists?代替
 
 这次优化过程，我受益匪浅。在早期数据量不大的情况下，一切都很正常。只有当数据量大的时候，才能暴露更多的问题。真的别说ActiveRecord慢，你的项目真的到了需要完全不用ORM而手写sql语句才能有好的性能的时候，我想，那时候你的项目需要的是架构上的重构了吧，比如使用更多的集群，使用哪种集群的架构，使用哪种数据库等等。我不能说ActiveRecord真是快，ActiveRecord存在的意义也不是为了快，而是为了便捷。
 但是，ActiveRecord不慢，而是你的使用姿势不正确罢了(说白了，就是你功底差，写的查询都是xxx)
+
+##### 关于联合索引
+where条件的顺序是不重要的，可以认为是无序的。mysql会寻找最优的索引进行查询。关键的是联合索引的顺序要满足创建索引条件的规则。举个例子:
+
+```
+where("a = 1 and c > 2 and b = 3 ")
+```
+
+index(a,b,c) 和index(a,c,b) 这两个索引，能够使用到index(a,b,c) 而索引 index(a,c,b) 其实相当于使用到了index(a,c) b条件并不会在索引中使用到。因为 > 条件会终止查找后面条件的索引。
+
 
 优化仍在继续，将继续积累总结
