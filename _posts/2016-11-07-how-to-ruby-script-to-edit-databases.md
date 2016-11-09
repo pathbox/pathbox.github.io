@@ -31,6 +31,7 @@ image: /assets/images/post.jpg
 四、让脚本可以重复运行
 
   尽量让脚本可以重复运行。即使加入额外的find或者find_or_create_by查询。或者捕获异常，而不是让异常中断操作。不要使用清空数据库的方式，因为这样需要从0条记录开始跑，所需要的时间更长。
+  脚本重复运行要注意的是，避免每次的重复运行增加脏数据
 
 五、使用find_each 或 find_in_batches
 
@@ -67,7 +68,7 @@ Company.find_each do |company|
 end
 
 progressbar.log "=== 初始化完毕 ==="
-User.where(p: ['A','UG']).update_all(creator: '管理员')
+User.where(p: ['A','UG']).update_all(status: true)
 ```
 
 代码示例小结:
@@ -123,7 +124,7 @@ end
 
 User.where(p: ['A','UG']).find_each do |user|
   begin
-    user.update!(creator: '管理员')
+    user.update!(status: true)
   rescue => e
     puts e
     update_user_error << user.id
@@ -152,4 +153,4 @@ error: error_user: []; error_company: []
 也许在本地或测试环境你的脚本运行的没有问题，但是，线上的数据数量往往是本地和测试环境的n倍，并且已经有很多隐藏的脏数据，各种奇妙的事情都有可能发生。即使是在半夜运行脚本，
 能够预先做更多的准备对应出现的异常情况，也能更快的找到问题的所在。
 
-祝君好运，准备下一次的项目升级                             
+准备下一次的项目升级                             
