@@ -93,3 +93,15 @@ a = ActionController::Parameters.new({"a"=> 1})
 ##### 我的坑
 字段field 用了 serialize :field, Hash
 前端传值的时候是传的 ActionController::Parameters, 而更改字段值的时候有可能用的是Hash，导致有的记录 field是ActionController::Parameters，有的是hash都用 ["a"] 这样取值的话，就不会有错了
+
+##### 补充 使用 HashWithIndifferentAccess
+
+```ruby
+
+a = {"key" => "keyword"}
+b = HashWithIndifferentAccess.new(a)
+b.class #=>  ActiveSupport::HashWithIndifferentAccess
+b[:key] #=> "keyword"
+b["key"] #=> "keyword"
+
+```
