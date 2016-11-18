@@ -22,6 +22,10 @@ tig
 
 命令行式的工具。和git的命令配合使用，基本就满足所有操作了。我一般用来查看提交代码的修改
 
+tig show
+
+tig week develop 可以比较两个分支间的差异和分支情况
+
 ##### git merge rebase cherry-pick
 
 git 的merge操作会把两个分支进行合并成一个分支操作。这其实是一个"三方"合并。两个分支会找到
@@ -32,6 +36,8 @@ git 的rebase　操作就较好的解决了merge操作带来的分支混乱的�
 git rebase xxx　也会带来冲突，这时往往需要解决冲突,　git add .之后，进行git rebase --continue 操作，如果不想git rebase 了，就git rebase --abort进行中断。git rebase 操作后经常需要强push,也就是　git push -f 。这个操作会带来的后果是，会覆盖之前的代码。如果有人的分支和远端分支不一样，被另一个人强推操作到该分支后，很可能会导致其提交的丢失。而merge操作则可以不带来强推导致某个提交丢失的问题。merge的逻辑很简单，合并，有冲突解决冲突，提交代码，形成新的提交，不会把之前的提交丢失。(至少在我的使用中，没出现commit丢失的情况，而rebase出现过)
 
 git cherry-pick 真的是个很好用，很灵活的合并方法。它不是要合并分支，而是合并某次commit的代码。这样就更不会担心某个分支之前代码的不同，而只选择某次commit，取其合并。合并的粒度更小，也许就避免了之前分支中代码的干扰。git cherry-pick　就是这样的作用。
+
+cherry-pick 也会有冲突，这时候修改完冲突,git add --a 之后执行 git cherry-pick --continue
 
 ##### git reset
 
@@ -50,3 +56,6 @@ git reset 是一种很方便的同步远程代码的方法，而不会产生merg
 git reflog 可以查看git 操作行为的日志.
 
 可以看见commit 有HEAD@{n}这样的标记。你可以利用这个标记，进行代码的回退
+
+##### git rebase -i + commit_md5_string
+git rebase -i + commit_md5_string 这个命令可用用于方便删除某个commit。会使用vim打开编辑信息,然后删除相应的commit后，就可用wq保存就可以了
