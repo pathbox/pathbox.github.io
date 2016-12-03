@@ -24,7 +24,9 @@ tig
 
 tig show
 
-tig week develop 可以比较两个分支间的差异和分支情况
+tig week develop 可以比较两个分支间的git flow情况
+
+或者 tig HEAD develop 比较当前分支和develop分支的git flow情况
 
 ##### git merge rebase cherry-pick
 
@@ -59,3 +61,12 @@ git reflog 可以查看git 操作行为的日志.
 
 ##### git rebase -i + commit_md5_string
 git rebase -i + commit_md5_string 这个命令可用用于方便删除某个commit。会使用vim打开编辑信息,然后删除相应的commit后，就可用wq保存就可以了
+
+git status 中文显示乱码问题修复
+
+git config --global core.quotepath false
+
+oh-my-zsh 中文显示问题
+
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
