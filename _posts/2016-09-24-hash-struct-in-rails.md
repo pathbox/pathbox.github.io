@@ -105,3 +105,18 @@ b[:key] #=> "keyword"
 b["key"] #=> "keyword"
 
 ```
+
+##### Hashie is nice!
+
+Hashie is very powerful. Show a simple way about it here.
+
+```ruby
+hash = Hashie::Mash.new
+
+hash[:key] = "hello"
+hash[:key] #=> "hello"
+hash["key"] #=> "hello"
+hash.key  #=> "hello"
+
+# This is a nice way for me.
+```
