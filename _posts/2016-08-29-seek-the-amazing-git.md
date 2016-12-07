@@ -70,3 +70,7 @@ oh-my-zsh 中文显示问题
 
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
+
+###### git config --global push.default simple
+
+这样操作之后，就可以简短的使用 git push ，git pull 等 不制定具体的分支名称，而会帮我们自动的使用当前的分支名称，真是不错
