@@ -314,6 +314,7 @@ serverurl=unix:///tmp/supervisor.sock ; 这个是supervisorctl本地连接superv
 sudo supervisord
 # 明确指定配置文件
 sudo supervisord -c /etc/supervisord.conf
+# supervisord 起动前，对应的旧的sock文件需要手动删除
 # 使用 user 用户启动 supervisord 一般使用root管理
 supervisord -u user
 
@@ -338,6 +339,8 @@ supervisorctl update
 
 #####开机自动启动 Supervisord
 
+```
+
 # 下载脚本
 sudo su - root -c "sudo curl https://gist.githubusercontent.com/howthebodyworks/176149/raw/d60b505a585dda836fadecca8f6b03884153196b/supervisord.sh > /etc/init.d/supervisord"
 # 设置该脚本为可以执行
@@ -347,3 +350,5 @@ sudo update-rc.d supervisord defaults
 # 试一下，是否工作正常
 service supervisord stop
 service supervisord start
+
+```
