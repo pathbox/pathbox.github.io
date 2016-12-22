@@ -6,7 +6,7 @@ categories: server
 image: /assets/images/post.jpg
 ---
 
-#####简介
+##### 简介
 
 [Supervisor](http://supervisord.org/index.html) 是基于 Python 的进程管理工具，只能运行在 Unix-Like 的系统上，也就是无法运行在 Windows 上。Supervisor 官方版目前只能运行在 Python 2.4 以上版本，但是还无法运行在 Python 3 上，不过已经有一个 Python 3 的移植版 supervisor-py3k。
 
@@ -20,10 +20,12 @@ Supervisor 有两个主要的组成部分：
 
 2.supervisorctl，是命令行管理工具，可以用来执行 stop、start、restart 等命令，来对这些子进程进行管理。
 
-#####安装
+##### 安装
+
 Ubuntu 14.04 系统： sudo apt-get install supervisor
 
-#####配置
+##### 配置
+
 在 /etc/supervosor/ 目录下有 supervisord.conf文件和conf.d目录。你可以将共用的配置内容写在supervisord.conf中，分别的程序配置在conf.d目录下，新建*.conf文件就可以。它会被include加载到主配置文件中，和Nginx的配置原理是一样的。
 
 具体配置的注释内容，可以参考supervisor文档。这里列出简单的配置内容，没有配置的选项一般supervisor会帮你使用默认配置内容。
@@ -31,7 +33,6 @@ Ubuntu 14.04 系统： sudo apt-get install supervisor
 一个简单的对应守护进程服务配置
 
 ```
-
 [program:program_name] ; 程序的命名，对supervisor来说，需要唯一
 command=/home/user/workspace/bin/program_name  ; 你要监控管理的守护进程服务命令
 autostart=true        ; 是否自动启动 管理的守护进程
@@ -44,12 +45,11 @@ stdout_logfile=/var/log/supervisor/program_name.log   ; 守护进程的日志输
 loglevel=debug                ; 日志等级
 stopasgroup=false  ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
 killasgroup=false  ;默认为false，向进程组发送kill信号，包括子进程
-
 ```
 
 一个比价详细的配置描述
-```
 
+```
 [unix_http_server]            
 file=/tmp/supervisor.sock   ; socket文件的路径，supervisorctl用XML_RPC和supervisord通信就是通过它进行
                               的。如果不设置的话，supervisorctl也就不能用了  
@@ -304,10 +304,9 @@ serverurl=unix:///tmp/supervisor.sock ; 这个是supervisorctl本地连接superv
 ;[include]                         ;这个东西挺有用的，当我们要管理的进程很多的时候，写在一个文件里面
                                     就有点大了。我们可以把配置信息写到多个文件中，然后include过来
 ;files = relative/directory/*.ini
-
 ```
 
-#####命令
+##### 命令
 
 ```
 # 使用默认的配置文件 /etc/supervisord.conf
@@ -334,13 +333,11 @@ supervisorctl stop all
 supervisorctl reload
 # 根据最新的配置文件，启动新配置或有改动的进程，配置没有改动的进程不会受影响而重启
 supervisorctl update
-
 ```
 
-#####开机自动启动 Supervisord
+##### 开机自动启动 Supervisord
 
 ```
-
 # 下载脚本
 sudo su - root -c "sudo curl https://gist.githubusercontent.com/howthebodyworks/176149/raw/d60b505a585dda836fadecca8f6b03884153196b/supervisord.sh > /etc/init.d/supervisord"
 # 设置该脚本为可以执行
@@ -350,5 +347,4 @@ sudo update-rc.d supervisord defaults
 # 试一下，是否工作正常
 service supervisord stop
 service supervisord start
-
 ```
