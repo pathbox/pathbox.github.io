@@ -375,3 +375,7 @@ func main() {
 ```
 
 如果channel变量为nil，则for range将永远阻塞。
+
+参考链接：
+
+[关于Go，你可能不注意的7件事](http://tonybai.com/2015/09/17/7-things-you-may-not-pay-attation-to-in-go/)
