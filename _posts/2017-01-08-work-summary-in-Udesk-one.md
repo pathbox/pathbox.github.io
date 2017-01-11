@@ -76,3 +76,7 @@ MySQL中设置的最大连接数，当超过时，会以MySQL中的设置为准�
 ioutil.ReadAll(r.Body) 只能读取一次，这一次读完了，相同的请求再读就是空的了(比如在下一个middleware中读取时)
 
 所以，用context的方法，将这个值进行临时保存和传递
+
+##### Magic Number
+
+避免代码中出现Magic Number。定义合理的常量来代替Magic Number 的出现
