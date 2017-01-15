@@ -1,11 +1,11 @@
 # Build settings
 markdown: kramdown
 highlighter: rouge
-gems: [jekyll-paginate] 
+gems: [jekyll-paginate]
 # Site settings
-title: "PathBox's Blog"
+title: "Yestoday you said tomorrow."
 description:
-   Yestoday you said tomorrow.
+  I want to go to the gym and train myself!
 
 email: guijihe@163.com
 #blog logo
@@ -17,10 +17,10 @@ name: 'PathBox'
 author: 'PathBox'
 author_image: "/assets/images/author.jpg"
 
-paginate:	10
+paginate:	20
 
 #url: "http://blog.jerry-tao.com" # the base hostname & protocol for your site
-baseurl: ""
+baseurl: "http://pathbox.github.io"
 
 # social icons and sharing options
 social:
