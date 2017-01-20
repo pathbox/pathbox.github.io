@@ -80,3 +80,14 @@ ioutil.ReadAll(r.Body) 只能读取一次，这一次读完了，相同的请求
 ##### Magic Number
 
 避免代码中出现Magic Number。定义合理的常量来代替Magic Number 的出现
+
+##### Don't use DateTime.parse
+
+```ruby
+T = "2017-01-20 12:00:00"
+DateTime.parse(T)  #=> Fri, 20 Jan 2017 12:00:00 +0000
+Time.parse(T)      #=> 2017-01-20 12:00:00 +0800
+```
+
+DateTime.parse 解析的结果没有时区，存到数据库的话，会多加8个小时(在中国)，这样在数据库的值就变为了“2017-01-20 20:00:00”
+并不是我们想要的结果，如果用Time.parse 的话，就会帮你自动转时区了
