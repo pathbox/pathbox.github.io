@@ -87,22 +87,27 @@ func main(){
   for _, a := range zoo {
     fmt.Println(a.Type(), " can ", a.Swim())
   }
-  func (f *Frog) Type() string {
-    return "Frog"
-  }
-  func (f *Frog) Swim() string {
-    return "Kick"
-  }
-  func (d *Dog) Type() string {
-    return "Dog"
-  }
-  func (d *Dog) Swim() string {
-    return "Doggie"
-  }
 }
+
+func (f *Frog) Type() string {
+  return "Frog"
+}
+func (f *Frog) Swim() string {
+  return "Kick"
+}
+func (d *Dog) Type() string {
+  return "Dog"
+}
+func (d *Dog) Swim() string {
+  return "Doggie"
+}
+
 ```
 
 总结:
+
 + type struct 要属于这个接口
+
 + type struct 要定义实现接口定义的方法代码
+
 + type struct 这样就能执行各自方法的代码逻辑
