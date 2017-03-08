@@ -74,3 +74,6 @@ export LANG=en_US.UTF-8
 ###### git config --global push.default simple
 
 这样操作之后，就可以简短的使用 git push ，git pull 等 不制定具体的分支名称，而会帮我们自动的使用当前的分支名称，真是不错
+
+##### git push origin HEAD:name_xx_xxx
+一种非常好用的以本地当前分支代码，新建一个新的分支name_xx_xxx的方法。可以简单的认为，这样操作之后，在远程仓库和本地仓库都建立了"指针"。直接checkout 到name_xx_xxx就可以了
