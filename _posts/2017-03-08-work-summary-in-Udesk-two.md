@@ -55,3 +55,15 @@ JSON.load(serialized_args)
 所以，如果你传了 hash = {name: "My name", age: 20} 参数， 在 worker 代码里， 得到的其实是 {"name": "My name", "age": 20}
 
 No symbol key again
+
+##### 使用Get 请求进行更新数据操作的话，有安全漏洞。CSRF攻
+示例：
+
+　　银行网站A，它以GET请求来完成银行转账的操作，如：http://www.mybank.com/Transfer.php?toBankId=11&money=1000
+
+　　危险网站B，它里面有一段HTML的代码如下：
+
+　　<img src=http://www.mybank.com/Transfer.php?toBankId=11&money=1000>
+　　首先，你登录了银行网站A，然后访问危险网站B，噢，这时你会发现你的银行账户少了1000块......
+
+　　为什么会这样呢？原因是银行网站A违反了HTTP规范，使用GET请求更新资源。在访问危险网站B的之前，你已经登录了银行网站A，而B中的<img>以GET的方式请求第三方资源（这里的第三方就是指银行网站了，原本这是一个合法的请求，但这里被不法分子利用了），所以你的浏览器会带上你的银行网站A的Cookie发出Get请求，去获取资源“http://www.mybank.com/Transfer.php?toBankId=11&money=1000”，结果银行网站服务器收到请求后，认为这是一个更新资源操作（转账操作），所以就立刻进行转账操作......
