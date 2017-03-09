@@ -35,7 +35,7 @@ delete / delete_all: All associated objects are destroyed immediately without ca
 elasticsearch 的mapping 能新增field，不能更改原来的field，更改需要重建索引，即清空索引数据，然后重建索引结构，最后导入数据
 
 ##### find_in_batches
-不是find_in_batch. 可以这样 where().where().find_in_batches
+不是find_in_batch. 可以这样 where().where().find_in_batches, 默认是一次处理1000个记录
 
 ##### Sidekiq 对参数的要求
 The arguments you pass to perform_async must be composed of simple JSON datatypes: string, integer, float, boolean, null, array and hash. The Sidekiq client API uses JSON.dump to send the data to Redis. The Sidekiq server pulls that JSON data from Redis and uses JSON.load to convert the data back into Ruby types to pass to your perform method. Don't pass symbols, named parameters or complex Ruby objects (like Date or Time!) as those will not survive the dump/load round trip correctly.
