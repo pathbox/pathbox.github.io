@@ -72,3 +72,6 @@ No symbol key again
 如果在Sidekiq的配置文件中没有配置一个队列A，而在worker文件中指定了队列A，这个worker不会执行。因为，找不到队列A。
 所以，需要在配置文件配置对应的队列A才行。如果在worker文件中不写使用哪个队列，则会使用默认的队列default。default
 最好也在Sidekiq配置文件中配置好
+
+##### Elasticseatch 查看某个索引document count数量
+User.__elasticsearch__.client.count(index:'users')
