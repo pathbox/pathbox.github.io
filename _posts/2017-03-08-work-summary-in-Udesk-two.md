@@ -75,3 +75,11 @@ No symbol key again
 
 ##### Elasticseatch 查看某个索引document count数量
 User.__elasticsearch__.client.count(index:'users')
+
+##### 对于joins表操作时，相同字段的条件需要指定表名
+A B 两个表进行joins操作，他们都有created_at 和 flag字段
+A.joins(:b).where("table_a.created_at > ?", Time.now) # Right
+A.joins(:b).where("created_at > ?", Time.now) # ActiveRecord::StatementInvalid: Mysql2::Error: Column 'created_at' in where clause is ambiguous
+A.joins(:b).where(flag: true) # Right， flag 会是 A表的字段
+A.joins(:b).where(" a_name = ? ", "Kitty") # Right, 连接表中只有唯一的a_name 字段
+A.joins(:b).where(" b_name = ? ", "Kitty") # Right, 连接表中只有唯一的b_name 字段
