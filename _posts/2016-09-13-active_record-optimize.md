@@ -94,5 +94,59 @@ where("a = 1 and c > 2 and b = 3 ")
 
 index(a,b,c) 和index(a,c,b) 这两个索引，能够使用到index(a,b,c) 而索引 index(a,c,b) 其实相当于使用到了index(a,c) b条件并不会在索引中使用到。因为 > 条件会终止查找后面条件的索引。
 
+##### order(id: :asc) vs order(created_at: :asc)
+一个500w+ 数据的表A
+
+```
+A.where(aa_id: #{aa_id}).where(created_at: start_time..end_time).order(id: :asc)
+```
+建立联合索引: create index idx_a_aa_id_created_at
+使用explain 该sql，发现没有使用联合索引，而是使用的主键，需要2s左右的时间。
+和预测的不一样，容易发现，原因在于order(id: :asc)，导致MySQL选择使用了主键作为索引。
+更改代码:
+
+```
+A.where(aa_id: #{aa_id}).where(created_at: start_time..end_time).order(created_at: :asc)
+```
+
+这样联合索引就使用到了，只用了0.5ms查询出结果，nice! 优化成功
+所以，在order by的时候，不一样选择id，当数据量大且查询sql条件变多变复杂的时候，就需要实际测试了。
+
+##### or is not good， it make a slow slow sql
+
+在model B中有一个scope
+
+```
+scope :b_show, ->(a_id) do
+  user_ids = B.users.pluck(:id)
+  where("user_id  in (?) or a_id  = ?", user_ids, a_id)
+end
+```
+
+查询的瓶颈在于or查询。
+
+放弃or 查询语句，拆成多个查询语句
+
+```
+scope :b_show, ->(a_id) do
+  user_ids = B.users.pluck(:id)
+  ids_1 = B.where(user_id: user_ids).pluck(:id)
+  ids_2 = B.where(a_id: a_id).pluck(:id)
+  ids = (ids_1 + ids_2).uniq
+  where(id: ids)
+end
+```
+速度一下由s级别变为几十ms。是的，这样多了几个查询，但是，速度快了100倍。
+但是，这里有个注意点，就是ids元素个数。如果得到的ids元素个数是100w，那也会产生性能问题。
+因为最后一句 where(id: ids) 是sql的 IN 查询语句。亲自测试，当ids元素个数为10w一下时，
+where(id: ids) 速度都可以很快。 这得益于id主键。 如果你IN 的字段不是主键，且没有加索引，
+也会产生性能问题。可以简单的概况为下面的性能比较式子:
+
+```
+IN 主键 >= IN 唯一索引 >= IN 不唯一索引 > IN 无索引字段
+```
+
+所以，在一定程度，可以放心的使用IN。其实，Rails include语句，在解决N+1 问题的时候，
+最后一条sql就是使用IN id主键的查询
 
 优化仍在继续，将继续积累总结
