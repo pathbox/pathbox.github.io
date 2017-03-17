@@ -72,10 +72,9 @@ SELECT COUNT( * ) AS count_all, o_g_id AS o_g_id FROM `cs` WHERE `c`.`o_g_id` IN
 
 有时候这句查询需要6秒的时间，一般情况是3秒。通过explain分析，这个查询的row达到了300+w
 
-> 优化成 if cs.where(email: email).plesent?
+> 优化成 if cs.where(email: email).exists?
 
 email原本有索引。结果只需要0.05秒，row = 1。而且不耗内存，第一种方式产生的数组有可能消耗一定内存
-present? 方法还可以用　exists?代替
 
 ##### 复杂的MySQL查询让索引失效，拆成多个简单的查询。
 如果遇到了复杂的MySQL查询，有可能让索引失效，这时候要么重新找能合理使用上索引的方式，要么将复杂的查询拆分成简单的查询，也往往可以得到很好的效果。
@@ -148,5 +147,15 @@ IN 主键 >= IN 唯一索引 >= IN 不唯一索引 > IN 无索引字段
 
 所以，在一定程度，可以放心的使用IN。其实，Rails include语句，在解决N+1 问题的时候，
 最后一条sql就是使用IN id主键的查询
+
+##### exists?
+当只需要判断sql查询的结果是否存在的时候，使用exists? 方法会得到意想不到的高效查询
+
+A 表数据为500w+
+```
+A.where(nam: 'Jerry').exists?
+A Exists (0.6ms)  SELECT 1 AS one FROM `a` WHERE `a`.`name` = Jerry LIMIT 1
+```
+并且exists? 完胜 present? 甚至比 count 性能还好
 
 优化仍在继续，将继续积累总结
