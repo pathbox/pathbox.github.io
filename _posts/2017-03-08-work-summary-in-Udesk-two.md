@@ -83,3 +83,11 @@ A.joins(:b).where("created_at > ?", Time.now) # ActiveRecord::StatementInvalid: 
 A.joins(:b).where(flag: true) # Right， flag 会是 A表的字段
 A.joins(:b).where(" a_name = ? ", "Kitty") # Right, 连接表中只有唯一的a_name 字段
 A.joins(:b).where(" b_name = ? ", "Kitty") # Right, 连接表中只有唯一的b_name 字段
+
+##### redirect_to
+在controller中
+
+```ruby
+redirect_to home_path
+puts "Hello World"  # 仍然会执行
+```
