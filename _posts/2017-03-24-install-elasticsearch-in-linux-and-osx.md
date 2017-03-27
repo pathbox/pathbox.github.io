@@ -152,3 +152,21 @@ drwxr-xr-x  3 pathbox admin  102  3  7 11:44 plugins/
 jar文件包放在 /usr/local/Cellar/elasticsearch-1.4.2/plugins/ik
 
 这和Ubuntu的目录不一样，否则会导致加载不到ik分词包而报错(这折腾了很久)
+
+##### 安装head插件
+
+```
+进入到elasticsearch/bin路径
+
+路径下有plugin 命令文件
+sudo ./plugin -install mobz/elasticsearch-head
+
+安装完插件之后会在es节点bin路径同级创建一个plugins目录,存放安装的插件
+
+重启elasticsearch
+sudo service elasticsearch restart
+
+访问 http://localhost:9200/_plugin/head/
+
+简单的使用教程： http://www.sojson.com/blog/85.html
+```
