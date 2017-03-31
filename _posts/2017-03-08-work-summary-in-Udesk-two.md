@@ -91,3 +91,40 @@ A.joins(:b).where(" b_name = ? ", "Kitty") # Right, 连接表中只有唯一的b
 redirect_to home_path
 puts "Hello World"  # 仍然会执行
 ```
+
+##### build a find_in_batches for myself
+
+```ruby
+class FindInBatchesExtend
+
+  # 该方法实现find_in_batches 功能，但是order by 是以 updated_at 排序，在使用ES增量同步时，提高了效率
+  def self.find_in_batches(relation, order_cloumn = "updated_at", batch_size = 1000)
+    relation = relation.order("#{order_cloumn} ASC").limit(batch_size)
+    records = relation.to_a
+
+    while records.any?
+      records_size = records.size
+      offset_column = records.last.send("#{order_cloumn}")
+
+      yield records
+
+      break if records_size < batch_size
+      records = relation.where("#{order_cloumn} >= ?", offset_column).to_a
+    end
+  end
+end
+```
+
+##### order by id 不一定是最高效的
+```
+SELECT COUNT(*) FROM `tickets` WHERE `tickets`.`company_id` = 5899 AND `tickets`.`status_id` = 3 AND (closed_at >= '2017-03-13 00:00:00') ORDER BY `tickets.id` ASC
+```
+
+上面已经建立了 company_id status_id closed_at 的联合索引，但是任然很慢。通过explain查看没有使用到联合索引
+将代码改成执行下面的sql
+
+```
+SELECT COUNT(*) FROM `tickets` WHERE `tickets`.`company_id` = 5899 AND `tickets`.`status_id` = 3 AND (closed_at >= '2017-03-13 00:00:00') ORDER BY `tickets.closed_at` ASC
+```
+
+则使用到了联合索引，速度变为10+ms，优化成功
