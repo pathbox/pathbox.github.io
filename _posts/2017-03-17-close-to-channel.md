@@ -224,3 +224,186 @@ func main() {
 // fmt.Println(<-c) <-c is blocking, until c <- 1
 // 新开的goroutine首先去读channel,可是由于channel中没有值，所以它被阻塞了，直到main中向channel发送值，goroutine才拿到它想要的值并继续运行。
 ```
+
+example7
+
+```go
+
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	naturals := make(chan int)
+	squares := make(chan int)
+
+	go func() {
+		for x := 0; x < 100; x++ {
+			naturals <- x
+		}
+		close(naturals)
+	}()
+
+	go func() {
+		for x := range naturals {
+			squares <- x * x
+		}
+		close(squares)
+	}()
+
+	for x := range squares {
+		fmt.Println(x)
+	}
+}
+
+// 发送完成后，可以关闭channel，关闭后所有对这个channel的写操作都会panic,而读操作依旧可以进行，当所有值都读完后，继续读该channel会得到zero value
+
+```
+
+deadlock example8
+
+```go
+
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	c := make(chan int)
+	go func() {
+		time.Sleep(3 * time.Second)
+		fmt.Println("before received")
+
+	}()
+	fmt.Println("before send")
+	c <- 1
+	fmt.Println("after received")
+}
+
+// before send
+// before received
+// fatal error: all goroutines are asleep - deadlock!
+
+// goroutine 1 [chan send]:
+// main.main()
+//   /Users/pathbox/code/learning-go/src/channel/example/example_lock1.go:16 +0x10c
+// exit status 2
+
+// send in main goroutinue
+// no receive, send the data to channel, deadlock!
+
+```
+
+no deadlock example9
+
+```go
+
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	c := make(chan int)
+	go func() {
+		fmt.Println("before received")
+		fmt.Println("receive", <-c)
+		fmt.Println("after received")
+
+	}()
+
+	time.Sleep(1 * time.Second)
+	fmt.Println("done")
+}
+
+// before received
+// done
+
+// no send, receive will get nil, receive <-c in sub goroutinue
+// fmt.Println("receive", <-c) and fmt.Println("after received") don't run
+// no deadlock
+
+```
+
+example10
+
+```go
+
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	c := make(chan int)
+	go func() {
+		fmt.Println("before send")
+		c <- 100
+		fmt.Println("after send")
+
+	}()
+
+	time.Sleep(1 * time.Second)
+	fmt.Println("done")
+}
+
+// before send
+// done
+
+// no receive, send c <- 100 in sub goroutinue
+// fmt.Println("after send") don't run
+// no deadlock
+
+```
+
+deadlock example11
+
+```go
+
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	c := make(chan int)
+	go func() {
+		fmt.Println("before send")
+
+	}()
+
+	<-c
+
+	time.Sleep(1 * time.Second)
+	fmt.Println("done")
+}
+
+// before send
+// fatal error: all goroutines are asleep - deadlock!
+
+// goroutine 1 [chan receive]:
+// main.main()
+//   /Users/pathbox/code/learning-go/src/channel/example/example_lock4.go:15 +0x7f
+// exit status 2
+
+// receive <-c in main goroutinue
+// no send
+// deadlock!
+
+```
+
+如果 main goroutinue中有channel操作，但是没有子goroutinue对channel操作，deadlock发生死锁，因为main goroutinue
+被channel操作阻塞了。
+如果 子 goroutinue中有channel操作，但是没有其他goroutinue队channel操作，no deadlock。main goroutinue
+没有被channel操作阻塞。 子 goroutinue会自动消亡
