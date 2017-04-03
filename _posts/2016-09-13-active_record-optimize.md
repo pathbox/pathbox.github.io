@@ -159,3 +159,19 @@ A Exists (0.6ms)  SELECT 1 AS one FROM `a` WHERE `a`.`name` = Jerry LIMIT 1
 并且exists? 完胜 present? 甚至比 count 性能还好
 
 优化仍在继续，将继续积累总结
+
+##### ORDER BY ID ASC
+一般情況下，order by id asc 是比较合适的。
+
+```
+SELECT COUNT(*) FROM `tickets` WHERE `tickets`.`company_id` = 5899 AND `tickets`.`status_id` = 3 AND (closed_at >= '2017-03-13 00:00:00') ORDER BY `tickets.id` ASC
+```
+
+上面已经建立了 company_id status_id closed_at 的联合索引，但是任然很慢。通过explain查看没有使用到联合索引
+将代码改成执行下面的sql
+
+```
+SELECT COUNT(*) FROM `tickets` WHERE `tickets`.`company_id` = 5899 AND `tickets`.`status_id` = 3 AND (closed_at >= '2017-03-13 00:00:00') ORDER BY `tickets.closed_at` ASC
+```
+
+则使用到了联合索引，速度变为10+ms，优化成功
