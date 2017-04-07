@@ -22,3 +22,8 @@ B方根据相同的算法构造token和传过来的token比较是否相同即可
 
 ##### order by 利用索引优化，你可以看
 http://stackoverflow.com/questions/12148943/mysql-performance-slow-using-filesort
+
+##### some ES
+ES支持给索引预定义property和mapping
+ElasticSearch refresh操作只是写到文件缓存系统
+当 segment 刷到磁盘，translog 才进行清空
