@@ -27,3 +27,11 @@ http://stackoverflow.com/questions/12148943/mysql-performance-slow-using-filesor
 ES支持给索引预定义property和mapping
 ElasticSearch refresh操作只是写到文件缓存系统
 当 segment 刷到磁盘，translog 才进行清空
+
+##### 邮件问题
+密送的邮件收信人，Postfix没能收到密送的收信人地址
+
+> Postfix -> Ruby script -> (post) parse build eml file -> post proj action parse build mail(database operation)
+
+在通过subject取id信息的时候，subject编码分成了两行，由于id是在后面，也就是在第二行编码中
+创建一个新的eml文件的时候，丢失了id内容，传到下一个action时候，解析拆分的方法没把id解析到，导致了异常
