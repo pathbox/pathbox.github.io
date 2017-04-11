@@ -36,3 +36,16 @@ ElasticSearch refresh操作只是写到文件缓存系统
 在通过subject取id信息的时候，subject编码分成了两行，由于id是在后面，也就是在第二行编码中
 创建一个新的eml文件的时候，丢失了id内容，传到下一个action时候，解析拆分的方法没把id解析到，导致了异常
 原因是 gem mail 2.5.4的一个bug，2.6.4之后修复了这个bug，所以需要升级使用的mail gem
+
+##### render is not return
+在controller中，render is not return
+
+```ruby
+def create
+  user = User.Create(params)
+  code = user ? 200 : 500
+  render :json => {code: code}
+  UserExampleWorker.perform_async(params)  # 上面及时render了，这一句也会继续执行下去。redirect_to 和这里类似
+end
+
+```
