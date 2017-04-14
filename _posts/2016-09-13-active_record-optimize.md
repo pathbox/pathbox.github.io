@@ -175,3 +175,16 @@ SELECT COUNT(*) FROM `tickets` WHERE `tickets`.`company_id` = 5899 AND `tickets`
 ```
 
 则使用到了联合索引，速度变为10+ms，优化成功
+
+
+##### 让代码更好的使用联合索引
+联合索引: [company_id, owner_group_id, owner_id, deleted]
+下面两种查询都使用到了该联合索引，but 查询速度完全不同
+5000w+ records
+
+```sql
+SELECT COUNT(*) FROM `customers` WHERE `customers`.`deleted` = 0 AND `customers`.`owner_group_id` = 1 AND `customers`.`owner_id` = 1  # => 30s+  holly shit
+
+SELECT COUNT(*) FROM `customers` WHERE `customers`.`company_id` = 1 AND `customers`.`deleted` = 0 AND `customers`.`owner_group_id` = 1 AND `customers`.`owner_id` = 1  # => 10ms what amazing
+```
+所以，果断修改代码，增加了company_id 条件的查询到原语句
