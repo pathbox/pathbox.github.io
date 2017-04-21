@@ -84,3 +84,6 @@ MySQL IO 几乎快满了，会影响到回调的时候 同步ES的操作，导�
 ##### custom field
 在新增自定义字段的时候，要给使用了自定义字段的表的ES，比如(Ticket) 使用回调方法，为对应的ES新增这个新增的自定义字段属性
 You know this is called predefine mapping
+
+##### Outlook email
+Why Outlook email and sina email is different
