@@ -80,3 +80,7 @@ cellphone = "" 或者 cellphone 不传 是可以判断电话号码为空
 ##### MySQL is too busy
 MySQL IO 几乎快满了，会影响到回调的时候 同步ES的操作，导致数据没有同步ES成功
 当ES磁盘快满的时候，也会导致无法再往ES中写入数据
+
+##### custom field
+在新增自定义字段的时候，要给使用了自定义字段的表的ES，比如(Ticket) 使用回调方法，为对应的ES新增这个新增的自定义字段属性
+You know this is called predefine mapping
