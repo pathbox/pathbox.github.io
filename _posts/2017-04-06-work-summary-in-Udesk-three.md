@@ -90,3 +90,7 @@ Why Outlook email and sina email is different
 
 ##### websocket-bench with http
 当用websocket-bench 模拟websocket做压力测试的时候，别忘了url要以http:// 开头。。。
+
+##### go-socket.io
+今天做测试，用websocket-bench 压测。 项目用的是go-socket.io 底层其实用的是 gorilla/websocket
+建立一万个空连接，消耗了1.2g的内存
