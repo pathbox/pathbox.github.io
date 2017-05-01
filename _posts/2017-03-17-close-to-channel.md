@@ -33,9 +33,9 @@ func main() {
 // before received
 // fatal error: all goroutines are asleep - deadlock!
 
-// send in the main goroutinue
-// 如果读取操作在子goroutinue， 写操作在main goroutinue， 读取操作会需要先执行，并且阻塞main goroutinue
-// 如果 channel 读取操作和写操作 都在子goroutinue 则谁先就谁先ready
+// send in the main goroutine
+// 如果读取操作在子goroutine， 写操作在main goroutine， 读取操作会需要先执行，并且阻塞main goroutine
+// 如果 channel 读取操作和写操作 都在子goroutine 则谁先就谁先ready
 ```
 
 example2
@@ -66,8 +66,8 @@ func main() {
 // 100
 // after received
 
-// c <- in sub goroutinue, <- c in main goroutinue, c <- block main goroutinue
-// no deadlock. 子goroutinue中的 c<- 100 阻塞了main goroutinue
+// c <- in sub goroutine, <- c in main goroutine, c <- block main goroutine
+// no deadlock. 子goroutine中的 c<- 100 阻塞了main goroutine
 ```
 
 example3
@@ -104,10 +104,10 @@ func main() {
 // 1
 // after received
 
-// send is in the sub goroutinue
+// send is in the sub goroutine
 // send is be ready first, then received
 // receive is not blocking. This is a nice way.
-// but main goroutinue don't wait for two of them,
+// but main goroutine don't wait for two of them,
 // c <- 1 block <-c, send first then received
 // <-c wait for c<-1
 
@@ -148,8 +148,8 @@ func main() {
 // print channel 1
 // after received
 
-// send is in the sub goroutinue
-// receive is in the sub goroutinue
+// send is in the sub goroutine
+// receive is in the sub goroutine
 
 // receive is be ready first, then send
 // receive is blocking until send the data, it is not good
@@ -187,7 +187,7 @@ func main() {
 }
 
 // after received
-// main goroutinue will not wait for two sub goroutinue, they will be killed when main goroutinue is over
+// main goroutine will not wait for two sub goroutine, they will be killed when main goroutine is over
 ```
 
 example6
@@ -294,7 +294,7 @@ func main() {
 //   /Users/pathbox/code/learning-go/src/channel/example/example_lock1.go:16 +0x10c
 // exit status 2
 
-// send in main goroutinue
+// send in main goroutine
 // no receive, send the data to channel, deadlock!
 
 ```
@@ -326,7 +326,7 @@ func main() {
 // before received
 // done
 
-// no send, receive will get nil, receive <-c in sub goroutinue
+// no send, receive will get nil, receive <-c in sub goroutine
 // fmt.Println("receive", <-c) and fmt.Println("after received") don't run
 // no deadlock
 
@@ -359,7 +359,7 @@ func main() {
 // before send
 // done
 
-// no receive, send c <- 100 in sub goroutinue
+// no receive, send c <- 100 in sub goroutine
 // fmt.Println("after send") don't run
 // no deadlock
 
@@ -397,13 +397,13 @@ func main() {
 //   /Users/pathbox/code/learning-go/src/channel/example/example_lock4.go:15 +0x7f
 // exit status 2
 
-// receive <-c in main goroutinue
+// receive <-c in main goroutine
 // no send
 // deadlock!
 
 ```
 
-如果 main goroutinue中有channel操作，但是没有子goroutinue对channel操作，deadlock发生死锁，因为main goroutinue
+如果 main goroutine中有channel操作，但是没有子goroutine对channel操作，deadlock发生死锁，因为main goroutine
 被channel操作阻塞了。
-如果 子 goroutinue中有channel操作，但是没有其他goroutinue队channel操作，no deadlock。main goroutinue
-没有被channel操作阻塞。 子 goroutinue会自动消亡
+如果 子 goroutine中有channel操作，但是没有其他goroutine队channel操作，no deadlock。main goroutine
+没有被channel操作阻塞。 子 goroutine会自动消亡

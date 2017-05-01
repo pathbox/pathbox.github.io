@@ -93,4 +93,4 @@ Why Outlook email and sina email is different
 
 ##### go-socket.io
 今天做测试，用websocket-bench 压测。 项目用的是go-socket.io 底层其实用的是 gorilla/websocket
-建立一万个空连接，消耗了1.2g的内存
+建立一万个空连接，消耗了1g的内存
