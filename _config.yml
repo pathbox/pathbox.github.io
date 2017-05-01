@@ -3,7 +3,7 @@ markdown: kramdown
 highlighter: rouge
 gems: [jekyll-paginate]
 # Site settings
-title: "Yestoday you said tomorrow."
+title: "Somebody always does group exercise with your maximum power"
 description:
   I want to go to the gym and train myself!
 
