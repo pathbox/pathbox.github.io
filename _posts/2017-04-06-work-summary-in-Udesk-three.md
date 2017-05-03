@@ -108,3 +108,39 @@ Why Outlook email and sina email is different
 ５　回调中如果有不同的写操作，考虑这些不同的写操作之间的耦合性
 现在系统中，有的回调逻辑很复杂，使得排错处理难度很大。
 在处理工单回调比如触发器等，其中又有ＥＳ同步的回调，使得当触发器的回调中报异常中止的话，会导致ＥＳ同步没有执行，使得使用回调机制同步ＥＳ很脆落
+
+```ruby
+after_save :put_test
+after_save :raise_test
+
+def raise_test
+  raise "now it is raise"
+end
+
+def put_test
+  puts "===================="
+  self.name = 'Name'
+end
+#
+# (0.2ms)  BEGIN
+#   SQL (0.4ms)  INSERT INTO `cities` (`code`, `name`) VALUES (1000, 'beijing')
+# ====================
+#    (2.3ms)  ROLLBACK
+# RuntimeError: now it is raise
+# from /home/user/Documents/udesk_proj/app/models/city.rb:10:in `raise_test'
+# [5] pry(main)> c
+# => #<City id: 3, code: 1000, name: "nono", province_id: nil>
+
+# 上面代码等价于
+
+after_save :put_and_raise
+
+def put_and_raise
+  puts "===================="
+  self.name = 'Name'
+  raise "now it is raise"
+end
+```
+
+即使分开写了两个after_save方法，但是执行顺序是队列，从上往下执行。如果其中有错误中断了，则不会继续执行下去。
+总结就是，相同的回调操作是按照队列顺序进行，并且先执行的逻辑会影响后执行的逻辑方法
