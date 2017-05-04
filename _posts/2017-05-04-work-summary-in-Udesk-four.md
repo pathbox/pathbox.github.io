@@ -14,3 +14,8 @@ validates :content, uniqueness: { scope: [:company_id], message: "%{value}已经
 ```
 然而，当高并发时,两个请求相差0.4s，这个在model层的验证并不是真正原子性的，是的这层验证失效。
 如果能在数据库建立唯一索引[company_id, content]，这样，对高并发情况，也能支持验证，防止数据库产生脏数据。
+
+##### https域名中有http的请求
+https的域名下发起http的请求，浏览器会认为发起了不安全的请求而报错。
+将该请求也使用https
+一般https域名的地址，当使用http协议访问时，Nginx只要做了http到https的重定向，就能重定向到https协议下
