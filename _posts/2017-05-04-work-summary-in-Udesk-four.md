@@ -17,3 +17,8 @@ validates :content, uniqueness: { scope: [:company_id], message: "%{value}已经
 
 ##### union 出现在request body中时,会被阿里高防识别为可疑攻击而返回405。
 比如 MySQL 的union注入攻击
+
+##### https域名中有http的请求
+https的域名下发起http的请求，浏览器会认为发起了不安全的请求而报错。
+将该请求也使用https
+一般https域名的地址，当使用http协议访问时，Nginx只要做了http到https的重定向，就能重定向到https协议下
