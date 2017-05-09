@@ -14,3 +14,6 @@ validates :content, uniqueness: { scope: [:company_id], message: "%{value}已经
 ```
 然而，当高并发时,两个请求相差0.4s，这个在model层的验证并不是真正原子性的，是的这层验证失效。
 如果能在数据库建立唯一索引[company_id, content]，这样，对高并发情况，也能支持验证，防止数据库产生脏数据。
+
+##### union 出现在request body中时,会被阿里高防识别为可疑攻击而返回405。
+比如 MySQL 的union注入攻击
