@@ -22,3 +22,9 @@ validates :content, uniqueness: { scope: [:company_id], message: "%{value}已经
 https的域名下发起http的请求，浏览器会认为发起了不安全的请求而报错。
 将该请求也使用https
 一般https域名的地址，当使用http协议访问时，Nginx只要做了http到https的重定向，就能重定向到https协议下
+
+##### Don't forget Sidekiq get the json not the hash params
+当传递hash 参数到Sidekiq 中的时候，Sidekiq 中间会转为json.　再转回hash
+所以，hash = {name: 'cary'} 到Sidekiq 中就变为　hash = {"name" => 'cary'}
+hash[:name] => nil
+hash["name"] => cary
