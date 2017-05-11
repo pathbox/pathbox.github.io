@@ -49,7 +49,7 @@ image: /assets/images/post.jpg
 
 八、踩过的坑。。。。。
 
-##### 在rails c(用的是pry环境)不要跑脚本，因为脚本代码中如果有next方法，会使用到的是pry的next方法而不是ruby的next方法，然后你就掉坑里了
+##### 在rails c(用的是pry环境)不要跑脚本，因为脚本代码中如果有next方法，会使用到的是pry的next方法而不是ruby的next方法，然后你就掉坑里了这对rails 4.0 的版本有这个问题,　４.2 以上的版本应该修复了
 
 ##### 代码中不要定义和数据库字段相同名称的方法，如果有重名的方法，请先确认是需要该方法还是需要的是数据库的字段。是数据库的字段请使用read_attributes
 
@@ -171,7 +171,7 @@ error: error_user: []; error_company: []
 也许在本地或测试环境你的脚本运行的没有问题，但是，线上的数据数量往往是本地和测试环境的n倍，并且已经有很多隐藏的脏数据，各种奇妙的事情都有可能发生。即使是在半夜运行脚本，
 能够预先做更多的准备对应出现的异常情况，也能更快的找到问题的所在。
 
-准备下一次的项目升级 
+准备下一次的项目升级
 
 
 
@@ -181,65 +181,253 @@ error: error_user: []; error_company: []
 
 
 
-```ruby 
-# sync_data_to_es.rake
+```ruby
 STDOUT.sync = true
 
-# 使用rake脚本，根据创建时间参数，和对应表的参数，同步表的数据到ElasticSearch
-# rake sync_es:sync_data_es form=2016-03-04 to=2016-09-08 table=Article
-# 第一次的时候，要确保有对应的索引存在.table 参数要是对应model的名称
-#coding: utf-8
+# 该方法实现find_in_batches 功能，但是order by 是以 updated_at 排序，在使用ES增量同步时，提高了效率
+  def find_in_batches(relation, order_cloumn = "updated_at", batch_size = 1000)
+    relation = relation.order("#{order_cloumn} ASC").limit(batch_size)
+    records = relation.to_a
 
-namespace :sync_es do
+    while records.any?
+      records_size = records.size
+      offset_column = records.last.send("#{order_cloumn}")
+
+      yield records
+
+      break if records_size < batch_size
+      records = relation.where("#{order_cloumn} >= ?", offset_column).to_a
+    end
+  end
+
+#coding: utf-8
+# 第一次的时候，要确保有对应的索引存在
+# rake udesk_es_sync:sync_data_es from=2016-03-04 to=2016-09-08 table=Ticket company_id=x batch_size=1000
+# 支持 并发 rake parallel=1/4  udesk_es_sync:sync_data_es form=2016-03-04 table=Ticket
+# batch_size=1000 批量取的数量
+# 公司参数可传可不传
+# table 参数要是对应model的名称 如: Ticket, to 和conpany_id 可以不传
+# 对于有自定义字段的同步，可以在最后加 es_sync=true 优化自定义字段的同步速度，暂时对ticket有效
+namespace :udesk_es_sync do
+
   desc 'MySQL 数据记录同步到ES'
   task sync_data_es: :environment do
-    from  = ENV['form']
-    to    = ENV['to']
-    model = ENV['table']
+    from       = ENV['from']
+    to         = ENV['to']
+    model      = ENV['table']
+    company_id = ENV['company_id']
+    lot_num    = ENV['parallel'].split('/').first if ENV['parallel']
+    batch_size = (ENV['batch_size'] || 1000).to_i
 
     from = Time.parse(from)
-    to   = Time.parse(to)
-    total = 0
+    to   = to.present? ? Time.parse(to) : Time.now
+    record_total = 0
+    i = 0
     s = Time.now
 
-    if model.present?
-      model = model.camelize.constantize
-      error = []
-      model.__elasticsearch__.create_index!
-      model.where("? < created_at and created_at < ?", from, to).find_in_batches do |records|
-        body_ary = []
-        records.each do |record|
-          begin
-            body_ary << { index: { _id: record.id, data: record.as_indexed_json } }
-          rescue => e
-            options = {}
-            options['record_id'] = record.id
-            options['occur_at'] = Time.current
-            options['exception'] = {}
-            options['exception']['message']   = e.try(:message)
-            options['exception']['backtrace'] = e.try(:app_backtrace)
-            error << options
+    time = s.strftime("%Y%m%d%H%M%S")
+    log_name = "es_sync_error_log_#{time}_#{model}_#{lot_num}.log"
+    LOGGER = create_udesk_logger(log_name)
+    if model.blank?
+      LOGGER.record do |title, log|
+        title << "ES Sync Mysql"
+        log[:info] = "table param is blank"
+      end
+      return
+    end
+    LOGGER.record do |title, log|
+      title << "ES Sync Mysql"
+      log[:info] = "++++++++++ start sync work ++++++++++"
+    end
+
+    model = model.camelize.constantize
+    model.index_name # 用于验证是否有对应的ES索引，没有会报错而不再继续进行
+    if model == WorkLog
+      where_sql = model.where(created_at: (from..to))
+    else
+      where_sql = model.where(updated_at: (from..to))
+    end
+    if company_id.present?
+      where_sql = where_sql.where(company_id: company_id)
+    end
+    text_field_fields = $ARGV.last == "es_sync=true" ? TextField.get_text_select_fields : nil
+    find_in_batches(where_sql, "updated_at", batch_size) do |records|
+      body_ary = []
+      i += 1
+      next unless Paralleler.valid?(i)
+      records.each do |record|
+        begin
+          record.custom_field_es_hash = text_field_fields if text_field_fields.present?
+          body_ary << { index: { _id: record.id, data: record.as_indexed_json } }
+        rescue => e
+          options                           = {'exception'=>{}}
+          options['record_id']              = record.id
+          options['occur_at']               = Time.current
+          options['exception']['message']   = e.try(:message)
+          options['exception']['backtrace'] = e.try(:app_backtrace)
+          LOGGER.record  do |title, log|
+            title << "ES Sync Mysql"
+            log[:info] = "++++++++++++error: #{options}"
           end
         end
-        model.__elasticsearch__.client.bulk({
-                                                index: model.index_name,
-                                                type: model.document_type,
-                                                body: body_ary
-                                            })
-        total += 1
-        count = total * 1000
-        puts "------------------------------ #{count}"
       end
-      model.__elasticsearch__.refresh_index!
-    else
-      puts "class param is invalid or blank"
+      next if body_ary.blank?
+      begin
+        model.__elasticsearch__.client.bulk({
+          index: model.index_name,
+          type: model.document_type,
+          body: body_ary
+        })
+        record_total += records.size
+        last_record = body_ary.last
+        last_id     = last_record.try(:[], :index).try(:[], :_id)
+        LOGGER.record do |title, log|
+          title << "ES Sync Mysql"
+          log[:info] = "NO.#{i} batch imported(#{records.size})"
+          log[:record_totaltotal] = "-------- #{record_total}"
+          log[:last_id] = " last record id: #{last_id}"
+        end
+      rescue => e
+        options  = {'exception'=>{}}
+        first_record = body_ary.first
+        first_id     = first_record.try(:[], :index).try(:[], :_id)
+        options.merge!({first_id: first_id, last_id: last_id})
+        options['occur_at']               = Time.current
+        options['exception']['message']   = e.try(:message)
+        options['exception']['backtrace'] = e.try(:app_backtrace)
+        LOGGER.record do |title, log|
+          title << "ES Sync Mysql"
+          log[:info] = "++++++++++++error: #{options}"
+        end
+      end
     end
+    model.__elasticsearch__.refresh_index!
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++sync deleted record start
+  if model != WorkLog
+    LOGGER.record do |title, log|
+       title << "ES Sync Mysql"
+       log[:info] = "sync deleted record start"
+     end
+    where_sql = EsSyncDeletedRecord.where(record_type: model.to_s).where("updated_at >= ?", from)
+    if company_id.present?
+      where_sql = where_sql.where(company_id: company_id)
+    end
+    i = 0
+    total = 0
+    find_in_batches(where_sql, "updated_at", batch_size) do |records|
+      i += 1
+      next unless Paralleler.valid?(i)
+      body = records.map{|record| {delete: {_id: record.record_id}}}
+      model.__elasticsearch__.client.bulk({
+        index: model.index_name,
+        type: model.document_type,
+        body: body
+      })
+      total += records.size
+    end
+    LOGGER.record do |title, log|
+       title << "ES Sync Mysql Delete"
+       log[:info] = "-------- deleted record count #{total}"
+       log[:count] = "-------- EsSyncDeletedRecord count #{where_sql.count}"
+     end
+   end
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     e = Time.now
     x = e - s
-    puts "Sync work is done~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    puts "Time Seconds: #{x}"
+    LOGGER.record do |title, log|
+      title << "ES Sync Mysql"
+      log[:info] = "Sync work is done~~~~~~"
+      log[:second] = "Need seconds: #{x}"
+    end
+  end
+
+# rake udesk_es_sync:check_sync_data_es from=2016-03-04 to=2016-09-08 table=Ticket company_id=x
+# 公司参数可传可不传
+# table 参数要是对应model的名称 如: Ticket
+# 同步数量小于5w的不适合用本脚本，直接使用import force:true 不断同步就可以
+# 没有updated_at 字段的表不可以检验
+  desc 'MySQL 数据记录同步到ES校验'
+  task check_sync_data_es: :environment do
+    from       = ENV['from']
+    to         = ENV['to']
+    model      = ENV['table']
+    company_id = ENV['company_id']
+    count_from_mysql = ENV['count'] ? ENV['count'].to_i : nil
+
+    from = Time.parse(from)
+    to   = to.present? ? Time.parse(to) : Time.now
+
+    if model.blank?
+      puts "table param is invalid or blank"
+      return
+    end
+    puts "++++++++++ check sync work ++++++++++"
+
+    model = model.camelize.constantize
+    model_mysql = model.where(updated_at: (from..to))
+    if company_id
+      model_mysql = model_mysql.where(company_id: company_id)
+    end
+
+    count_from_mysql = count_from_mysql || model_mysql.count
+    count_from_es    = Elasticsearch::Model.client.count(index: model.index_name)["count"]
+    index_name = model.index_name
+    puts "Count from Mysql #{index_name}: #{count_from_mysql}"
+    puts "Count from ES #{index_name}: #{count_from_es}"
+    puts "开始进行MySQL-ES #{index_name}数据的随机抽查"
+
+    num = count_from_mysql / 1000
+    shuffle_ids = []
+    if num > 999
+      # 每num条随机抽一个, 抽取1000个
+      1000.times.each do |item|
+        min = item * num
+        max = min + num
+        r_num = rand(min..max)
+        shuffle_ids << model.where("id >= #{r_num}").take.try(:id)
+      end
+    else
+      shuffle_ids = model_mysql.order("rand()").limit(1000).pluck(:id)
+    end
+    hash = {}
+    result = model.__elasticsearch__.search(
+      _source: {include: 'updated_at'},
+      query: {filtered: {filter: {terms: {
+        _id: shuffle_ids
+        }}}},
+      size: 1000
+      )
+
+    result.results.to_a.each do |item|
+      hash[item[:_id].to_s] = Time.zone.parse(item[:_source][:updated_at])
+    end
+    model_mysql.where(id: shuffle_ids).pluck(:id, :updated_at).each do |item|
+      id = item.first.to_s
+      if hash[id] != item.last
+        puts "++++++++ disaccorded #{model} id: #{id}"
+      else
+        puts "++++++++ #{model} id: #{id} OK"
+      end
+    end
+    puts "++++++++++ check sync work finish ++++++++++"
   end
 end
+```
+
+##### 写rails 脚本,　对ES进行mapping 预定义
+```ruby
+# bundle exec rails runner -e development 2017-05-11-add_columns_to_users_es_mapping.rb
+
+client = Elasticsearch::Model.client
+client.indices.put_mapping index: "users", type: "user", body: {
+  user: {
+    properties: {
+      source_type: {type: :string, index: :not_analyzed},
+      source_id: {type: :integer}
+    }
+  }
+}
 ```
 
 ​                   
