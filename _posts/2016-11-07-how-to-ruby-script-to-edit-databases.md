@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 如何更可控、稳定地写Ruby脚本操作线上数据库的表
+title: 如何更可控、稳定地写Ruby脚本操作线上数据库的记录
 date:   2016-11-07 16:15:06
 categories: rails
 image: /assets/images/post.jpg
