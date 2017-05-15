@@ -3,9 +3,9 @@ markdown: kramdown
 highlighter: rouge
 gems: [jekyll-paginate]
 # Site settings
-title: "Somebody always does group exercise with your maximum power"
+title: "Yestoday you said tomorrow"
 description:
-  I want to go to the gym and train myself!
+  Somebody always does group exercise with your maximum power
 
 email: guijihe@163.com
 #blog logo
