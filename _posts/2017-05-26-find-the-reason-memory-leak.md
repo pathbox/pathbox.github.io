@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 记一次Go websocket　项目内存泄露排查
+title: 记一次Go websocket　项目内存泄露排查 + 使用　Go pprof定位内存泄露
 date:   2017-05-26 20:20:06
 categories: Go
 image: /assets/images/post.jpg
