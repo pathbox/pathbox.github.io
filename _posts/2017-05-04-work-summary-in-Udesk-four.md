@@ -118,3 +118,49 @@ C 如果没有路由满足，调用NotFoundHandler的ServeHttp
 所有的变量代表的值都有可能是nil
 
 浅拷贝只拷贝了对象，对于像Array一样的集合，这意味着仅仅复制了容器本身而没有复制其中的元素。可以在不影响原始集合的情况下增添或移除其中的元素，但修改元素本身则是由影响的。修改任一元素都会影响原始集合本身，同样也会影响到任何引用这一元素的对象。
+
+##### Golang Slices And The Case Of The Missing Memory
+[文章链接](http://openmymind.net/Go-Slices-And-The-Case-Of-The-Missing-Memory/)
+
+```go
+body, _ := ioutil.ReadAll(resp.Body)
+```
+
+slice 的设计是当bytes数达到现在的长度值时，slice会去申请现在两倍的容量，所以，有时候会出现cap 是 len两倍的大小，而浪费了一定的内存
+
++ 2x growth algorithm
+
+If we know the size of the response, the above code is rather inefficient. The buffer starts at 512 bytes and uses 2x growth algorithm. The result is a number of unnecessary allocation and high likelihood of wasted memory (again, this last part isn't immediately obviously until you compare the length of body with its capacity). The solution?:
+
+buffer := bytes.NewBuffer(make([]byte, 0, resp.ContentLength)
+buffer.ReadFrom(res.Body)
+body := buffer.Bytes()
+
+Given a ContentLength of 70KB, what would you imagine len(body) and cap(body) to equal? The length will be the expected 70KB, but the capacity will be 143872 bytes. For a reason that isn't clear to me, the bytes.Buffer class requires bytes.MinRead extra space. It has a value of 512. So unless we create a buffer of res.ContentLength + bytes.MinRead, we'll end up with an array which is 70K*2 + 512 of actual space.（2x + 512）
+
+When you know the size of the data, like in the above case with a ContentLength, you should use the `<io.ReadFull>`:
+
+```go
+body := make([]byte, 0, resp.ContentLength)
+_, err := io.ReadFull(res.Body, body)
+```
+
+Otherwise, you'll have to first read it into a growing buffer and then copy it back into a fixed-length array. You'll need to decide if the saved memory is worth the extra CPU. We use something like:
+
+```go
+//ioutil.ReadAll starts at a very small 512
+//it really should let you specify an initial size
+buffer := bytes.NewBuffer(make([]byte, 0, 65536))
+io.Copy(buffer, r.Body)
+temp := buffer.Bytes()
+length := len(temp)
+var body []byte
+//are we wasting more than 10% space?
+if cap(temp) > (length + length / 10) {
+  body = make([]byte, length)
+  copy(body, temp)
+} else {
+  body = temp
+}
+```
+但是上面的方案能够减少不必要的内存空间的创建，但是，增加了一定的cpu使用
