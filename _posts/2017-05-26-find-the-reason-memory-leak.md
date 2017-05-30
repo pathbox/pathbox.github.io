@@ -27,8 +27,8 @@ Go提供了一个已经足够强大的pprof库。这样，我直接使用这个�
 # Lookups = 1321203
 # Mallocs = 1558757559
 # Frees = 1533787828
-# HeapAlloc = 3537545936　　　　　　　　　　　　分配给堆的内存使用量
-# HeapSys = 3784015872　　　　　　　　　　　　　堆占用系统的内存使用量
+# HeapAlloc = 3537545936　　　　　　　　　　　　进程堆内存分配使用的空间，通常是用户new出来的堆对象，包含未被gc掉的。
+# HeapSys = 3784015872　　　　　　　　　　　　　进程从系统获得的堆内存，因为golang底层使用TCmalloc机制，会缓存一部分堆内存，虚拟地址空间
 # HeapIdle = 167993344　　　　　　　　　　　　　堆中空闲但没有释放还给系统的内存使用量
 # HeapInuse = 3616022528　　　　　　　　　　　　堆中正在使用的内存使用量
 # HeapReleased = 0
@@ -48,6 +48,7 @@ Then，在我本地build项目的目录，执行：
 ```
 go tool pprof ./bin/my-go-app-20170426103223 http://xxx.xxx.xxx.xxx:9090/debug/pprof/heap
 ```
+我们可以看数据top来查看正在使用的对象较多的函数入口。通常用来检测有没有不符合预期的内存 对象引用。
 
 ```
 (pprof) top
@@ -67,6 +68,7 @@ Showing top 10 nodes out of 83 (cum >= 43.01MB)
    43.01MB  2.30% 81.10%    43.01MB  2.30%  net/url.parse
 ```
 上面列出了现在系统哪些包和库的函数的内存使用量，可以使用 list lib_name　来定位到具体代码的位置。
+当我们不明确这些调用时是被哪些函数引起的时，我们可以输入top -cum来查找，-cum的意思就是，将函数调用关系 中的数据进行累积，比如A函数调用的B函数，则B函数中的内存分配量也会累积到A上面，这样就可以很容易的找出调用链。
 
 ```
 1517.34MB of 1870.97MB total (81.10%)
@@ -227,3 +229,5 @@ The world has returned calm.
 [gorilla/sessions](http://www.gorillatoolkit.org/pkg/sessions)
 
 [pprof的使用](http://gpdb.rocks/golang/profiling/2016/07/31/golang-profiling.html)
+
+[一篇文章](https://lrita.github.io/2017/05/26/golang-memory-pprof/)
