@@ -69,3 +69,40 @@ token最多。但是，随着数据量的增加，如果到一定的数据量，
 
 ##### ES同样有分页性能瓶颈
 今天遇到一个ES的问题。ES在一段时间突然负载变大，涨了5倍。查找原因，分析日志后，结果是一个客户写了爬虫疯狂的爬我们的列表页面(他们把cookie的取出来用在爬虫中)，而这个列表页面用的是ES。然后，爬虫开始分页，从第一页爬到5w多页。系统中用的是普通的ES分页方法。from 数量，size 数量。这种分页方案在数据量大且翻页到一定大的页数时，会产生严重的性能问题。而且，对方不是爬一次就结束了，而是一分钟疯狂的爬。所以，导致了ES的性能问题。
+
+##### rails controller callback 顺序
+首先，controller 中的 callback是一个队列，当有同名的callback的时候，调用顺序是按照先进先出，也就是从上到下的顺序。
+
+把before_action 和 after_action 看成等价的。所以，他们是按照队列顺序调用。
+
+after_action 无论是否放在上面，都是最后执行的。
+
+如果有prepend_xxx 这是最先执行的
+
+prepend_before_action  prepend_after_action, prepend_around_action
+
+```ruby
+after_action :log_a
+before_action :log_b
+
+def index
+  puts "run"
+end
+
+def log_a
+  puts "===around action 1"
+  yield
+  puts "===around action 2"
+end
+
+def log_b
+  puts "===before action"
+end
+
+# 这样的结果是
+
+===around action 1
+===before action
+run
+===around action 2
+```
