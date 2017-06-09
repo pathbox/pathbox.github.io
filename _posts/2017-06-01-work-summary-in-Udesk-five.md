@@ -106,3 +106,14 @@ end
 run
 ===around action 2
 ```
+
+##### 关于tags标签表的设计
+有时候系统中需要使用标签功能， 并且不是一个地方或一个表需要标签。
+
+新建一个tags表，tags的 name 名称就是唯一标识的。
+
+新建一个中间表， taggings表。 表中有 tag_id 和 tagging_id tagging_type
+
+tags 和 对应的某个表就是 多对多的关系
+
+例如： user、product、post等地方需要tag，就可以共用tags一张表，对taggings来说他们都是多态
