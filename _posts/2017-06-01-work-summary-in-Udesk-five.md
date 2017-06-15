@@ -117,3 +117,70 @@ run
 tags 和 对应的某个表就是 多对多的关系
 
 例如： user、product、post等地方需要tag，就可以共用tags一张表，对taggings来说他们都是多态
+
+##### ES mapping field customer.level  和level 的搜索情况
+
+索引 tickets 其中有这样的mapping
+
+```
+"customer": {
+              "properties": {
+                 "level": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                 },
+                 "nick_name": {
+                    "type": "string",
+                    "analyzer": "char_split"
+                 }
+              }
+           }
+```
+
+进行下面搜索时
+```
+1.
+
+GET tickets/ticket/_search
+{
+    "query":{
+    "filtered":{
+        "filter":{
+            "bool":{
+                "must": [
+                   {"term":{
+                   "company_id": 1
+                   }},
+                   {"term":{
+                   "customer.level":"vip"
+                   }}
+                ]
+            }
+        }
+    }
+  }
+}
+
+2.
+GET tickets/ticket/_search
+{
+    "query":{
+    "filtered":{
+        "filter":{
+            "bool":{
+                "must": [
+                   {"term":{
+                   "company_id": 1
+                   }},
+                   {"term":{
+                   "level":"vip"
+                   }}
+                ]
+            }
+        }
+    }
+  }
+}
+```
+
+这两种搜索都能得到结果。但个人会选择第一种方式，避免以后有可能造成的冲突
