@@ -184,3 +184,59 @@ GET tickets/ticket/_search
 ```
 
 这两种搜索都能得到结果。但个人会选择第一种方式，避免以后有可能造成的冲突
+
+##### Rails send_data and send_file
+
+```ruby
+send_data(data, options = {})
+send_file(path, options = {})
+
+Main difference here is that you pass DATA (binary code or whatever) with send_data or file PATH with send_file
+So you can generate some data and send it as an inline text or as an attachment without generating file on your server via send_data. Or you can send ready file with send_file
+
+```
+
+```ruby
+data = "Hello World!"
+send_data( data, :filename => "my_file.txt" )
+```
+
+OR
+
+```ruby
+data = "Hello World!"
+file = "my_file.txt"
+File.open(file, "w"){ |f| f << data }
+send_file( file )
+```
+
+##### 使用oink分析内存问题
+最近公司的服务器内存涨了4G，是在上回发版后开始上升。在访问请求并没有上涨的情况下，增加了这么多内存。公司原来就有装oink这个公司。
+
+登入一台服务器，然后 输入  bundle exec oink --threshold=10 log/oink.log
+--threshold=10 表示10M内存
+
+可以得到以下的信息(这是在测试服务器上测试的)：
+```
+---- MEMORY THRESHOLD ----
+THRESHOLD: 10 MB
+
+-- SUMMARY --
+Worst Requests:
+1. Jun 16 15:03:08, 87944 KB, home#index
+2.
+3.
+......
+10.
+
+Worst Actions:
+23, home#index
+
+Aggregated Totals:
+Action                         	Max	Mean	Min	Total	Number of requests
+home#index                     	53260	17994	10964	197944	11
+```
+
+然后可以查看哪些action和请求url是消耗内存较多的，查看这些action的相关代码。查出一个昨天刚离职的同事之前写了一个优化count语句的代码修改，他把所有相关id找出来，然后存在数组中在size来优化原来的count。。。这样这个数据可以有几十万个元素，内存自然暴涨了
+
+oink果然是个神器
