@@ -61,11 +61,11 @@ mysql -uroot -p --local-infile
 
 mysql提供了多种导入txt文件的条件,如果txt文件是这样的
 文件d.txt的内容示例:
- 
+
  1
- 
+
  2
- 
+
  3
 
 ```
@@ -154,12 +154,8 @@ rails中一种简单的分页优化：
 
 本文完。
 
-参考文章: https://ruby-china.org/topics/27004
-         http://blog.jobbole.com/102520/
+参考文章:
 
+https://ruby-china.org/topics/27004
 
-
-
-
-
-
+http://blog.jobbole.com/102520/
