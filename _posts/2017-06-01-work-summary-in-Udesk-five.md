@@ -249,3 +249,15 @@ file = params[:file]
 当file.read , 再执行 file.read的时候， 是读取到""。 因为file已经被读过了，对应的文件指针应该是到了最尾部。此时的file的流内容是空的。如果，需要重新读这个file的内容，需要 file.rewind。 这样，之后再执行 file.read 就又可以读取到内容。
 
 file 还有一个重要的属性，就是tempfile。file.tempfile.path，可以得到临时文件的位置。实际上，上传文件操作，服务器先生成了一个临时文件，在对这个临时文件进行读取或者是另存为一个新的文件，最后这个临时文件就没有用了，可以被删除。
+
+##### constantize underscore
+
+model = "Ticket"
+
+table = model.constantize => class Ticket
+
+model.underscore => "ticket"
+
+table.table_name
+
+table.index_name 在include es模块的情况下
