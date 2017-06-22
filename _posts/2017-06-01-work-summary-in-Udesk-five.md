@@ -262,7 +262,7 @@ table.table_name
 
 table.index_name 在include es模块的情况下
 
-##### model.slice
+##### record.slice
 使用model.slice方法，简单的构造hash。
 
 ```ruby
@@ -271,3 +271,13 @@ result = u.slice(:id, :nick_name)
 result[:nick_name] #=> Tom
 result["nick_name"] #=> Tom
 ```
+
+##### default params in method
+def my_method(name, city=[], age, color=[])
+end
+
+在ruby 2.1.1 下这样定义方法会报错
+改为
+
+def my_method(name, city, age, color=[])
+end
