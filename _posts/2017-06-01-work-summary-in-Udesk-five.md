@@ -261,3 +261,13 @@ model.underscore => "ticket"
 table.table_name
 
 table.index_name 在include es模块的情况下
+
+##### model.slice
+使用model.slice方法，简单的构造hash。
+
+```ruby
+u = User.first
+result = u.slice(:id, :nick_name)
+result[:nick_name] #=> Tom
+result["nick_name"] #=> Tom
+```
