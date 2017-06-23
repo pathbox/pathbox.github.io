@@ -281,3 +281,14 @@ end
 
 def my_method(name, city, age, color=[])
 end
+
+##### presence
+"".presence => nil
+[].present => nil
+当你想要把空类型的值都转为nil的时候，presence可以帮助你
+
+例子：
+
+name = params[:name].presence || default_name
+
+|| 的前面需要为空，当参数为"",或" "的时候，也可以通过presence转为nil，然后就可以用到default_name了
