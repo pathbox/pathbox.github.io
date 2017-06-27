@@ -292,3 +292,12 @@ end
 name = params[:name].presence || default_name
 
 || 的前面需要为空，当参数为"",或" "的时候，也可以通过presence转为nil，然后就可以用到default_name了
+
+##### RestClient 的 post
+RestClient.post "http://example.com/resource", {'x' => 1}.to_json, {content_type: :json, accept: :json}
+如果payload只是一个hash， 则RestClient默认会使用表单提交(x-www-form-urlencoded) 方式提交请求，
+
+如果payload转为了json(to_json), RestClient会使用(application/json)的方式发起请求
+
+在最后一个参数增加了 {accept: :json}, 表示接收 json 类型的response
+如果不写这个参数， 如果response默认返回xml，则你的结果会是xml类型。
