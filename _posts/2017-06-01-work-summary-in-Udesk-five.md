@@ -301,3 +301,8 @@ RestClient.post "http://example.com/resource", {'x' => 1}.to_json, {content_type
 
 在最后一个参数增加了 {accept: :json}, 表示接收 json 类型的response
 如果不写这个参数， 如果response默认返回xml，则你的结果会是xml类型。
+
+##### 如果没有想要去升级某个库、包或gem，那么也许永远也不会更新了
+
+如果没有想要去升级某个库、包或gem，那么也许永远也不会更新了。
+因为当项目变得庞大了，想要做升级，代价无疑是巨大的

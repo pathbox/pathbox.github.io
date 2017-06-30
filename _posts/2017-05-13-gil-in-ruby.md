@@ -78,7 +78,7 @@ multi-thread 的消耗时间比　single-thread　少快20倍。可以看出，�
 
 Ruby GIL doesn't block IO operations. 所以，像http　requests，　文件IO操作，是不会被GIL所限制的。
 
-对于MySQL connection，　使用mysql2　的gem，也解决了GIL限制的问题，Ruby 程序也能并行的向MySQL Server　
+对于MySQL connection，使用mysql2 gem，也解决了GIL限制的问题，Ruby 程序也能并行的向MySQL Server　
 发送连接请求，或者并行使用连接池查寻。No GIL。
 
 关于Ruby 的web服务器。　Puma 使用的是多线程的方案。　对于http 请求, Puma　是能真正使用多线程处理的，而不会被GIL所限制，　所以Puma拥有更好的并发处理能力(理论上来说)。　但是,多线程拥有永恒的问题，竞态条件、竞态资源问题。如果，你写了并非是线程安全的代码，也许就会导致奇特的bug出现了。比如：
