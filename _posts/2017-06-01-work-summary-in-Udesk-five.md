@@ -306,3 +306,34 @@ RestClient.post "http://example.com/resource", {'x' => 1}.to_json, {content_type
 
 如果没有想要去升级某个库、包或gem，那么也许永远也不会更新了。
 因为当项目变得庞大了，想要做升级，代价无疑是巨大的
+
+##### rails中的多对多出现慢查询
+
+user_group 和 user 是多对多的关系，有中间表 users_user_group
+执行这条语句user_group.users 实际执行的是：
+
+```
+User Load (6.7ms) SELECT `users`.* FROM `users` INNER JOIN `users_user_groups` ON `users`.`id` = `users_user_groups`.`user_id` WHERE `users_user_groups`.`user_group_id` = 1
+```
+很快，几毫秒就可以了。
+
+而这条语句： user_group.users.agents
+
+```
+Role Load (1.2ms)  SELECT `roles`.* FROM `roles` WHERE `roles`.`name` = 'agent' LIMIT 1
+User Load (2266.9ms)  SELECT `users`.* FROM `users` INNER JOIN `users_user_groups` ON `users`.`id` = `users_user_groups`.`user_id` WHERE `users_user_groups`.`user_group_id` = 1 AND `users`.`role_id` = 2
+```
+
+OMG，执行了两秒。 原因在于多了AND `users`.`role_id` = 2
+
+优化方法：
+
+```ruby
+json.array! user_group.users do |user|
+  if user.role_id = Role.agent.id
+  	json.(agent, :id, :nick_name, :aliase)
+  end
+end
+```
+
+当然，也可以考虑加合适的索引方式来进行优化
