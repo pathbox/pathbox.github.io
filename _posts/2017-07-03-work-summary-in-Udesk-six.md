@@ -141,7 +141,7 @@ IM通讯界面，要不，云问机器人变为了唯一的IM入口，导致IM�
 
 永远保持不相信第三方服务不会崩溃的态度
 
-###### jwt解析失败
+##### jwt解析失败
 jwt 调用接口失败。
 
 注意点：
@@ -149,3 +149,12 @@ jwt 调用接口失败。
 + 参数的组成
 + token是否正确
 + encode 和 deceode 是否对应
+
+##### 使用 capistrano-sidekiq
+使用 capistrano-sidekiq 可以在一台服务器上部署多个sidekiq。
+
+set :sidekiq_processes, 4
+
+表示开启4个sidekiq 进程
+
+这样的好处是，能够一定程度提高sidekiq的并发能力，以及进行了一定的容灾处理
