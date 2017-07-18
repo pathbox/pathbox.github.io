@@ -158,3 +158,35 @@ set :sidekiq_processes, 4
 表示开启4个sidekiq 进程
 
 这样的好处是，能够一定程度提高sidekiq的并发能力，以及进行了一定的容灾处理
+
+##### hash 的赋值操作，无处不是坑
+hash的merge操作其实是很危险的操作，会把原来的整个值被新的值，相同的key是会被覆盖。如果原本的hash值的层级比较多，当新的值的层级比较少，
+则很有可能原有值中的不想被覆盖的值也被覆盖了。
+
+例子：
+```ruby
+ha = {name: 'Tom', age: {old: 22, new: 21}}
+hb = {name: 'Jerry', age: {old: 20}}
+
+ha.merge!(hb)
+
+```
+
+这时候，ha 就变为了{name: 'Jerry', age: {old: 20}} , 实际上是只想更改old 这个key的值。
+
+对 hash字段值，别用 等号。
+
+```ruby
+user.fields = {name: 'Tom'}
+user.save
+```
+
+上面的代码会把原有的fields的值完全覆盖。这时候应该做的是，
+
+```ruby
+result = user.fields[:name] = 'Tom'
+user.fields = result
+user.save
+```
+
+hash 的赋值操作，无处不是坑
