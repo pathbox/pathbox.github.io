@@ -190,3 +190,10 @@ user.save
 ```
 
 hash 的赋值操作，无处不是坑
+
+##### Sidekiq执行
+
+MyWorker.perform_async(notice) 异步执行
+MyWorker.new.perform(notice) 同步执行会阻塞，可以在rails c中快速执行测试
+MyWorker.perform_in(3.seconds, notice)  一定时间后执行
+Sidekiq::Client.push('class' => MyWorker, 'args' => [1, 2, 3])  # Lower-level generic APISidekiq::Client.push('class' => MyWorker, 'args' => [1, 2, 3])  # Lower-level generic API
