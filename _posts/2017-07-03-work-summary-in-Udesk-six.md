@@ -197,3 +197,13 @@ MyWorker.perform_async(notice) 异步执行
 MyWorker.new.perform(notice) 同步执行会阻塞，可以在rails c中快速执行测试
 MyWorker.perform_in(3.seconds, notice)  一定时间后执行
 Sidekiq::Client.push('class' => MyWorker, 'args' => [1, 2, 3])  # Lower-level generic APISidekiq::Client.push('class' => MyWorker, 'args' => [1, 2, 3])  # Lower-level generic API
+
+##### serialize fields 中的changes、 pervious_changes
+如果某个字段 fields 是被序列化为数组或hash
+
+```ruby
+serialize fields, Array
+serialize fields, Hash
+```
+
+这时想要得到对象的 changes、 pervious_changes值。 需要做的是 构造一个fields_deep_dup 的值，然后修改这个值，再覆盖这个fields字段。 如果，直接修改fields字段中的值，外层对象其实是不变的。changes、 pervious_changes 就得不到这个fields 的change
