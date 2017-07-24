@@ -207,3 +207,28 @@ serialize fields, Hash
 ```
 
 这时想要得到对象的 changes、 pervious_changes值。 需要做的是 构造一个fields_deep_dup 的值，然后修改这个值，再覆盖这个fields字段。 如果，直接修改fields字段中的值，外层对象其实是不变的。changes、 pervious_changes 就得不到这个fields 的change
+
+##### crontab的尝试
+crontab -e
+
+打开crontab的编辑界面，进行定时任务的vim编辑页面
+
+```
+*/30 * * * * /home/user/Documents/server.sh
+```
+
+然后保存。crontab会自动读取新的设置
+
+crontab -l 可以列出你的设置内容
+
+crontab -r 删除crontab文件
+
+可以使用这种方法在$HOME目录中对crontab文件做一备份:
+
+crontab -l > $HOME/mycron
+
+如果没有使用vim对crontab进行编辑，可以编辑$HOME目录下的. profile文件，在其中加入这样一行:
+
+```
+EDITOR=vi; export EDITOR  
+```
