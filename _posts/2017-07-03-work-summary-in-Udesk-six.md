@@ -252,3 +252,15 @@ node.data: false
 node.master: false
 node.data: false
 ```
+
+##### ElasticSearch各个目录说明
+
+| type| description| location|
+|------|------|-------|------|
+|home	|Home of elasticsearch installation|	/usr/share/elasticsearch|
+|bin|	Binary scripts including elasticsearch to start a node	|/usr/share/elasticsearch/bin|
+|conf	|Configuration files elasticsearch.yml and logging.yml	|/etc/elasticsearch|
+|conf	|Environment variables including heap size,file descriptors	|/etc/default/elasticsearch|
+|data	|The location of the data files	|/var/lib/elasticsearch/|
+|logs	|Log files location	|/var/log/elasticsearch|
+|plugins| Plugin files location	|/usr/share/elasticsearch/plugins|
