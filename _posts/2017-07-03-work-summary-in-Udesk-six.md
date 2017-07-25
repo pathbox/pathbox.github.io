@@ -194,8 +194,11 @@ hash 的赋值操作，无处不是坑
 ##### Sidekiq执行
 
 MyWorker.perform_async(notice) 异步执行
+
 MyWorker.new.perform(notice) 同步执行会阻塞，可以在rails c中快速执行测试
+
 MyWorker.perform_in(3.seconds, notice)  一定时间后执行
+
 Sidekiq::Client.push('class' => MyWorker, 'args' => [1, 2, 3])  # Lower-level generic APISidekiq::Client.push('class' => MyWorker, 'args' => [1, 2, 3])  # Lower-level generic API
 
 ##### serialize fields 中的changes、 pervious_changes
@@ -203,6 +206,7 @@ Sidekiq::Client.push('class' => MyWorker, 'args' => [1, 2, 3])  # Lower-level ge
 
 ```ruby
 serialize fields, Array
+
 serialize fields, Hash
 ```
 
@@ -231,4 +235,20 @@ crontab -l > $HOME/mycron
 
 ```
 EDITOR=vi; export EDITOR  
+```
+
+##### 三种类型的Elasticsearch node节点
+
+配置文件中给出了三种配置高性能集群拓扑结构的模式,如下：
+
+```
+1. 如果你想让节点从不选举为主节点,只用来存储数据,可作为负载器
+node.master: false
+node.data: true
+2. 如果想让节点成为主节点,且不存储任何数据,并保有空闲资源,可作为协调器
+node.master: true
+node.data: false
+3. 如果想让节点既不称为主节点,又不成为数据节点,那么可将他作为搜索器,从节点中获取数据,生成搜索结果等
+node.master: false
+node.data: false
 ```
