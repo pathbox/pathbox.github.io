@@ -264,3 +264,16 @@ node.data: false
 |data	|The location of the data files	|/var/lib/elasticsearch/|
 |logs	|Log files location	|/var/log/elasticsearch|
 |plugins| Plugin files location	|/usr/share/elasticsearch/plugins|
+
+##### 使用 Elasticsearch 帮助你快速的count表数据
+当一个表的数据到达千万甚至亿级别的时候，MySQL的 count操作的耗时已经惨不忍睹。如果，你的Elasticsearch中也有一份和MySQL几乎一样的数据库，可以用Elasticsearch帮你实现这种查询，和MySQL的count相比，真的是飞速。
+
+在rails c中执行：
+
+```ruby
+time = "1909-07-27 16:42:04 +0800"
+pa = {filtered: {filter: {bool: {must:[{range: {created_at: {gte: time}}}]}}}}
+cs=Customer.__elasticsearch__.search(query: pa)
+cs.results.total
+```
+这是一种简单的方法，当然还有别的方法。如果需要增加条件，则可以修改对应的pa hash的值就可以了
