@@ -277,3 +277,9 @@ cs=Customer.__elasticsearch__.search(query: pa)
 cs.results.total
 ```
 这是一种简单的方法，当然还有别的方法。如果需要增加条件，则可以修改对应的pa hash的值就可以了
+
+##### 用elasticsearch Edge NGram Tokenizer分词，优化前缀搜索
+
+Edge NGram Tokenizer https://www.elastic.co/guide/en/elasticsearch/reference/1.4/analysis-edgengram-tokenizer.html
+
+当长度等于3时，可以使用这个分词来进行前缀搜索匹配，而当长度大于3的时候，使用prefix 性能会更佳好。
