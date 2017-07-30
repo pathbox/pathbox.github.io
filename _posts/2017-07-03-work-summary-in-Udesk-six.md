@@ -283,3 +283,6 @@ cs.results.total
 Edge NGram Tokenizer https://www.elastic.co/guide/en/elasticsearch/reference/1.4/analysis-edgengram-tokenizer.html
 
 当长度等于3时，可以使用这个分词来进行前缀搜索匹配，而当长度大于3的时候，使用prefix 性能会更佳好。
+
+##### 分布式简记
+访问层 <-> 逻辑层 <-> 数据存储层
