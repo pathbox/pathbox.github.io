@@ -3,7 +3,7 @@ layout: post
 title: 升级Elasticsearch集群数量实战记录
 date:   2017-07-30 21:00:06
 categories: Work
-image: /assets/images/post.jpg
+image: /assets/images/elasticsearch.png
 ---
 
 现在线上有一个elasticsearch集群搜索服务有三台elasticsearch实例（es1、es2、es3），打算将其升级为5台（增加es4、es5）。这篇文章主要是对整个操作的过程记录，以及出现的问题总结，包括移动数据量所需要的时间。因为，一开始由于不知道线上数据量全部分配完需要多少时间，如果从凌晨开始操作，到早上8点都还没有同步完，这样会影响到白天线上业务的正常使用。
