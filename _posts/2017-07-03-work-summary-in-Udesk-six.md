@@ -287,3 +287,6 @@ Edge NGram Tokenizer https://www.elastic.co/guide/en/elasticsearch/reference/1.4
 ##### 分布式简记
 访问层 <-> 逻辑层 <-> 数据存储层
 动态负载均衡策略；读写分离策略；一致性哈希策略。
+
+##### initializers
+initializers中的文件在rails 启动的时候会加载，如果变更其中的文件内容，则需要重启rails
