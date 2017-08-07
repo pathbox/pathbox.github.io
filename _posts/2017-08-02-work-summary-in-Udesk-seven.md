@@ -29,3 +29,88 @@ result1 = file_name.match(/\A.*\[(\S+)\].*\Z/)
 
 ##### Kafka为什么那么快
 Kafka速度的秘诀在于，它把所有的消息都变成一个的文件。通过mmap(Memory Mapped Files)提高I/O速度，写入数据的时候它是末尾添加(顺序写入)所以速度最优；读取数据的时候配合sendfile直接暴力输出。阿里的RocketMQ也是这种模式，只不过是用Java写的
+
+##### 增加edge_ngram tokenizer, 优化前缀搜索
+
+rails_script1.rb
+```ruby
+# rails r rails_script1.rb
+# 为索引增加一个新的analyzer
+
+new_settings = {
+  analysis: {
+    analyzer: {
+      edge_prefix_split: {
+        type: 'custom',
+        tokenizer: 'edge_ngram_tokenizer'
+      }
+    },
+    tokenizer: {
+      edge_ngram_tokenizer: {
+        type: 'edge_ngram',
+        min_gram: 1,
+        max_gram: 10,
+        token_chars: ['letter','digit']
+      }
+    }
+  }
+}
+
+client = Elasticsearch::Model.client.indices
+timestamp = Time.now
+client.close index: 'customers'
+client.put_settings index: 'customers', body: new_settings
+client.open index: 'customers'
+```
+
+rails_script2.rb
+```ruby
+# rails r rails_script2.rb
+# 在原来索引基础上，增加一个field
+indexes :nick_name, type: 'multi_field' do
+  indexes :prefix, analyer: 'edge_prefix_split'
+end
+
+client = Elasticsearch::Model.client
+client.indices.put_mapping index: "users", type: "user", body: {
+  user: {
+    properties:{
+      name: {
+        type: "string",
+        index: "no",
+        fields: {
+          prefix: {
+            type: "string",
+            analyzer: "edge_prefix_split"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+如果你没有使用multi_fiel(elasticsearch 5.0以上已经废弃了)，你需要
+
+```
+indexes :name do
+  indexes :prefix, type: :string, analyzer: 'edge_prefix_split'
+end
+
+client = Elasticsearch::Model.client
+client.indices.put_mapping index: "users", type: "user", body: {
+  user: {
+    properties:{
+      name:{
+        type: :string, analyzer: :edge_prefix_split
+      }
+    }
+  }
+}
+
+```
+最后，再慢慢的为所有记录执行：  __elasticsearch__.index_document。 将每个记录的nick_name.prefix，使用 analyzer edge_prefix_split进行分词。
+
+在搜索的时候，使用 {prefix: {"name.prefix"=>"#{search_value}"}} 就可以了。
+
+edge_ngram 真的是天生用于前缀搜索的tokenizer
