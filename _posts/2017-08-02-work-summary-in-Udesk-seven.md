@@ -114,3 +114,10 @@ client.indices.put_mapping index: "users", type: "user", body: {
 在搜索的时候，使用 {prefix: {"name.prefix"=>"#{search_value}"}} 就可以了。
 
 edge_ngram 真的是天生用于前缀搜索的tokenizer
+
+##### 关于服务器TCP最大连接数
+ulimit -n 65536 设为65536
+
+服务端的最大TCP连接数没有这个限制
+
+服务器中的客户端TCP连接数有这个限制。比如：nginx的处理连接数，使用数据库的TCP连接数
