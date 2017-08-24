@@ -129,3 +129,89 @@ ulimit -n 65536 设为65536
 ##### 使用JWT官网推荐的jwt包
 如果JWT的其他参数都对了，但是，加密得到的最后的jwt值还是不对，就是你的加密算法不对了。一种可能是你所用的加密算法的包和官方使用的包的算法不一致。这时候，需要到JWT官方网址，
 https://jwt.io/. 在 __Libraries__ 项目有推荐的jwt包。请使用这些推荐的jwt包。
+
+
+##### 使用inject、reduce 方法的坑
+最近在使用inject的时候遇到了一个问题。我的代码例子是：
+
+```ruby
+[1,2,3,4,5,6].inject([]) do |sum, i|
+  if i > 1
+    sum << i
+  end
+end
+```
+
+结果报错：
+
+```ruby
+NoMethodError: undefined method `<<' for nil:NilClass
+```
+一开始很奇怪，在inject([])的时候，我给sum赋值初始值为数组了，报错信息怎么会报 sum是一个 nil:NilClass呢？
+
+打断点
+
+```ruby
+def test_inject
+  [1,2,3,4,5,6].inject([]) do |sum, i|
+    if i > 1
+      binding.pry
+      sum << i
+    end
+    sum
+  end
+end
+```
+
+发现确实 sum是nil。想到了可能是if i > 1 这个条件判断的影响。修改一下测试代码
+
+```ruby
+def test_inject_0
+  [1,2,3,4,5,6].inject([]) do |sum, i|
+    if i > 0
+      sum << i
+    end
+  end
+end
+
+def test_inject_3
+  [4,5,6,1,2,3].inject([]) do |sum, i|
+    binding.pry
+    if i > 3
+      sum << i
+    end
+  end
+end
+```
+
+```ruby
+test_inject_0  # [1, 2, 3, 4, 5, 6]
+
+test_inject_3  
+sum
+# []
+# [4]
+# [4,5]
+# [4,5,6]
+# NoMethodError: undefined method `<<' for nil:NilClass
+```
+根据test_inject_3 ， 当i的值不满足 if i > 3 的条件的时候，sum的值就被置为nil了。
+
+如果你需要在inject的block中进行对操作元素的条件过滤操作，你会将sum变为nil。
+
+所以建议不在inject的block中进行条件过滤操作，而是在inject方法之前过滤好。
+
+同理reduce方法。
+
+Ruby 版本： ruby 2.4.0p0 (2016-12-24 revision 57164) [x86_64-linux]
+
+解决方法
+```ruby
+[1,2,3,4,5,6].inject([]) do |sum, i|
+  if i > 1
+    sum << i
+  end
+  sum
+end
+```
+在最后返回 sum，因为 inject方法会将最后的返回值赋值给sum。如果在if 判断条件没有通过的情况下，会将nil值返回给sum
