@@ -215,3 +215,139 @@ Ruby 版本： ruby 2.4.0p0 (2016-12-24 revision 57164) [x86_64-linux]
 end
 ```
 在最后返回 sum，因为 inject方法会将最后的返回值赋值给sum。如果在if 判断条件没有通过的情况下，会将nil值返回给sum
+
+##### 控制elasticsearch启动、关闭、重启shell脚本
+
+```
+APP_EXEC="/usr/local/service/elasticsearch/bin/elasticsearch"
+LOG_FILE="/mnt/log/elasticsearch.log"
+PID_FILE="/mnt/run/elasticsearch.pid"
+PID_DIR="$APP_DIR/pid"
+LOG_DIR="$APP_DIR/log"
+
+USAGE="Usage: $0 {start|stop|restart|status} [--force]"
+FORCE_OP=false
+
+start_it() {
+    echo "Starting Elasticsearch..."
+    $APP_EXEC 1>"$LOG_FILE" 2>&1 &
+    echo $! > "$PID_FILE"
+    echo "Elasticsearch started with pid $!"
+}
+
+pid_file_exists() {
+    [ -f "$PID_FILE" ]
+}
+
+get_pid() {
+    echo "$(cat "$PID_FILE")"
+}
+
+is_running() {
+    PID=$(get_pid)
+    ! [ -z "$(ps aux | awk '{print $2}' | grep "^$PID$")" ]
+}
+
+remove_pid_file() {
+    echo "Removing pid file"
+    rm -f "$PID_FILE"
+}
+
+start_app() {
+    if pid_file_exists
+    then
+        if is_running
+        then
+            PID=$(get_pid)
+            echo "Elasticsearch already running with pid $PID"
+            exit 1
+        else
+            echo "Elasticsearch stopped, but pid file exists"
+            if [ $FORCE_OP = true ]
+            then
+                echo "Forcing start anyways"
+                remove_pid_file
+                start_it
+            fi
+        fi
+    else
+        start_it
+    fi
+}
+stop_process() {
+    PID=$(get_pid)
+    echo "Killing process $PID"
+    kill $PID
+}
+
+stop_app() {
+    if pid_file_exists
+    then
+        if is_running
+        then
+            echo "Stopping Elasticsearch ..."
+            stop_process
+            remove_pid_file
+            echo "Elasticsearch stopped"
+        else
+            echo "Elasticsearch already stopped, but pid file exists"
+            if [ $FORCE_OP = true ]
+            then
+                echo "Forcing stop anyways ..."
+                remove_pid_file
+                echo "Elasticsearch stopped"
+            else
+                exit 1
+            fi
+        fi
+    else
+        echo "Elasticsearch already stopped, pid file does not exist"
+        exit 1
+    fi
+}
+status_app() {
+    if pid_file_exists
+    then
+        if is_running
+        then
+            PID=$(get_pid)
+            echo "Elasticsearch running with pid $PID"
+        else
+            echo "Elasticsearch stopped, but pid file exists"
+        fi
+    else
+        echo "Elasticsearch stopped"
+    fi
+}
+case "$2" in
+--force)
+    FORCE_OP=true
+    ;;
+"")
+    ;;
+*)
+    echo $USAGE
+    exit 1
+    ;;
+esac
+
+case "$1" in
+start)
+    start_app
+    ;;
+stop)
+    stop_app
+    ;;
+restart)
+    stop_app
+    start_app
+    ;;
+status)
+    status_app
+    ;;
+*)
+    echo $USAGE
+    exit 1
+    ;;
+esac
+```
