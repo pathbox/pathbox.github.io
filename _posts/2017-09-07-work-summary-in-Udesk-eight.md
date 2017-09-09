@@ -8,3 +8,7 @@ image: /assets/images/post.jpg
 
 ##### ActiveRecord reload
 reload方法：数据库更新不可能反馈到变更前创建的对象上。通过reload方法让对象重新加载数据库最新的变更。
+
+##### SaaS PaaS IaaS 开设一家披萨店
+阮一峰关于 SaaS PaaS IaaS 的解释文章
+http://www.ruanyifeng.com/blog/2017/07/iaas-paas-saas.html
