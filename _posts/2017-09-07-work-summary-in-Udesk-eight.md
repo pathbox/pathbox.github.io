@@ -20,3 +20,41 @@ http://www.ruanyifeng.com/blog/2017/07/iaas-paas-saas.html
 如果选择传 current_user， 在方法使用中往往还需要考虑，current_user 会不会为nil。为nil的时候，代码逻辑会不会报错，需要做什么处理。
 而当传current_user_id的时候，如果方法中只是需要current_user.id，并不需要更多的current_user的属性，我会选择传current_user_id
 因为我发现，传current_user会产生更复杂的情况
+
+##### Many RUN is a shit in Dockerfile
+
+`shit`
+用了N层，有几个RUN就有几层
+
+```
+FROM	debian:jessie
+RUN	apt-get	update
+RUN	apt-get	install	-y	gcc	libc6-dev	make
+RUN	wget	-O	redis.tar.gz	"http://download.redis.io/releases/redi
+s-3.2.5.tar.gz"
+RUN	mkdir	-p	/usr/src/redis
+RUN	tar	-xzf	redis.tar.gz	-C	/usr/src/redis	--strip-components=1
+RUN	make	-C	/usr/src/redis
+RUN	make	-C	/usr/src/redis	install
+```
+
+`nice`
+
+这样才用了一层
+```
+FROM	debian:jessie
+RUN	buildDeps='gcc	libc6-dev	make'	\
+				&&	apt-get	update	\
+				&&	apt-get	install	-y	$buildDeps	\
+				&&	wget	-O	redis.tar.gz	"http://download.redis.io/releases/r
+edis-3.2.5.tar.gz"	\
+				&&	mkdir	-p	/usr/src/redis	\
+				&&	tar	-xzf	redis.tar.gz	-C	/usr/src/redis	--strip-component
+s=1	\
+				&&	make	-C	/usr/src/redis	\
+				&&	make	-C	/usr/src/redis	install	\
+				&&	rm	-rf	/var/lib/apt/lists/*	\
+				&&	rm	redis.tar.gz	\
+				&&	rm	-r	/usr/src/redis	\
+				&&	apt-get	purge	-y	--auto-remove	$buildDeps
+```
