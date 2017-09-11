@@ -8,7 +8,7 @@ image: /assets/images/post.jpg
 
 众所周知，我们能使用Golang轻松编写并发程序。Golang利用goroutine，让我们编写并发程序变得容易。并发程序中重要的问题之一就是如何正确的处理“竞争资源”或“共享资源”。Golang为我们提供了锁的机制。这篇文章，就简单介绍Golang中锁的使用方法。并且进行错误的使用方法和正确的使用方法的代码示例对比。文章的所以代码示例在：https://github.com/pathbox/learning-go/tree/master/src/lock
 
-我们看第一个栗子🌰：
+我们看第一个栗子：
 
 ```go
 package main
@@ -94,7 +94,7 @@ Count Value:  1000
 声明了一个全局锁后，其作用范围是全局。直接使用，而不是将其作为参数传递到方法中。
 
 
-下一个栗子🌰
+下一个栗子
 
 ```go
 package main
