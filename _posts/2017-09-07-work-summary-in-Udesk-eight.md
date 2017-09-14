@@ -58,3 +58,9 @@ s=1	\
 				&&	rm	-r	/usr/src/redis	\
 				&&	apt-get	purge	-y	--auto-remove	$buildDeps
 ```
+
+##### 变量取名思考
+
+根据变量类型取名
+
+根据变量功能取名
