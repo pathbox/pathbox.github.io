@@ -64,3 +64,48 @@ s=1	\
 根据变量类型取名
 
 根据变量功能取名
+
+##### 在rails项目中同时使用两个ES集群
+
+/initializers/elasticsearch.rb
+
+```ruby
+# 默认的elasticsearch client
+Elasticsearch::Model.client = Elasticsearch::Client.new(
+  host: "127.0.0.1:9200",
+  randomize_hosts: true,
+  retry_on_failure: 0,
+  log: true,
+  transport_options: { request: { timeout: 10 } }
+)
+
+# 自定义的第二个elasticsearch client
+MySecondClient = Elasticsearch::Client.new(
+  host: "127.0.0.1:9500",
+  randomize_hosts: true,
+  retry_on_failure: 0,
+  log: true,
+  transport_options: { request: { timeout: 10 } }
+)
+```
+
+app/model/post.rb
+
+```ruby
+#当直接使用：
+Post.__elasticsearch__.search(query: query)
+
+# 上面ES查询语句访问的是默认的elasticsearch
+```
+
+使用自定义的elasticsearch
+
+```ruby
+class Post < ActiveRecord::Base
+  self.__elasticsearch__.client = MySecondClient # 指定使用第二个elasticsearch
+
+  Post.__elasticsearch__.search(query: query)
+
+  # 这时候，访问的是第二个elasticsearch
+end
+```
