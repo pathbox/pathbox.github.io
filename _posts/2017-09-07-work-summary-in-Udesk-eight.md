@@ -109,3 +109,6 @@ class Post < ActiveRecord::Base
   # 这时候，访问的是第二个elasticsearch
 end
 ```
+
+##### 把二进制命令放入 /usr/bin目录中，后会发生神奇的事
+把二进制命令放入 /usr/bin目录中，你就可以在终端使用这个命令啦～
