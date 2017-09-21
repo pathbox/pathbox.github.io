@@ -137,3 +137,12 @@ user_ids = UsersUserGroup.where(user_group_id: user_group_ids).pluck(:user_id).u
 而且用到了pluck，不会产生大量的user对象数组
 
 但是如果你是需要使用到user对象的其他字段的时候，就不能这样做了
+
+##### 和`elasticsearch` 有关的 `gem` `document`
+http://www.rubydoc.info/gems/elasticsearch-watcher
+
+http://www.rubydoc.info/gems/elasticsearch-api/Elasticsearch/API
+
+http://www.rubydoc.info/gems/elasticsearch-model/Elasticsearch
+
+http://www.rubydoc.info/gems/elasticsearch-transport
