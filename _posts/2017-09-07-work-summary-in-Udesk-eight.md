@@ -146,3 +146,17 @@ http://www.rubydoc.info/gems/elasticsearch-api/Elasticsearch/API
 http://www.rubydoc.info/gems/elasticsearch-model/Elasticsearch
 
 http://www.rubydoc.info/gems/elasticsearch-transport
+
+
+##### ActiveRecord merge
+
+```ruby
+User.where(company_id: 1).joins(:tickets).merge(Ticket.where(company_id: 1))
+
+User Load (1236.6ms)  SELECT `users`.* FROM `users` INNER JOIN `tickets` ON `tickets`.`user_id` = `users`.`id` WHERE `users`.`company_id` = 1 AND `tickets`.`company_id` = 1
+
+User.where(company_id: 1).joins(:tickets).merge(->{joins(:tickets)})
+User Load (1205.6ms)  SELECT `users`.* FROM `users` INNER JOIN `tickets` ON `tickets`.`user_id` = `users`.`id` WHERE `users`.`company_id` = 1
+```
+
+`ActiveRecord merge` 帮助你在joins连接表操作的时候，可以优雅的增加`where` 条件操作，就不用自己手写SQL了 
