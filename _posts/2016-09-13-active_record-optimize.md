@@ -189,6 +189,32 @@ SELECT COUNT(*) FROM `customers` WHERE `customers`.`company_id` = 1 AND `custome
 ```
 所以，果断修改代码，增加了company_id 条件的查询到原语句
 
+
+##### includes + map tip
+```ruby
+current_user.user_groups.includes(:users).map(&:users).flatten
+```
+
+```sql
+UserGroup Load (0.6ms)  SELECT `user_groups`.* FROM `user_groups` INNER JOIN `users_user_groups` ON `user_groups`.`id` = `users_user_groups`.`user_group_id` WHERE `users_user_groups`.`user_id` = 2
+  UsersUserGroup Load (0.8ms)  SELECT `users_user_groups`.* FROM `users_user_groups` WHERE `users_user_groups`.`user_group_id` IN (1, 2)
+  User Load (3.2ms)  SELECT `users`.* FROM `users` WHERE `users`.`id` IN (2, 3, 4, 5, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 36, 37, 38, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 122, 13, 100146, 100149, 100150, 100154, 100155, 100156, 10, 39, 64, 100157)
+
+```
+得到结果是一个user对象数组
+
+如果只是想要得到user_id
+
+其实只要执行两句sql查询
+```
+user_group_ids = current_user.user_groups.pluck(:id)
+user_ids = UsersUserGroup.where(user_group_id: user_group_ids).pluck(:user_id).uniq
+```
+
+而且用到了pluck，不会产生大量的user对象数组
+
+但是如果你是需要使用到user对象的其他字段的时候，就不能这样做了
+
 ##### 关于数据库优化的记录
 1.索引优化
 

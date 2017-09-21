@@ -135,3 +135,5 @@ user_ids = UsersUserGroup.where(user_group_id: user_group_ids).pluck(:user_id).u
 ```
 
 而且用到了pluck，不会产生大量的user对象数组
+
+但是如果你是需要使用到user对象的其他字段的时候，就不能这样做了

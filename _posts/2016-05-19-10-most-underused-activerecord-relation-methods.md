@@ -1,12 +1,4 @@
----
-layout: post
-title: 10 most underused activerecord relation methods(翻译)
-date:   2016-05-19 15:26:06
-categories: rails
-tag: rails AR::Relation
-image: /assets/images/post.jpg
----
-
+# 10 most underused activerecord relation methods(翻译)
 
 
 ### 10.first_or_create with a block
@@ -37,7 +29,9 @@ Book.create(title: 'Tale of Two Cities',
 
 ```
 
-传的三个属性都将用于create操作。
+传的三个属性都将用于create操作
+
+同样的，find_or_create_by 也可以进行block的操作
 
 ### 9.first_or_initialize
 如果你还不想要save这条记录，可以使用first_or_initialize:
@@ -157,27 +151,3 @@ end
 ```
 
 原文: http://www.mitchcrowe.com/10-most-underused-activerecord-relation-methods/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
