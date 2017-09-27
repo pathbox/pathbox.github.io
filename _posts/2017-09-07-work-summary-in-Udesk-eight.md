@@ -159,4 +159,27 @@ User.where(company_id: 1).joins(:tickets).merge(->{joins(:tickets)})
 User Load (1205.6ms)  SELECT `users`.* FROM `users` INNER JOIN `tickets` ON `tickets`.`user_id` = `users`.`id` WHERE `users`.`company_id` = 1
 ```
 
-`ActiveRecord merge` 帮助你在joins连接表操作的时候，可以优雅的增加`where` 条件操作，就不用自己手写SQL了 
+`ActiveRecord merge` 帮助你在joins连接表操作的时候，可以优雅的增加`where` 条件操作，就不用自己手写SQL了
+
+##### create_index! in elasticsearch
+
+```ruby
+def create_index!(options={})
+  options = options.clone
+
+  target_index = options.delete(:index) || self.index_name
+  settings =  options.delete(:settings) || self.settings.to_hash
+  mappings = options.delete(:mappings) || self.mappings.to_hash
+
+  delete_index!(options.merge index: target_index) if options[:force]
+
+  unless index_exists?(index: target_index)
+    self.client.indices.create index: target_index,
+      body: {
+        settings: settings,
+        mappings: mappings
+      }
+  end
+end
+
+```
