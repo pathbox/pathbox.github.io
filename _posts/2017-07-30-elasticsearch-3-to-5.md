@@ -202,7 +202,7 @@ posts               4 p STARTED   993938   3.5gb es3_ip es3
 
 posts在elasticsearch1 上出现了三个shard
 
-实际上，原本集群中的三台服务器是不用重启的，你可以修改他们elasticsearch.yml 配置中的单拨数组设置：discovery.zen.ping.unicast.hosts。加上新加的两台服务器的ip，和 discovery.zen.minimum_master_nodes:3。下次重启的时候，就会读取这个新的配置，而不需要马上重新。因为，k可以通过调用API的方式，动态配置discovery.zen.minimum_master_nodes，而discovery.zen.ping.unicast.hosts的配置，在新的elasticsearch服务器上配置五台服务器的ip地址就可以了。
+实际上，原本集群中的三台服务器是不用重启的，你可以修改他们elasticsearch.yml 配置中的单拨数组设置：discovery.zen.ping.unicast.hosts。加上新加的两台服务器的ip，和 discovery.zen.minimum_master_nodes:3。下次重启的时候，就会读取这个新的配置，而不需要马上重新。因为，IK可以通过调用API的方式，动态配置discovery.zen.minimum_master_nodes，而discovery.zen.ping.unicast.hosts的配置，在新的elasticsearch服务器上配置五台服务器的ip地址就可以了。
 
 打开所有es服务器的monit，测试线上elasticsearch搜索功能
 
