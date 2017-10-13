@@ -44,3 +44,12 @@ http.Request: 封装客户端HTTP请求数据
 http.ResponseWriter: 用来构造服务器端HTTP响应数据
 http.Handler: URL处理程序必须实现的接口
 ```
+
+##### 不要手贱卸载homebrew
+重要的事说三遍：
+
+不要手贱卸载homebrew
+
+不要手贱卸载homebrew
+
+不要手贱卸载homebrew
