@@ -71,3 +71,11 @@ select/poll模型，这些技术都有一定的缺点：如selelct最大不能�
 Epoll is C10K killer
 
 lib libevent
+
+##### index_exists?
+
+```ruby
+add_index :agent_extras, :agent_id	unless index_exists?(:agent_extras, :agent_id)
+```
+
+用该方法可以在创建索引的时候,判断索引是否存在,索引不存在才创建,避免创建相同索引而报错
