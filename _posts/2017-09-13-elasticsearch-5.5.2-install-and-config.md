@@ -62,7 +62,10 @@ max number of threads [1024] for user [tommy] is too low, increase to at least [
 
 * hard nofile 65536
 * soft nofile 65536
+
+* - memlock unlimited  # 打开内存lock
 ```
+然后重新登入，比如ssh重新登入
 
 你可以通过 ulimit -n 命令看是否修改成功
 
@@ -71,6 +74,7 @@ vim /etc/sysctl.conf
 ```
 vm.max_map_count=262144
 ```
+之后运行 sudo /sbin/syctl -p 可以立即让修改生效
 
 vim config/jvm.options
 
@@ -159,6 +163,13 @@ curl -XPUT 'http://localhost:9200/_all/_settings?preserve_existing=true' -d '{
 discovery.zen.ping.timeout =>(更新为) discovery.zen.ping_timeout
 ```
 
+在config目录，手动mkdir scripts， 文件夹中可以没有任何脚本文件
+
+config 目录中的文件权限，都修改为644. 因为新版本的elasticsearch 不建议使用root 或sudo的方式启动了，所以，对应的权限，也需要给予
+
+
+
+
 ##### 安装IK中文分析器
 
 ```
@@ -176,6 +187,12 @@ ik_smart: 会做最粗粒度的拆分
 ```
 ./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v5.5.2/elasticsearch-analysis-ik-5.5.2.zip
 ```
+现在貌似对5.5.2版本不支持这种命令方式安装了，你需要使用第二种安装方式。
+
+下载对应版本analysis-ik的zip，然后自行在config和plugins目录解压analysi-ik文件夹
+
+下载地址在： https://github.com/medcl/elasticsearch-analysis-ik/releases
+
 IK目录
 ```
 /home/user/elasticsearch-5.5.2/config/analysis-ik
