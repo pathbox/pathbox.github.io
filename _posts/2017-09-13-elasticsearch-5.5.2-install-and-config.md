@@ -81,6 +81,7 @@ vim config/jvm.options
 ```
 # Xms represents the initial size of total heap space
 # Xmx represents the maximum size of total heap space
+# 配置的内存大小需要为整数，单位用g或m
 
 -Xms1g
 -Xmx1g
