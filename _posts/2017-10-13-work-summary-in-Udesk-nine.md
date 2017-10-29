@@ -79,3 +79,20 @@ add_index :agent_extras, :agent_id	unless index_exists?(:agent_extras, :agent_id
 ```
 
 用该方法可以在创建索引的时候,判断索引是否存在,索引不存在才创建,避免创建相同索引而报错
+
+##### 在接口调用中使用 proxy(中心处理) and adapter(分类处理)
+最近总结了项目中对云问机器人的调用接口。代码使用了proxy模式+adapter模式
+
+proxy中，对接口进行统一的处理。对request params 和response 进行处理
+
+adapter 根据传的识别参数不同， 调用微信机器人的接口，或client端的机器人接口
+
+想起另一个项目中，也是类似的使用了这两种模式结合的方式设计代码
+
+益处是:  共同的方法或内容统一处理，分类的方法再细分处理。避免重复性代码，并且可维护性提高。
+
+不需要同事维护多个地方，一般只要维护proxy一个地方。 因为adapter处的维护较少。
+
+当需要增加一个类别adapter的时候，可以很方便的增加。只要增加一个新的adapter，使用共同的proxy。
+
+而不用写一个新的proxy
