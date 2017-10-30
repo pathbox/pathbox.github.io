@@ -99,3 +99,12 @@ adapter 根据传的识别参数不同， 调用微信机器人的接口，或cl
 
 ##### ruby present?
 false.present? 返回的也是false， 而不是true
+
+##### 一个异常编码空格引发的错误
+报错信息
+```
+NameError (undefined local variable or method `　' for #<Company:0x007f369c32b958>):
+xxx.rb:133:in `is_ok?'
+```
+
+是指这一行有一个异常的空格编码，ruby解释器无法识别。 选中这一行就能发现这个空格代码和旁边的显示不一样l
