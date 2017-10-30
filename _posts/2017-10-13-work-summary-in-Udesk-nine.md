@@ -96,3 +96,6 @@ adapter 根据传的识别参数不同， 调用微信机器人的接口，或cl
 当需要增加一个类别adapter的时候，可以很方便的增加。只要增加一个新的adapter，使用共同的proxy。
 
 而不用写一个新的proxy
+
+##### ruby present?
+false.present? 返回的也是false， 而不是true
