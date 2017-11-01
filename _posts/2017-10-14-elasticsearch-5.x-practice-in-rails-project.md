@@ -19,7 +19,7 @@ Elasticsearch-5.x server 版本的安装可以参考之前的文章:。我是安
 
 在`Gemfile`中增加
 
-```
+```ruby
 gem "elasticsearch"
 gem "elasticsearch-model"
 gem "elasticsearch-rails"
@@ -51,6 +51,7 @@ gem "elasticsearch-rails"
 
 简单的图表示：
 
+![orders]( /assets/images/orders.png "Orders")
 
 在项目中，实现别名机制不难。详见[官方文档的例子](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html)
 
@@ -140,7 +141,7 @@ end
 `app/models/order.rb`
 
 1.4版本中的mapping配置
-```
+```ruby
 indexes :subject, type: 'multi_field' do
   indexes :raw, type: :string, index: :not_analyzed
   indexes :tokenized, analyzer: :ik_smart
@@ -158,7 +159,7 @@ end
 
 5.x版本中的mapping配置
 
-```
+```ruby
 indexes :subject, type: :keyword do
   indexes :raw, type: :keyword
   indexes :tokenized, analyzer: :ik_smart
@@ -257,5 +258,3 @@ filters[:must] << {
 terms_array = value.map {|v| {term: {field_name => v}}}
 {bool: {must: terms_array}}
 ```
-
-这次升级，算是暂时结束了。如果有朋友有更好的elasticsearch使用经验，欢迎交流。
