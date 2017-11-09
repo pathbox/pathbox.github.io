@@ -107,4 +107,7 @@ NameError (undefined local variable or method `　' for #<Company:0x007f369c32b9
 xxx.rb:133:in `is_ok?'
 ```
 
-是指这一行有一个异常的空格编码，ruby解释器无法识别。 选中这一行就能发现这个空格代码和旁边的显示不一样l
+是指这一行有一个异常的空格编码，ruby解释器无法识别。 选中这一行就能发现这个空格代码和旁边的显示不一样
+
+##### Ubuntu修改文件所属用户和组
+chown -r user:group .XXX/* 同时更改XXX目录下所有文件的用户和用户组
