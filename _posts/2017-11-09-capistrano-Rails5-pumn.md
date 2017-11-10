@@ -231,6 +231,10 @@ server {
 
 ```
 
+cd /etc/nginx/sites-enabled
+
+ln -s /etc/nginx/sites-available/cap_puma cap_puma.conf 
+
 ##### puma.rb
 
 `/web/www/udesk_vcall/shared/puma.rb`
