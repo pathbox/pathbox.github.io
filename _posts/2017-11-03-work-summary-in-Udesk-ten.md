@@ -50,3 +50,42 @@ Don't do it again
 周末redis服务器挂了，持续了20分钟。影响到了登入后的初始界面，使得初始界面无法访问。初始界面会调的接口，应该没有redis请求的相关逻辑，避免客户连登入都登入不了。
 而是哪个模块需要redis，在那个模块的接口再请求redis。如果不可避免需要请求redis，也许要思考redis集群方案，或redis挂了后及时的报警机制，以及时定位问题
 单点故障就是像地雷一样
+
+##### 从conn 读取数据时，慎用bufio
+
+good read
+
+```go
+func read(conn net.Conn) (string, error) {
+  readBytes := make([]byte, 1)
+  var buffer bytes.Buffer
+  for {
+    _, err := conn.Read(readBytes) // conn => readBytes
+    if err != nil {
+      return "", err
+    }
+    readByte := readBytes[0]
+    if readByte == DELIMITER{
+      break
+    }
+    buffer.WriteByte(readByte) // readByte => buffer
+  }
+  return buffer.String(), nil
+}
+```
+
+bad read
+
+```go
+func read(conn net.Conn) (string, error) {
+  reader := bufio.NewReader(conn)
+  readBytes, err := bufio.NewReader(conn)
+  if err != nil {
+    return "", err
+  }
+  return string(readBytes[:len(readBytes) - 1]), nil
+}
+```
+
+在这里，我们队read函数的每一次调用都会导致一个新的针对当前连接的缓冲读取器被创建，我们实际上是在使用不同的缓冲读取器试图从同一个连接上读取数据。这显然会造成一些问题，因为没有任何机制来协调它们读取操作，本应该留给后面的缓冲读取器读取的数据却被提前读取到了前面的缓冲读取器的缓冲区。这不但会导致一些数据块的不完整，甚至还可能会使一些数据块被漏掉。
+解决方法也很简单，直接在for代码块之前初始化一个缓冲读取器，并且保证在for循环中总是使用同一个缓冲读取器来读取护具。
