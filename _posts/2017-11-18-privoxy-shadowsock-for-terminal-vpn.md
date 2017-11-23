@@ -28,6 +28,15 @@ forward-socks5 / 127.0.0.1:1080 .
 
 其他的配置如果你看不懂或还不需要,就不用改动,使用默认的就可以
 
+执行
+
+```
+export http_proxy=http://127.0.0.1:8118
+export https_proxy=http://127.0.0.1:8118
+```
+
+或者把其加入到 .zsh_profile(我用的zsh)
+
 之后，进行 `go get google.golang.org/xxx` 之类下载的谷歌源的代码包，就能成功了
 
 Just mark
