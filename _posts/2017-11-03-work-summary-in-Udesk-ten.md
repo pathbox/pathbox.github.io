@@ -197,3 +197,11 @@ http://www.jianshu.com/p/4a58761d758f
 zh-cn.yml zh-CN.yml 两个文件共存，在macOS系统中，会出现覆盖问题，只能识别出一个。
 
 这个锅我不背啊！
+
+##### Why do many websocket libraries implement their own application-level heartbeats?
+
++ Websocket `ping` is initiated by the server only
++ The browser Websocket API isn't able to send `ping` frames and the incoming `ping` from the server are not exposed in any way
++ These pings arer about keepalive, not presence
++ Therefore if the server goes away without a proper TCP teardown(network lost/crash etc), the client doesn't know if connection is still open
++ Adding a heartbeat at application level is a way for the client to establish the servers presence, or lack thereof. These must be sent as normal data messages because that's all the Websocket API (browser) is capable of.
