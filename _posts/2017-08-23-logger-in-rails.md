@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Rails中的使用logger实用技巧
+title: 简记Rails中的logger实用技巧
 date:   2017-08-23 15:30:06
 categories: Rails
 image: /assets/images/post.jpg
@@ -8,7 +8,7 @@ image: /assets/images/post.jpg
 
 ##### Gem lograge
 
-[lograge](https://github.com/roidrage/lograge) is awesome for doing log.
+[lograge](https://github.com/roidrage/lograge) is awesome for formating log.
 
 ```ruby
 
@@ -47,10 +47,6 @@ end
 
 环境：Rails 5.1.4
 
-不使用 `lograge`
-
-使用 `lograge`
-
 `lograge`还提供了不同的formatters。
 
 ```
@@ -67,7 +63,7 @@ Lograge::Formatters::Raw.new       # Returns a ruby hash object
 默认的日志格式是 key=value的格式：
 
 ```ruby
-[2017-12-01 11:49:10] [INFO] [] [localhost] [127.0.0.1] [1593754b-bc95-42] method=GET path=/ format=*/* controller=HomeController action=welcome status=200 duration=472.00 view=0.00 params={} time=2017-12-01 11:49:09 +0800
+[2017-12-01 22:43:00] [INFO] [] [localhost] [127.0.0.1] [1593754b-bc95-42] method=GET path=/ format=*/* controller=HomeController action=welcome status=200 duration=472.00 view=0.00 params={} time=2017-12-01 11:49:09 +0800
 
 ```
 
@@ -130,7 +126,7 @@ end
 ```ruby
 log = create_my_logger("third_api_service.log")
 
-... # 某些操作
+... # do something
 result = do_third_api_service
 if result
   log.info("Third api service success")
@@ -149,14 +145,14 @@ module MyLogger
     info = {}
     title = []
 
-    yield title, info
+    yield msg, info
 
     timestamp  = Time.now.strftime('%Y%m%d_%H%M%S_%L')
-    title      = [timestamp, title].flatten.compact
+    msg      = [timestamp, msg].flatten.compact
     title = title.join('-')
 
     data = {}
-    data[:title] = title
+    data[:msg] = msg
     data.merge! info
 
     self.debug data.to_json # 打印json日志内容
@@ -174,3 +170,52 @@ def create_my_logger(file_name)
   logger
 end
 ```
+
+使用示例：
+```ruby
+SYNC_LOGGER = create_my_logger('sync.log')
+
+SYNC_LOGGER.log_json do |msg, info|
+  msg << 'user_id:1'
+  info[:action] = 'sync success'
+end
+```
+
+生成sync.log文件会打印以下信息：
+
+```ruby
+[2017-12-01 22:45:20] [DEBUG] {"title":"20171202_141419_311-user_id:1","action":"sync success"}
+```
+
+##### 为调用外部服务增加必要日志
+
+当系统中有需要http client形式调用外部服务时，比如：微信开发的微信接口，推送接口，第三方开放API，我会这么做：
+
+使用示例：
+```ruby
+API_LOGGER = create_my_logger('xxx_api.log')
+
+API_LOGGER.log_json do |msg, info|
+  begin
+    msg << 'xxx:api:user_id:1'
+    info[:resquest] = request_params
+    start = Time.now
+    res = httpclient.do(url, request_params)
+    duration = Time.now - start
+    info[:response] = res
+    info[:duration] = duration
+    info[:error] = nil
+  rescue => e
+    info[:res] = nil
+    info[:error] = "#{e.inspect}"
+  end
+end
+```
+
+将`请求参数`、`返回响应`、`报错信息`都记录下来，查看日志时一目了然。出问题时，能帮助你很快的定位出是系统中的bug还是外部服务的bug。
+
+证明"代码的清白"，就靠他们了。
+
+一个好的日志设计和使用习惯，是一个系统稳定、健壮和可控的重要保证。
+
+本文简单小结了在Rails项目中日志的使用。
