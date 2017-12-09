@@ -49,3 +49,36 @@ for {
 这样就能正确使用了
 
 ```
+
+##### Rails 5 belongs_to foreign_id must be not blank
+
+Rails 5 中
+
+```ruby
+class User < ApplicationRecord
+  belongs_to :school
+  belongs_to :city
+end
+
+user = User.new
+user.save!
+
+# ActiveRecord::RecordInvalid: 验证失败: School必须存在, City必须存在
+# 外键id必须要有值
+```
+
+new_framework_defaults.rb
+
+```ruby
+Rails.application.config.active_record.belongs_to_required_by_default = false
+```
+这样就不会进行sql查询,不会强制存在了
+
+或者
+
+```ruby
+class User < ApplicationRecord
+  belongs_to :school, optional: true  # required: true
+  belongs_to :city, optional: true
+end
+```
