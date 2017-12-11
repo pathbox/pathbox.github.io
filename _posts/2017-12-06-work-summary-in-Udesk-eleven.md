@@ -82,3 +82,54 @@ class User < ApplicationRecord
   belongs_to :city, optional: true
 end
 ```
+
+##### 两个项目的Sidekiq之间的通信技巧
+
+Sidekiq： 项目A
+
+Sidekiq： 项目B
+
+设计A作为生成者，B作为消费者。由于B中有大量业务逻辑，不想在A中又实现一遍，而是通过Sidekiq，在A中将参数存到B的redis中，B再从中取出进行“消费”
+
+```ruby
+B_SIDEKIQ_REDIS = Redis::Namespace.new(B_SIDEKIQ_NAMESPACE, redis: B_REDIS)
+B_SIDEKIQ_REDIS_POOL = ConnectionPool.new(timeout: 1) { B_SIDEKIQ_REDIS }
+```
+
+Sidekiq 源码中使用到的池是`ConnectionPool.new`, 所以这里实例化了一个全局的池`B_SIDEKIQ_REDIS_POOL`
+
+```ruby
+# A项目中
+# update_user_worker.rb
+
+class UpdateUserWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: :default, retry: false, pool: B_SIDEKIQ_REDIS_POOL
+end
+
+#代码莫处
+UpdateUserWorker.perform_async(1, 'Jerry')
+
+
+# B 项目中
+# update_user_worker.rb
+class UpdateUserWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: :default, retry: false
+
+  def perform(user_id, name)
+    user = User.find user_id
+    user.update!(name: name)
+  end
+end
+```
+
+在两个项目中创建相同的worker: `update_user_worker.rb`
+
+A项目中，`sidekiq_options`选项进行`pool`的配置，替换原来默认的pool，而使用B项目的redis
+
+B项目中，具体实现 `perform`方法逻辑
+
+原理简释: 在A中通过Sidekiq将参数存到B的redis中，B的Sidekiq从redis中取出参数，进行`消费`操作
+
+这样看，redis其实也可以使用相同的redis。只要生产者Sidekiq存的值使用的redis，消费者能够从中取出值就可以了，很简单，但在Rails项目中很实用的一个技巧
