@@ -17,7 +17,7 @@ name: 'PathBox'
 author: 'PathBox'
 author_image: "/assets/images/author.jpg"
 
-paginate:	20
+paginate:	50
 
 #url: "http://blog.jerry-tao.com" # the base hostname & protocol for your site
 baseurl: "http://pathbox.github.io"
