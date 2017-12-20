@@ -149,3 +149,13 @@ B项目中，具体实现 `perform`方法逻辑
 + 二进制数据存储
 
 + 适合于保存在关系型数据库中的结构化数据
+
+##### systemd 对每个服务的文件描述符限制
+Ubuntu 16.04之后使用了`systemd`。 `systemd`对监听的服务有文件描述符的限制，默认限制是1024。所以，如果要使用`systemd`，服务需要更多的文件描述符，达到高性能，高并发。需要修改这个配置
+
+```
+[Service]
+LimitCORE=infinity
+LimitNOFILE=100000
+LimitNPROC=100000
+```
