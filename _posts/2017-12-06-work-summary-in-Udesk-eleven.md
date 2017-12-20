@@ -107,7 +107,7 @@ class UpdateUserWorker
   sidekiq_options queue: :default, retry: false, pool: B_SIDEKIQ_REDIS_POOL
 end
 
-#代码莫处
+#代码某处
 UpdateUserWorker.perform_async(1, 'Jerry')
 
 
@@ -133,3 +133,19 @@ B项目中，具体实现 `perform`方法逻辑
 原理简释: 在A中通过Sidekiq将参数存到B的redis中，B的Sidekiq从redis中取出参数，进行`消费`操作
 
 这样看，redis其实也可以使用相同的redis。只要生产者Sidekiq存的值使用的redis，消费者能够从中取出值就可以了，很简单，但在Rails项目中很实用的一个技巧
+
+##### 图数据库简记
+
+适合 社交网络图谱 企业关系图谱
+
+更大深度的关联关系, 关系数据库当关联深度超过2时会有现严重的性能问题(join超过3个表性能急剧下降)
+
+缺点:
+
++ 记录大量基于事件的数据（例如日志条目或传感器数据）
+
++ 对大规模分布式数据进行处理，类似于Hadoop
+
++ 二进制数据存储
+
++ 适合于保存在关系型数据库中的结构化数据
