@@ -32,7 +32,6 @@ for {
 
 正确的姿势:
 
-
 socket := &Scoket{
   message: make(chan []byte),
   close: make(chan struct{}),
@@ -158,4 +157,43 @@ Ubuntu 16.04之后使用了`systemd`。 `systemd`对监听的服务有文件描�
 LimitCORE=infinity
 LimitNOFILE=100000
 LimitNPROC=100000
+```
+
+##### nginx-wss 配置例子
+
+```conf
+upstream my_app {
+  ip_hash;
+  server server_ip_a:7001;
+  server server_ip_b:7002;
+  server server_ip_c:7003;
+  keepalive 512;
+}
+
+server {
+  listen 7001;
+  listen 7004 ssl; # 使用https/wss的端口
+
+  ssl_certificate /srv/nginx-wss/conf/app.server.crt;
+  ssl_certificate_key /srv/nginx-wss/conf/private.pem;
+
+  proxy_read_time 120;
+
+  location / {
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-NginX-Proxy true;
+
+    add_header Access-Control-Allow-Methods "POST, GET, OPTIONS";
+    add_header Access-Control-Allow-Headers "x-requested-with,content-type";
+
+    proxy_pass http://my_app/;
+    proxy_redirect off;
+
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+  }
+}
 ```
