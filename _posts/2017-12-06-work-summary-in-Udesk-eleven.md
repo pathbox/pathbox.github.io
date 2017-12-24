@@ -197,3 +197,72 @@ server {
   }
 }
 ```
+
+##### go tips
+
+select语句，把CSP模式用到了极致
+
+```go
+select {
+case msg = <-c.memoryMsgChan: // 尝试从内存中读取
+case buf = <-c.backend.ReadChan: // 尝试从磁盘读取
+    msg, err = decodeMessage(buf)
+    if err != nil {
+      c.ctx.nsqd.logf("ERROR: failed to decode message - %s", err)
+      continue
+    }
+}
+```
+
+ReadFrom's sendFile
+
+
+
+```go
+
+// http模块对于文件只是简单地直接打开，获取文件描述符（file descriptor)
+// http模块调用io.Copy函数，io.Copy函数开始检查Reader Writer是否特殊的ReadFrom，WriteTo接口
+
+func (c *TCPConn) ReadFrom(r io.Reader) (int64, error) {
+  if n, err, handled := sendFile(c.fd, r); handled {
+    if err != nil && err != io.EOF{
+      err = &OpError{Op: "read", Net: c.fd.net, Source: c.fd.laddr, Addr: c.fd.raddr, Err: err}
+    }
+    return n, err
+  }
+}
+```
+
+fasthttp对于header的处理
+
+```go
+//fasthttp为什么会比net.http快，其中一个原因就是fasthttp并没有完全地解析所有的http请求header数据。这种做法也称作lazy loading
+
+type RequestHeader struct {
+        //...
+    contentLength      int
+    contentLengthBytes []byte
+
+    method      []byte
+    requestURI  []byte
+    host        []byte
+    contentType []byte
+    userAgent   []byte
+
+    h     []argsKV
+    bufKV argsKV
+
+    cookies []argsKV
+
+    rawHeaders []byte
+}
+
+//从[]byte转化为string时是有copy和alloc行为的。虽然数据量小时，没有什么影响，但是构建高并发系统时，这些小的数据就会变大变多，让gc不堪重负
+
+type argsKV struct {
+    key   []byte
+    value []byte
+}
+
+// net.http中使用了map[string]string来存储各种其他参数，这就需要alloc，为了达成zero alloc，fasthttp采用了遍历所有header参数来返回
+```
