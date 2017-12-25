@@ -197,3 +197,65 @@ server {
   }
 }
 ```
+
+##### Rails 项目中集中管理使用多个MySQL Database
+
+有时候，一个Rails Application需要访问不同的MySQL Database，并且不同的Model，访问不同的MySQL Database，ActiveRecord对此是支持的。
+
+关键的方法： `establish_connection(config = nil)`
+
++ 临时MySQL连接
+
+```ruby
+ActiveRecord::Base.establish_connection(
+  adapter:  "mysql2",
+  host:     "localhost",
+  username: "myuser",
+  password: "mypass",
+  database: "somedatabase"
+)
+```
+
++ 集中管理方式
+
+monkey patch ActiveRecord::Base
+
+```ruby
+class ActiveRecord::Basae
+  self.develompent
+    self.establish_connection :development
+  end
+
+  self.mysql_default
+    self.establish_connection :default
+  end
+
+  self.mysql_database_a
+    self.establish_connection :mysql_a
+  end
+
+  self.mysql_database_b
+    self.establish_connection :mysql_b
+  end
+end
+```
+
+这里 establish_connection 后面加的参数是 symbol，在你的databases.yml 文件中，要配置对应的symbol名称的MySQL配置。这样就会自动读取对应的symbol为key 的MySQL配置
+
+然后， products 表来自 mysql_a, colors 表来自 mysql_b
+
+```ruby
+# product.rb
+class ApplicationRecord < ActiveRecord::Base
+end
+
+class Product < ApplicationRecord
+  self.mysql_database_a
+end
+
+class Cplor < ApplicationRecord
+  self.mysql_database_b
+end
+```
+
+相当于手动重新进行了MySQL实例的连接操作。如果没有手动，ActiveRecord::Base 默认是根据不同的环境 development，production，staging，test，在databases.yml文件中，读取相应的MySQL实例配置。
