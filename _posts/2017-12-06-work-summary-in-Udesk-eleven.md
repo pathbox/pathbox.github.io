@@ -325,3 +325,8 @@ type argsKV struct {
 }
 
 // net.http中使用了map[string]string来存储各种其他参数，这就需要alloc，为了达成zero alloc，fasthttp采用了遍历所有header参数来返回
+
+```
+
+##### websocket 对网络稳定性的依赖
+websocket 对网络稳定性的依赖比想象中的要大，所以，设计合理的重连机制变得如此重要

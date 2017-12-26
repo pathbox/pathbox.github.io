@@ -66,11 +66,12 @@ HATP 的目标是 OLTP和OLAP的超集
 大型应用阶段：数据规模进一步上升，单一的主库已经不能满足交易需求，读库也跑不动越来越复杂的分析SQL。此时，企业选择了分库分表和分析型数据库，利用分库分表中间件，拆分交易主库，水平扩展交易性能，同时将数据同步到OLAP数据库中，进行分析计算，做到彻底的资源隔离；
 巨型应用阶段：数据规模再次上升，每次为OLTP数据库扩容都要消耗极大的人力物力，数据同步到OLAP数据库的时延和成本很高，使用时要为不同业务选择不同数据库入口，管理复杂度极大。此时，企业可以选择HTAP数据库进一步改善业务架构，降低成本，提升易用性，改善运维体验
 
-![hatp]( /assets/images/20171225/hatp.png "HATP")
+![hatp]( /assets/images/20171225/hatp.jpg "HATP")
 
 
 
 参考链接
+
 http://home.eeworld.com.cn/my/space-uid-346593-blogid-309668.html
 
 https://yq.aliyun.com/articles/154348?utm_content=m_27304
