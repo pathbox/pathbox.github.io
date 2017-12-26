@@ -3,7 +3,7 @@ layout: post
 title: Redis 集群搭建及使用Golang示例
 date:   2017-12-17 15:35:06
 categories: redis
-image: /assets/images/redis-logo.png
+image: /assets/images/post.jpg
 ---
 
 Redis 在3.x版本之后，自身支持了集群模式。Redis的集群主要是 master-slave的形式。集群定义了
