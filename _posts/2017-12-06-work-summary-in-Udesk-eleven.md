@@ -329,4 +329,29 @@ type argsKV struct {
 ```
 
 ##### websocket 对网络稳定性的依赖
-websocket 对网络稳定性的依赖比想象中的要大，所以，设计合理的重连机制变得如此重要
+websocket 对网络稳定性的依赖比想象中的要大，所以，设计合理的重连机制变得如此重要.
+然而,设计重连机制,就要对新旧连接直接的状态和上下文进行合理的处理.是进行无缝连接,还是作为新的连接状态
+
+##### Redis Pub/Sub 简单分析
+
++ 消息发布者（Pub）
+
+即publish客户端，无需独占connection，可以在publish消息的同时，使用同一个redis-client connection进行其他操作，例如：INCR等
+
++ 消息订阅者（Sub）
+
+即subscribe客户端，需要独占connection，即进行subscribe期间，热第三client无法穿插其他操作，此时client以阻塞的方式等待`publish端`的消息。因此subscribe端需要使用单独的connection，甚至需要在额外的线程中使用。一旦subscribe端断开connection，将失去connection失效期的所有消息。
+
+流程：
+
+1. subscribe端首先向一个Set集合中增加“订阅者ID”，此Set集合保存了“活跃订阅者”，订阅者ID标记每一个唯一的订阅者，例如：sub：email， sub：web。此Set称为“活跃订阅者集合”
+
+2. subscribe端开启订阅操作，并基于Redis创建一个以“订阅者ID”为Key的List数据结构，此List中存储了所有尚未消费的信息。此List称为“订阅者消息队列”
+
+3. publish端 每发布一条消息后，publish端都需要遍历“活跃订阅者集合”，并依次向每个“订阅者消息队列”尾部追加此次发布的消息。
+
+4. 到此位置，我们基本保证发布的每一条消息，都会持久保存在每个“订阅者消息队列”中
+
+5. subscribe端，每收到一个订阅消息，在消费之后，必须删除自己的“订阅者消息队列”头部的一条消息记录
+
+6. subscribe端启动时，如果发现自己的“订阅者消息队列”有残存的记录，那么将会首先消费这些记录，然后再去订阅
