@@ -355,3 +355,38 @@ websocket 对网络稳定性的依赖比想象中的要大，所以，设计合�
 5. subscribe端，每收到一个订阅消息，在消费之后，必须删除自己的“订阅者消息队列”头部的一条消息记录
 
 6. subscribe端启动时，如果发现自己的“订阅者消息队列”有残存的记录，那么将会首先消费这些记录，然后再去订阅
+
+##### for + ticker + select实现循环间隔操作 
+```go
+go func() {
+		// invoke self-register with ticker
+		ticker := time.NewTicker(interval)
+		for {
+			resp, _ := client.Grant(context.Background(), int64(ttl))
+			log.Println("resp:", resp)
+			// should get first, if not exist, set it
+			_, err := client.Get(context.Background(), serviceKey)
+			if err != nil {
+				if err == rpctypes.ErrKeyNotFound {
+					if _, err := client.Put(context.TODO(), serviceKey, serviceValue, etcd3.WithLease(resp.ID)); err != nil {
+						log.Printf("grpclb: set service '%s' with ttl to etcd3 failed: %s", name, err.Error())
+					} else {
+						log.Printf("grpclb: service '%s' connect to etcd3 failed: %s", name, err.Error())
+					}
+				} else {
+					// refresh set to true for not notifying the watcher
+					if _, err := client.Put(context.Background(), serviceKey, serviceValue, etcd3.WithLease(resp.ID)); err != nil {
+						log.Printf("grpclb: refresh service '%s' with ttl to etcd3 failed: %s", name, err.Error())
+					}
+				}
+			}
+			// 使用select 控制for循环,中止或按照ticker间隔进行. 这样就不用sleep这样的方法了
+			select {
+			case <-stopSignal:
+				return
+			case <-ticker.C:
+				log.Println("ticker")
+			}
+		}
+	}()
+```
