@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Rails App之间的三种"通讯"方式实践
-date:   2017-01-05 10:54:06
+date:   2018-01-05 10:54:06
 categories: Rails
 image: /assets/images/post.jpg
 ---
