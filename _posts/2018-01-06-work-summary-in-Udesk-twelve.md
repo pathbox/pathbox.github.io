@@ -104,3 +104,19 @@ RPC 生态：
 RPC中间件代表：
 
 阿里的Dubbo、当当二次开发的DubboX、新浪Motan、Facebook的Thrift、Google的gRPC
+
+##### rails设置接口可跨域请求
+
+```ruby
+class MyController < ActionController::Base
+  after_action :setup_response_headers
+
+  def setup_response_headers
+    host = request.headers['Origin'] || '*'
+    response.headers['Access-Control-Allow-Origin'] = host
+    response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept,Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'POST, PUT, DELETE, GET, OPTIONS'
+    response.headers['Access-Control-Request-Method'] = '*'
+  end
+end
+```
