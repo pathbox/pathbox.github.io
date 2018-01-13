@@ -120,3 +120,19 @@ class MyController < ActionController::Base
   end
 end
 ```
+
+##### ActiveRecord mysql_utf8mb4
+
+```ruby
+# string_native_type_for_mysql_utf8mb4.rb
+
+require 'active_record/connection_adapters/abstract_mysql_adapter'
+
+module ActiveRecord
+  module ConnectionAdapters
+    class AbstractMysqlAdapter
+      NATIVE_DATABASE_TYPES[:string] = { name: "varchar", limit: 191}
+    end
+  end
+end
+```
