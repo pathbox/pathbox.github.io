@@ -150,3 +150,9 @@ godoc -http=:6060
 ##### RabbitMQ vs Kafka
 
 >分布式消息中间件Kafka和RabbitMQ在行业认可、服务支持、可靠性、可维护性、兼容性、易用性等方面各有特色。Kafka在开源许可证、产品活跃度、性能、安全性、可扩展性等方面优于RabbitMQ，Kafka采用的许可证更宽松，活跃度更高，性能远高于RabbitMQ，在安全性和可扩展性方面能够提供更好的保障。Kafka仅在功能上略少于RabbitMQ，但是已经具备了主要的功能。
+
+##### Redis RPOPLPUSH实现安全队列
+
+使用 RPOPLPUSH 获取消息时，RPOPLPUSH 会把消息返给客户端，同时把该消息放入一个备份消息列表，并且这个过程是原子的，可以保证消息的安全。当客户端成功的处理了消息后，就可以把此消息从备份列表中移除了。如果客户端因为崩溃的原因没有处理某个消息，那么就可以从备份列表destination中重新获取并处理这个消息。
+
+redis pub/sub 目前的问题是redis某个实例宕机（此时可能已经发布了消息但并没有订阅者消费）之后再恢复时，并不会重新发送为消费的消息。为了解决这个问题，我们约定生产者和消费者直接，通过redis的数据结构List，作为双方的通讯中介，数据传送也是通过这个List，比如生产者从list左边push数据lpush mylist message，消费者从右边pop取走数据，rpop mylist 得到message。而pub/sub消息机制是一个不可靠的方式，应该使用List + RPOPLPUSH 来实现简单安全的消息队列
