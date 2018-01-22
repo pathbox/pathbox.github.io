@@ -37,6 +37,8 @@ indices.fielddata.cache.size: 30%
 action.auto_create_index: false # 禁止自动创建索引
 ```
 
+如果没有指定scripts的目录，需要在config目录下新建一个scripts目录
+
 配置比较简单，其他的配置使用了默认值
 
 建议将`data`、`plugins`和`logs`目录不和`elasticsearch`安装目录放在一起，而是另外放在别的目录，这样当再进行小版本升级的时候，就很方便了，几乎不会影响之前的数据。
@@ -64,6 +66,8 @@ max number of threads [1024] for user [tommy] is too low, increase to at least [
 * soft nofile 65536
 
 * - memlock unlimited  # 打开内存lock
+#user soft memlock unlimited
+#user hard memlock unlimited
 ```
 然后重新登入，比如ssh重新登入
 
@@ -127,6 +131,23 @@ gateway.expected_nodes: 10
 这三项要求首先等待n个节点恢复，然后等待5分钟或者10个节点已经加入了集群就开始数据恢复
 ```
 
+#####设置副本分配 replicas number 为 0
+```
+curl -XPUT es_ip:9200/_all/_settings -d '
+{
+  "index" : {
+    "number_of_replicas" : 0
+  }
+}'
+```
+等一台ES服务数据导入完毕后，再打开为1.然后打开分片移动
+```
+curl -XPUT es_ip:9200/_cluster/settings -d '{
+  "transient": { "cluster.routing.allocation.enable": "all" } }'
+```
+
+让ES集群自动创建replicas分片的数据。这样速度会非常快
+
 ##### 发现的问题
 之前在1.4版本的时候有下面的配置
 
@@ -168,8 +189,11 @@ discovery.zen.ping.timeout =>(更新为) discovery.zen.ping_timeout
 
 config 目录中的文件权限，都修改为644. 因为新版本的elasticsearch 不建议使用root 或sudo的方式启动了，所以，对应的权限，也需要给予
 
+##### ES mapping 的field的数量默认限制是1000，如果需要使用更大的field数量，需要手动修改
 
-
+```ruby
+client.indices.put_settings(index: index_name, body: {'index.mapping.total_fields.limit'=> 100000})
+```
 
 ##### 安装IK中文分析器
 
