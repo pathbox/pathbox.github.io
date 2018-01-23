@@ -143,7 +143,10 @@ curl -XPUT es_ip:9200/_all/_settings -d '
 等一台ES服务数据导入完毕后，再打开为1.然后打开分片移动
 ```
 curl -XPUT es_ip:9200/_cluster/settings -d '{
-  "transient": { "cluster.routing.allocation.enable": "all" } }'
+  "transient": {
+    "cluster.routing.allocation.enable": "all"
+    }
+  }'
 ```
 
 让ES集群自动创建replicas分片的数据。这样速度会非常快
@@ -194,6 +197,10 @@ config 目录中的文件权限，都修改为644. 因为新版本的elasticsear
 ```ruby
 client.indices.put_settings(index: index_name, body: {'index.mapping.total_fields.limit'=> 100000})
 ```
+
+##### ignore_above 256
+为 keyword 类型的字段配置 ignore_above: 256，保留256 byte 这样就不会报超过 ` bytes can be at most 32766 in length`的错误
+lucene 对keyword 类型字段bytes长度限制
 
 ##### 安装IK中文分析器
 
