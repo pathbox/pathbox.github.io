@@ -161,3 +161,6 @@ redis pub/sub 目前的问题是redis某个实例宕机（此时可能已经发�
 在服务器上进行tmux命令，在执行想要的命令。
 
 如果是在本地tmux，然后ssh到服务器上。当本地机子睡眠，网络断了，会导致服务器上的tmux服务也关了，你执行的任务也就关了。
+
+##### elasticsearch 对nil的处理
+elasticsearch 对 nil的field会忽略，不会存到document中
