@@ -164,3 +164,302 @@ redis pub/sub 目前的问题是redis某个实例宕机（此时可能已经发�
 
 ##### elasticsearch 对nil的处理
 elasticsearch 对 nil的field会忽略，不会存到document中
+
+
+##### Elasticsearch 安装
+
+```
+Elasticsearch 安装
+版本: 5.6.4
+系统: Ubuntu 16.04
+Java: jdk-8u161-linux-x64.tar.gz
+1. 安装 JRE
+# 检查版本
+$ java -version
+$ echo $JAVA_HOME
+# 删除openJDK
+$ sudo apt-get purge openjdk-\*
+# 如果oracle-java8-installer报404
+$ cd /var/lib/dpkg/info
+$ sudo cp oracle-java8-installer.postinst bak.oracle-java8-installer.postinst
+$ sudo sed -i 's|JAVA_VERSION=8u151|JAVA_VERSION=8u161|' oracle-java8-installer.postinst
+$ sudo sed -i 's|PARTNER_URL=http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/|PARTNER_URL=http://download.oracle.com/otn-pub/java/jdk/8u161-b12/2f38c3b165be4555a1fa6e98c45e0808/|' oracle-java8-installer.postinst
+$ sudo sed -i 's|SHA256SUM_TGZ="c78200ce409367b296ec39be4427f020e2c585470c4eed01021feada576f027f"|SHA256SUM_TGZ="6dbc56a0e3310b69e91bb64db63a485bd7b6a8083f08e48047276380a0e2021e"|' oracle-java8-installer.postinst
+$ sudo sed -i 's|J_DIR=jdk1.8.0_151|J_DIR=jdk1.8.0_161|' oracle-java8-installer.postinst
+# 安装
+$ sudo apt-get install software-properties-common
+$ sudo add-apt-repository -y ppa:webupd8team/java
+$ sudo apt-get update
+$ sudo apt-get -y install oracle-java8-installer
+$ sudo apt install oracle-java8-set-default
+2. 安装 Elasticsearch
+# 安装
+$ sudo mkdir /usr/local/services
+$ curl -l https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.4.tar.gz -o elasticsearch-5.6.4.tar.gz
+$ sudo tar -xvf elasticsearch-5.6.4.tar.gz -C /usr/local/services/
+# 修改文件权限
+$ cd /usr/local/services/elasticsearch-5.6.4
+$ sudo chmod 644 config/elasticsearch.yml config/jvm.options config/log4j2.properties
+$ sudo mkdir config/scripts
+$ sudo chmod 755 config/scripts
+# 创建日志和数据目录
+$ sudo mkdir /mnt/elasticsearch-5.6.4
+$ sudo chown webuser:webuser /mnt/elasticsearch-5.6.4
+$ mkdir -p /mnt/elasticsearch-5.6.4/data
+$ mkdir -p /mnt/elasticsearch-5.6.4/logs
+$ sudo ln -sfn /usr/local/services/elasticsearch-5.6.4 /usr/local/services/elasticsearch
+# !注意: 修改 elasticsearch.yml 中的 cluster.name, 避免和现有集群冲突
+3. 安装 ik 分词
+$ sudo ./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v5.6.4/elasticsearch-analysis-ik-5.6.4.zip
+# 修改权限
+$ sudo chmod 755 config/analysis-ik
+$ sudo chmod 644 config/analysis-ik/*
+4. 修改配置
+Elasticsearch生产环境部署_配置
+config/elasticsearch.yml
+config/jvm.options
+# config/elasticsearch.yml
+# ======================== Elasticsearch Configuration =========================
+#
+# NOTE: Elasticsearch comes with reasonable defaults for most settings.
+# Before you set out to tweak and tune the configuration, make sure you
+# understand what are you trying to accomplish and the consequences.
+#
+# The primary way of configuring a node is via this file. This template lists
+# the most important settings you may want to configure for a production cluster.
+#
+# Please consult the documentation for further information on configuration options:
+# https://www.elastic.co/guide/en/elasticsearch/reference/index.html
+#
+# ---------------------------------- Cluster -----------------------------------
+#
+# Use a descriptive name for your cluster:
+#
+cluster.name: udesk_proj_production
+#
+# ------------------------------------ Node ------------------------------------
+#
+# Use a descriptive name for the node:
+#
+node.name: udesk_proj_es01
+node.master: true
+node.data: true
+#
+# Add custom attributes to the node:
+#
+#node.attr.rack: r1
+#
+# ----------------------------------- Paths ------------------------------------
+#
+# Path to directory where to store the data (separate multiple locations by comma):
+#
+path.data: /mnt/elasticsearch-5.6.4/data
+#
+# Path to log files:
+#
+path.logs: /mnt/elasticsearch-5.6.4/logs
+#
+# ----------------------------------- Memory -----------------------------------
+#
+# Lock the memory on startup:
+#
+bootstrap.memory_lock: true
+#
+# Make sure that the heap size is set to about half the memory available
+# on the system and that the owner of the process is allowed to use this
+# limit.
+#
+# Elasticsearch performs poorly when the system is swapping the memory.
+#
+# ---------------------------------- Network -----------------------------------
+#
+# Set the bind address to a specific IP (IPv4 or IPv6):
+#
+network.host: 10.1.251.187
+#
+# Set a custom port for HTTP:
+#
+http.port: 9200
+transport.tcp.port: 9300
+#
+# For more information, consult the network module documentation.
+#
+# --------------------------------- Discovery ----------------------------------
+#
+# Pass an initial list of hosts to perform discovery when new node is started:
+# The default list of hosts is ["127.0.0.1", "[::1]"]
+#
+discovery.zen.ping.unicast.hosts: ["10.1.251.187", "10.1.251.192", "10.1.251.193", "10.1.251.190", "10.1.251.191"]
+#
+# Prevent the "split brain" by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):
+#
+discovery.zen.minimum_master_nodes: 3
+#
+# For more information, consult the zen discovery module documentation.
+#
+# ---------------------------------- Gateway -----------------------------------
+#
+# Block initial recovery after a full cluster restart until N nodes are started:
+#
+gateway.recover_after_nodes: 3
+gateway.recover_after_time: 5m
+gateway.expected_nodes: 5
+#
+# For more information, consult the gateway module documentation.
+#
+# ---------------------------------- Various -----------------------------------
+#
+# Require explicit names when deleting indices:
+#
+#action.destructive_requires_name: true
+node.max_local_storage_nodes: 1
+indices.fielddata.cache.size: 30%
+action.auto_create_index: false
+# config/jvm.options
+## JVM configuration
+################################################################
+## IMPORTANT: JVM heap size
+################################################################
+##
+## You should always set the min and max JVM heap
+## size to the same value. For example, to set
+## the heap to 4 GB, set:
+##
+## -Xms4g
+## -Xmx4g
+##
+## See https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html
+## for more information
+##
+################################################################
+# Xms represents the initial size of total heap space
+# Xmx represents the maximum size of total heap space
+-Xms16g
+-Xmx16g
+################################################################
+## Expert settings
+################################################################
+##
+## All settings below this section are considered
+## expert settings. Don't tamper with them unless
+## you understand what you are doing
+##
+################################################################
+## GC configuration
+-XX:+UseConcMarkSweepGC
+-XX:CMSInitiatingOccupancyFraction=75
+-XX:+UseCMSInitiatingOccupancyOnly
+## optimizations
+# pre-touch memory pages used by the JVM during initialization
+-XX:+AlwaysPreTouch
+## basic
+# force the server VM (remove on 32-bit client JVMs)
+-server
+# explicitly set the stack size (reduce to 320k on 32-bit client JVMs)
+-Xss1m
+# set to headless, just in case
+-Djava.awt.headless=true
+# ensure UTF-8 encoding by default (e.g. filenames)
+-Dfile.encoding=UTF-8
+# use our provided JNA always versus the system one
+-Djna.nosys=true
+# use old-style file permissions on JDK9
+-Djdk.io.permissionsUseCanonicalPath=true
+# flags to configure Netty
+-Dio.netty.noUnsafe=true
+-Dio.netty.noKeySetOptimization=true
+-Dio.netty.recycler.maxCapacityPerThread=0
+# log4j 2
+-Dlog4j.shutdownHookEnabled=false
+-Dlog4j2.disable.jmx=true
+-Dlog4j.skipJansi=true
+## heap dumps
+# generate a heap dump when an allocation from the Java heap fails
+# heap dumps are created in the working directory of the JVM
+-XX:+HeapDumpOnOutOfMemoryError
+# specify an alternative path for heap dumps
+# ensure the directory exists and has sufficient space
+-XX:HeapDumpPath=/mnt/elasticsearch-5.6.4/logs/
+## GC logging
+-XX:+PrintGCDetails
+#-XX:+PrintGCTimeStamps
+-XX:+PrintGCDateStamps
+-XX:+PrintClassHistogram
+-XX:+PrintTenuringDistribution
+-XX:+PrintGCApplicationStoppedTime
+# log GC status to a file with time stamps
+# ensure the directory exists
+-Xloggc:/mnt/elasticsearch-5.6.4/logs/gc.log
+# By default, the GC log file will not rotate.
+# By uncommenting the lines below, the GC log file
+# will be rotated every 128MB at most 32 times.
+#-XX:+UseGCLogFileRotation
+#-XX:NumberOfGCLogFiles=32
+#-XX:GCLogFileSize=128M
+# Elasticsearch 5.0.0 will throw an exception on unquoted field names in JSON.
+# If documents were already indexed with unquoted fields in a previous version
+# of Elasticsearch, some operations may throw errors.
+#
+# WARNING: This option will be removed in Elasticsearch 6.0.0 and is provided
+# only for migration purposes.
+#-Delasticsearch.json.allow_unquoted_field_names=true
+环境配置
+# /etc/security/limits.conf
+# For Elasticsearch
+webuser soft nofile 65536
+webuser hard nofile 65536
+webuser soft memlock unlimited
+webuser hard memlock unlimited
+# /etc/sysctl.conf
+# For Elasticsearch
+vm.max_map_count=262144
+# 生效
+$ sudo /sbin/syctl -p
+5. 动态配置
+# 设置日志阀值
+$ curl -XPUT 'http://localhost:9200/_all/_settings?preserve_existing=true' -d '{
+"index.indexing.slowlog.threshold.index.debug" : "2s",
+"index.indexing.slowlog.threshold.index.info" : "5s",
+"index.indexing.slowlog.threshold.index.trace" : "500ms",
+"index.indexing.slowlog.threshold.index.warn" : "10s",
+"index.search.slowlog.threshold.fetch.debug" : "500ms",
+"index.search.slowlog.threshold.fetch.info" : "800ms",
+"index.search.slowlog.threshold.fetch.trace" : "200ms",
+"index.search.slowlog.threshold.fetch.warn" : "1s",
+"index.search.slowlog.threshold.query.debug" : "2s",
+"index.search.slowlog.threshold.query.info" : "5s",
+"index.search.slowlog.threshold.query.trace" : "500ms",
+"index.search.slowlog.threshold.query.warn" : "10s"
+}'
+6. 开机启动和自动拉起
+# /lib/systemd/system/elasticsearch.service
+[Unit]
+Description=Elasticsearch
+Documentation=http://www.elastic.co
+Wants=network-online.target
+After=network-online.target
+[Service]
+User=webuser
+Group=webuser
+Environment=CONF_DIR=/usr/local/services/elasticsearch/config
+WorkingDirectory=/usr/local/services/elasticsearch
+ExecStartPre=/usr/local/services/elasticsearch/bin/elasticsearch-systemd-pre-exec
+ExecStart=/usr/local/services/elasticsearch/bin/elasticsearch --quiet -Edefault.path.conf=${CONF_DIR}
+LimitNOFILE=65536
+LimitNPROC=2048
+LimitAS=infinity
+LimitFSIZE=infinity
+LimitMEMLOCK=infinity
+KillSignal=SIGTERM
+KillMode=process
+SendSIGKILL=no
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=45s
+TimeoutSec=20s
+TimeoutStopSec=0
+[Install]
+WantedBy=multi-user.target
+生效
+$ sudo systemctl enable elasticsearch.service
+```
