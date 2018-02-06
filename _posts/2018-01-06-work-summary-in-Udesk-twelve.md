@@ -463,3 +463,11 @@ WantedBy=multi-user.target
 生效
 $ sudo systemctl enable elasticsearch.service
 ```
+
+
+##### .gitignore规则不生效的解决办法
+```
+git rm -r --cached .
+git add .
+git commit -m 'update .gitignore'
+```

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 百万并发连接、65536和Linux TCP/IP 性能优化
-date:   2017-02-05 17:57:06
+date:   2018-02-05 17:57:06
 categories: concurrency
 image: /assets/images/post.jpg
 ---
@@ -167,6 +167,8 @@ net.ipv4.conf.default.accept_source_route = 0
 ```
 
 修改了系统默认的配置，一定要进行严格的压测。并监控线上的业务影响波动。不一定别人给的配置就是适合你的系统的配置。如果有异常情况，宁可使用默认配置。
+
+实现百万连接的瓶颈是：内存和网络带宽（网卡能力）
 
 
 参考链接
