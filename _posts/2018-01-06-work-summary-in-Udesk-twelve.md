@@ -471,3 +471,7 @@ git rm -r --cached .
 git add .
 git commit -m 'update .gitignore'
 ```
+
+##### go抢占式调度+非抢占式调度
+
+go有抢占式调度:如果一个Goroutine一直占用CPU，长时间没有被调度过，就会被runtime抢占掉
