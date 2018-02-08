@@ -2,7 +2,7 @@
 layout: post
 title: How key-based cache expiration works(翻译)
 date:   2016-06-03 13:40:06
-categories: rails
+categories: Rails
 image: /assets/images/post.jpg
 ---
 
@@ -59,6 +59,3 @@ end
 ```
 
 这个过程使它容易实现缓存方案,相信你永远不会使用到旧的缓存数据。没有混乱的清理处理因为你没有义务来追踪每一个点可能会更新一个对象。updated_at字段的所有缓存key自动为您的处理,无论哪里发生了更新操作。
-
-
- 

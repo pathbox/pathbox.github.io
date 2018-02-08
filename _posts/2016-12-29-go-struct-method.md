@@ -2,7 +2,7 @@
 layout: post
 title: go方法
 date:   2016-12-29 14:57:06
-categories: Go
+categories: Golang
 image: /assets/images/post.jpg
 ---
 

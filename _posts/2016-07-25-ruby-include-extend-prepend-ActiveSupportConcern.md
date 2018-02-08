@@ -6,8 +6,6 @@ categories: Ruby
 image: /assets/images/post.jpg
 ---
 
-
-
 ### 该总结的还是要总结的
 
 网上关于include extend prepend ActiveSupport::Concern文章不少，而且质量也很高。

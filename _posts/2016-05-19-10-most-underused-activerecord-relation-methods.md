@@ -1,4 +1,10 @@
-# 10 most underused activerecord relation methods(翻译)
+---
+layout: post
+title: 10 most underused activerecord relation methods(翻译)
+date:   2016-05-19 22:21:06
+categories: Rails
+image: /assets/images/post.jpg
+---
 
 
 ### 10.first_or_create with a block

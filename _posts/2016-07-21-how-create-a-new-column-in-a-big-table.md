@@ -2,11 +2,9 @@
 layout: post
 title: 如何为一个千万级以上的表新建一个字段
 date:   2016-07-21 22:13:06
-categories: MySQL
+categories: Database
 image: /assets/images/post.jpg
 ---
-
-
 
 MySQL中有一张表A，有十几个字段，字段中有索引，大概是1千万条记录。并且这个表是线上服务的表，随时有读写操作。
 现在，根据需求，你需要为这张表新建一个字段。你会怎么做？

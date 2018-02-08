@@ -2,7 +2,7 @@
 layout: post
 title: More about OOP in Go
 date:   2017-01-22 15:39:06
-categories: Go
+categories: Golang
 image: /assets/images/post.jpg
 ---
 

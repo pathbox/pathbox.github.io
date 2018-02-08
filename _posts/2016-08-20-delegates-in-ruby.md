@@ -6,8 +6,6 @@ categories: Rails
 image: /assets/images/top/20150322.jpg
 ---
 
-
-
 这是一篇在Ruby和Rails中使用代理模式各种方法的总结文章。
 
 ##### delegate in Ruby

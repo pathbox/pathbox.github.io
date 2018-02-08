@@ -2,7 +2,7 @@
 layout: post
 title: 理解class_eval and instance_eval
 date:   2016-05-21 22:21:06
-categories: rails
+categories: Ruby
 image: /assets/images/post.jpg
 ---
 
@@ -18,7 +18,7 @@ a = A.new
 a.instance_eval do
   puts self  # => a
   #current class => a's siingleton class
-  
+
   def method1
     puts "this is method1"
   end
@@ -30,7 +30,7 @@ a.method1
 b = A.new
 b.method1
 #=> NoMethodError: undefined method `method1' for #<A:0x007fbc2ced9550>
-  
+
 ```
 
 ##### 例子2.
@@ -91,7 +91,7 @@ A.class_eval do
 end
 
 a = A.new
-a.method1 
+a.method1
 #=> NoMethodError: undefined method `method1' for <A:0x002fbc69a446e8>
 
 A.method1
@@ -145,14 +145,14 @@ end
 #=> this is method1
 
 a
-#=>　#<A:0x00000005597e78> 
+#=>　#<A:0x00000005597e78>
 a.mthod1
 #=>undefined method `method1' for #<A:0x00000005597e78>
 #=>此时method1为 <Class:#<A:0x00000005597e78>>的方法而不是a<A:0x00000005597e78>的方法所以不能在外部被a调用
 ```
 
 
-别人的总结: 
+别人的总结:
 1. instance_eval必须由instance来调用，可以用来定义单例函数（singleton_methods)
 2. class_eval必须是由class来调用，可以用来定义类的实例方法(instance_methods)
 
@@ -163,7 +163,3 @@ class_eval 如果是类为定义者,方法 是def method1，则定义了实例�
 如果实例对象为定义者,方法是def method 则定义的方法都是该实例对象的单例方法。 只能由该实例对象（例子中的a）调用。如果方法是 def self.method1 则method1不能在外部调用, 只能在内部调用。它是a单例类的方法，而不是a的单例方法（不知道是否可以这样理解。因为其中的 self对象是<Class:#<A:0x00000005597e78>>）
 
 参考文章：https://ruby-china.org/topics/26208
-
-
-
-

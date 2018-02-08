@@ -2,7 +2,7 @@
 layout: post
 title: 使用privoxy代理shadowsocks让Teminal命令行实现VPN
 date:   2017-11-18 15:08:06
-categories: Skill
+categories: Tool
 image: /assets/images/post.jpg
 ---
 

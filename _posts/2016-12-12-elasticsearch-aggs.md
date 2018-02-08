@@ -2,8 +2,8 @@
 layout: post
 title: Elasticsearch 聚合搜索
 date:   2016-12-12 17:50:06
-categories: elasticsearch
-image: /assets/images/post.jpg
+categories: Elasticsearch
+image: /assets/images/elasticsearch.png
 ---
 
 这次掉了这个坑里。

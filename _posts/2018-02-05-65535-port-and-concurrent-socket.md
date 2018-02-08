@@ -2,7 +2,7 @@
 layout: post
 title: 百万并发连接、65536和Linux TCP/IP 性能优化
 date:   2018-02-05 17:57:06
-categories: concurrency
+categories: Server
 image: /assets/images/post.jpg
 ---
 ##### 65536

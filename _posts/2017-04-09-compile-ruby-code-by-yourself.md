@@ -2,7 +2,7 @@
 layout: post
 title: 用更好的Ruby code style 避免类型错误
 date:   2017-04-09 12:39:06
-categories: Rails
+categories: Ruby
 image: /assets/images/post.jpg
 ---
 

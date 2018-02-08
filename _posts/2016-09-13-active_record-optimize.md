@@ -2,7 +2,7 @@
 layout: post
 title: Rails 项目的数据库慢查询优化
 date:   2016-09-13 21:40:06
-categories: MySQL
+categories: Database
 image: /assets/images/post.jpg
 ---
 

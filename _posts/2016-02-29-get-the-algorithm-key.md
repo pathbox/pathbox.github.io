@@ -2,8 +2,7 @@
 layout: post
 title: Study algorithm again and again
 date:   2016-02-29 21:37:00
-categories: algorithm
-tag: algorithm
+categories: Thought
 image: /assets/images/post.jpg
 ---
 <h2>{{ page.title }}</h2>

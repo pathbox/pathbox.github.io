@@ -1,19 +1,34 @@
-- name: Software Engineer Keywords
+- name: Computer Language
   keywords:
-      - Java
-      - C++
+      - Golang
+      - Ruby
+      - Lua
       - Python
-      - Design Patterns
+      - C
 
-- name: Mobile Developer Keywords
+- name: Web Development
   keywords:
-      - Android
-      - Reverse Engineering
+      - Rails
+      - Fasthttp
+      - Beego
+      - Gorilla
+      - Gin
+      - HTML CSS Jquery
 
-- name: Windows Developer Keywords
+- name: Service Framework
   keywords:
-      - Win32 SDK
-      - DuiLib
-      - WTL
-      - COM
-      - WinDbg
+      - Elasticsearch
+      - GRPC
+      - Etcd
+      - OpenResty
+      - Rabbitmq
+      - Sidekiq
+      - Websocket
+      - Socket.io
+      - Microservice
+
+- name: Database
+  keywords:
+      - MySQL
+      - Redis
+      - MongoDB

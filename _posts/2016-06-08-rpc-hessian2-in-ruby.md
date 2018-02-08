@@ -2,7 +2,7 @@
 layout: post
 title: Hessian in ruby
 date:   2016-06-08 16:53:06
-categories: rails
+categories: Rails
 image: /assets/images/post.jpg
 ---
 
@@ -46,4 +46,3 @@ end
 调用该方法而得到计算结果。
 注意问题: 方法要是服务端所定义的方法,参数也需要按照服务端要求。(就像本地调用方法类似)
 Java在中大型的后端架构服务上确实很强大,这是现在ruby无法对比的
-

@@ -2,7 +2,7 @@
 layout: post
 title: rails中快速插入简单总结
 date:   2016-07-01 10:23:06
-categories: rails
+categories: Rails
 image: /assets/images/post.jpg
 ---
 
@@ -194,24 +194,3 @@ Finding the balance between ease of use (full ActiveRecord) and performance (bar
 can have a profound effect on the performance of your app
 
 ActiveRecord is not always best. Sometimes we need to come back to the nature of SQL.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

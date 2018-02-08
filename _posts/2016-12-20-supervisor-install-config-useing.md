@@ -2,7 +2,7 @@
 layout: post
 title: supervisor 安装、配置和使用
 date:   2016-12-20 11:05:06
-categories: server
+categories: Tool
 image: /assets/images/post.jpg
 ---
 

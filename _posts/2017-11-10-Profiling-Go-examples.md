@@ -2,7 +2,7 @@
 layout: post
 title: Profling Go Example
 date:   2017-11-10 15:16:06
-categories: Go
+categories: Golang
 image: /assets/images/post.jpg
 ---
 

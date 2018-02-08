@@ -2,8 +2,8 @@
 layout: post
 title: Manage and custom your elasticsearch index in Rails project
 date: 2017-03-01 17:23:06
-categories: tech
-image: /assets/images/post.jpg
+categories: Elasticsearch
+image: /assets/images/elasticsearch.png
 ---
 
 这周对Rails项目中的ElasticSearch进行了总结并写成了文档，觉得有一些内容值得记录和分享。
@@ -109,7 +109,7 @@ ES 会根据Article 中setting 和mapping的配置，在ES中 构建articles的�
 
 下面的三个操作，同样可以创建索引并导入数据
 
-```ruby 
+```ruby
 1. Article.__elasticsearch__.create_index! force: true  # 根据mapping和setting 创建articles索引，该索引没有任何数据
 2. Article.__elasticsearch__.refresh_index!  # refresh 操作
 3. Article.find_in_batches do |articles|   # 批量同步导入MySQL articles的数据
@@ -131,7 +131,7 @@ ES 会根据Article 中setting 和mapping的配置，在ES中 构建articles的�
 
 下面我们看*as_indexed_json* 的源码:
 
-```ruby 
+```ruby
 # File 'lib/elasticsearch/model/serializing.rb', line 26
 def as_indexed_json(options={})
   # TODO: Play with the `MyModel.indexes` method -- reject non-mapped attributes, `:as` options, etc
@@ -141,13 +141,13 @@ end
 
 这里的self 其实是model 的一个instance。我们可以在model中monkey patch这个方法。
 
-```ruby 
+```ruby
 # article.rb
 class Article < ActiveRecord::Base
   include Elasticsearch::Model
   include Elasticsearch::Model::Callbacks
   index_name self.table_name  # 这里可以自定义Article的ES索引名称
-  
+
   has_many :comments
   has_many :followers
 
@@ -158,11 +158,11 @@ class Article < ActiveRecord::Base
     end
     indexes :content, type: :string, analyzer: 'ik'
     indexes :created_at, type: :date
-  end 
+  end
 
   def as_indexed_json(options={})
     hash = as_json(
-      except: [:update_at], 
+      except: [:update_at],
       methods: [:parse_content],
       include: {
         comments: {only: [:id, :content]},
@@ -172,11 +172,11 @@ class Article < ActiveRecord::Base
     hash.merge!(other_hash)
     hash
   end
-  
+
   def other_hash
   	{title: "My title", owner: "My owner"}
   end
-  
+
   def parse_content
   	"Article: "+ self.content
   end
@@ -187,7 +187,7 @@ end
 
 这样，最后得到的hash 大概是这样的, 比如 Article.first.as_indexed_json:
 
-```ruby 
+```ruby
 {
   'id'=> 1,
   'subject' => '这是第一篇文章的主题',
@@ -207,7 +207,7 @@ end
 
 在index_document 方法的源码中:
 
-```ruby 
+```ruby
 # File 'lib/elasticsearch/model/indexing.rb', line 333
 def index_document(options={})
   document = self.as_indexed_json # Hi! I'm here!
@@ -251,7 +251,7 @@ client.indices.put_mapping index: "articles", type: "article", body: {
 
 得到的mappin 是：
 
-```ruby 
+```ruby
 "organization": {
   "properties": {
     "id": {
@@ -279,10 +279,10 @@ class Article < ActiveRecord::Base
   include Elasticsearch::Model
   include Elasticsearch::Model::Callbacks
   index_name self.table_name  # 这里可以自定义Article的ES索引名称
-  
+
   has_many :comments
   has_many :followers
-  
+
   settings analysis:{
     analyzer: {
       my_custom_analyzer:{ type: 'custom', tokenizer: 'ngram_tokenizer'}
@@ -298,12 +298,12 @@ class Article < ActiveRecord::Base
       end
       indexes :content, type: :string, analyzer: 'ik'
       indexes :created_at, type: :date
-    end 
+    end
   end
 
   def as_indexed_json(options={})
     hash = as_json(
-      except: [:update_at], 
+      except: [:update_at],
       methods: [:parse_content],
       include: {
         comments: {only: [:id, :content]},
@@ -313,11 +313,11 @@ class Article < ActiveRecord::Base
     hash.merge!(other_hash)
     hash
   end
-  
+
   def other_hash
   	{title: "My title", owner: "My owner"}
   end
-  
+
   def parse_content
   	"Article: "+ self.content
   end
@@ -334,7 +334,7 @@ settings analysis:{
     tokenizer: {
       ngram_tokenizer: { type: 'nGram', min_gram: 2, max_gram: 3, token_chars: ['lettler, 'digit', 'punctuation']}
     }
-} 
+}
 ```
 
 这里你可能需要倒回来看，我们自定义定义了一个 *tokenizer*， 取名为 *ngram_tokenizer* ，type 表示 使用的tokenizer。我们使用的是ES built-in 的 [nGram tokenizer](https://www.elastic.co/guide/en/elasticsearch/reference/2.4/analysis-edgengram-tokenizer.html) ，具体配置参数请看它的文档。ES built-in 了不同的tokenizer，开发人员可以自由选择使用。
@@ -360,4 +360,3 @@ PUT /my_index
 
 
 ElasticSearch 确实是一个优秀的全文搜索引擎。了解和实践更多的ElasticSearch的设置和搜索，能够体会到ElasticSearch更多的功能。即使看过ElasticSearch入门教程的朋友，我觉得ElasticSearch的官方文档也是非常值得阅读的。
-

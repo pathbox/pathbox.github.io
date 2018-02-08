@@ -2,7 +2,7 @@
 layout: post
 title: 理解rack中间件(转)
 date:   2016-05-25 13:55:06
-categories: rails
+categories: Rails
 image: /assets/images/post.jpg
 ---
 

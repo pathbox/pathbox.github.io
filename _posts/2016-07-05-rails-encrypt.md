@@ -2,7 +2,7 @@
 layout: post
 title: The encryption in ruby and rails
 date:   2016-07-05 11:25:06
-categories: rails
+categories: Rails
 image: /assets/images/post.jpg
 ---
 
@@ -131,40 +131,3 @@ signature = OpenSSL::HMAC.hexdigest('SHA256', appkey, params)
 有时候，对参数还需要进行一定的编码，比如用Base64。整个流程简单描述就是这样的。而这里大家可以知道，appkey这个
 字符串是只有你和API接口服务器知道的，如果泄密了，你的加密算法也就泄密了，别人就能很容易的进行伪造
 你的请求并且成功。 所以，别泄露appkey。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

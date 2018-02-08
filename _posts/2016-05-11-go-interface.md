@@ -1,9 +1,8 @@
 ---
 layout: post
 title: go interface
-date:   2016-05-09 14:37:06
-categories: go
-tag: go
+date:   2016-05-11 14:37:06
+categories: Golang
 image: /assets/images/post.jpg
 ---
 

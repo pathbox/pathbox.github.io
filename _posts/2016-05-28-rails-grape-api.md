@@ -2,7 +2,7 @@
 layout: post
 title: rails + grape 快速API简单搭建
 date:   2016-05-28 11:26:06
-categories: rails
+categories: Rails
 image: /assets/images/post.jpg
 ---
 

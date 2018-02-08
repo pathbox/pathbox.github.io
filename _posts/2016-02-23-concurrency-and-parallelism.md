@@ -2,14 +2,13 @@
 layout: post
 title: A story about concurrency and parallelism
 date:   2016-02-22 20:50:06
-categories: concurrency
-tag: concurrency
+categories: Summary
 image: /assets/images/post.jpg
 ---
 <h2>{{ page.title }}</h2>
 
   <p>This is a story about concurrency and parallelism</p>
-  <p>My wife is a teacher. Like most teachers, she's a master of multitasking. At any one 
+  <p>My wife is a teacher. Like most teachers, she's a master of multitasking. At any one
      instant, she's only doning one thing, but she's having to deal with many things concurrently.
      While listening to one child read, she might break off to calm down a rowdy classroom or answern
      a question. This is concurrent, but it's not parallel(there is only one of her).

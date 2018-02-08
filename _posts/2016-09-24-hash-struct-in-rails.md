@@ -2,7 +2,7 @@
 layout: post
 title: Hash struct in rails
 date:   2016-09-24 17:58:06
-categories: rails
+categories: Rails
 image: /assets/images/post.jpg
 ---
 

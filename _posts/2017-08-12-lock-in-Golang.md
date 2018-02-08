@@ -2,7 +2,7 @@
 layout: post
 title: 用喜欢和舒服的方式在Golang中使用锁、使用channel自定义锁
 date:   2017-08-12 17:05:06
-categories: Go
+categories: Golang
 image: /assets/images/post.jpg
 ---
 

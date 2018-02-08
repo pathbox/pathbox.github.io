@@ -2,8 +2,7 @@
 layout: post
 title: About Lock
 date:   2016-03-08 14:04:00
-categories: summary
-tag: lock
+categories: Summary
 image: /assets/images/post.jpg
 ---
 <h2>{{ page.title }}</h2>

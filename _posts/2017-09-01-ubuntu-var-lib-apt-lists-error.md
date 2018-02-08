@@ -2,7 +2,7 @@
 layout: post
 title: ubuntu 解决 Problem with MergeList /var/lib/apt/lists/ 类似错误
 date:   2017-09-01 17:57:06
-categories: Linux
+categories: Tool
 image: /assets/images/post.jpg
 ---
 

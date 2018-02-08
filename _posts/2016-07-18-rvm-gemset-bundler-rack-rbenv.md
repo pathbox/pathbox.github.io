@@ -6,8 +6,6 @@ categories: Ruby
 image: /assets/images/post.jpg
 ---
 
-
-
 ### RVM
 
 Rvm是ruby开发环境的管理工具。能够帮助开发者在不同的ruby版本中切换。包括 不同类型 Cruby和Jruby直接的切换。
@@ -200,32 +198,3 @@ Bundler.require 会加载传递给它的 group 中所有的 gems。（group 是�
 以 development 模式启动 Rails 时，Rails.groups 的值为 [:default, :development]，而以 production 模式启动 Rails 时，Rails.groups 的值为 [:default, :production]，等等。
 
 所以，Bundler 会去 Gemfile 中查找属于指定 group 的 gems，并且对每个找到的 gem 执行 require。如果你写了 nokogiri 这个 gem，它就会替你执行 require "nokogiri"。这就解释了为什么你无需写任何多余的代码，就能使你的 gems 在 Rails 中正常工作。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

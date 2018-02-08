@@ -2,7 +2,7 @@
 layout: post
 title: 在Linux系统中监控系统TCP数量
 date:   2017-08-25 15:21:06
-categories: Linux
+categories: Tool
 image: /assets/images/post.jpg
 ---
 

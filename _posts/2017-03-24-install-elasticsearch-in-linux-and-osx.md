@@ -3,7 +3,7 @@ layout: post
 title: Install Elasticsearch in Ubuntu and macOS
 date:   2017-03-24 21:16
 categories: Elasticsearch
-image: /assets/images/post.jpg
+image: /assets/images/elasticsearch.png
 ---
 
 ##### Ubuntu 14.04环境

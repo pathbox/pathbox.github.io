@@ -5,11 +5,12 @@ baseurl: "https://pathbox.github.io"
 url: "https://pathbox.github.io"
 date_format: "ordinal"
 title: Yestoday you said tomorrow
-subtitle: 
+subtitle: "Code Reading Study then go to the Gym"
 description: "Code Reading Study then go to the Gym"
 keywords: pathbox, Pathbox, pathbox博客
 timezone: Asia/Shanghai
 encoding: "utf-8"
+side_bar_repo_limit: 5
 
 # ---------------- #
 #      Author      #

@@ -2,7 +2,7 @@
 layout: post
 title: MySQL百万以上记录表分页优化
 date:   2016-06-26 11:02:06
-categories: MySQL
+categories: Database
 image: /assets/images/post.jpg
 ---
 

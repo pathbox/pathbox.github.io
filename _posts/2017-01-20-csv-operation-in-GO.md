@@ -2,7 +2,7 @@
 layout: post
 title: CSV operation in Go
 date:   2017-01-20 14:41:06
-categories: Go
+categories: Golang
 image: /assets/images/post.jpg
 ---
 

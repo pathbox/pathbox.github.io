@@ -2,7 +2,7 @@
 layout: post
 title: after_commit vs after_save
 date:   2016-05-15 15:30:06
-categories: rails
+categories: Rails
 tag: rails
 image: /assets/images/post.jpg
 ---
@@ -154,5 +154,3 @@ SELECT * FROM notifications WHERE id = 10
 
 
 而用after_commit 操作就不会了, 子进程(asyns_send_notification)一定会等整个代码进行到commit操作之后，才会触发。从这里也可以看出after_commit监听的范围比after_save要大
-
-

@@ -2,7 +2,7 @@
 layout: post
 title: Processing large CSV files with Ruby(翻译)
 date:   2016-06-13 15:24:06
-categories: rails
+categories: Rails
 image: /assets/images/post.jpg
 ---
 
@@ -232,10 +232,3 @@ Memory: 0.53 MB
 ```
 
 总结：从上面的例子，最佳的处理方式是最后两个方案。如果需要速度快，可以使用CSV.new的方案。但是会消耗文件大小的内存(如果你内存丰富的话可以考虑)
-
-
-
-
-
-
-

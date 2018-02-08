@@ -2,7 +2,7 @@
 layout: post
 title: 如何更可控、稳定地写Rails脚本操作线上数据库的记录
 date:   2016-11-07 16:15:06
-categories: rails
+categories: Rails
 image: /assets/images/post.jpg
 ---
 

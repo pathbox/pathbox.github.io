@@ -2,7 +2,7 @@
 layout: post
 title: Swimming in my life
 date:   2016-04-17 21:48:06
-categories: life
+categories: Thought
 image: /assets/images/post.jpg
 ---
 
