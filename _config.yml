@@ -1,53 +1,75 @@
-# Build settings
-markdown: kramdown
-highlighter: rouge
-gems: [jekyll-paginate]
-# Site settings
-title: "Yestoday you said tomorrow"
-description:
-  Somebody always does group exercise with your maximum power
-
-email: guijihe@163.com
-#blog logo
-logo: "/assets/images/author.jpg"
-# blog cover
-#cover: "/assets/images/cA4aKEIPQrerBnp1yGHv_IMG_9534-3-2.jpg"
-
-name: 'PathBox'
-author: 'PathBox'
-author_image: "/assets/images/author.jpg"
-
-paginate:	50
-
-#url: "http://blog.jerry-tao.com" # the base hostname & protocol for your site
+# ---------------- #
+#   Main Configs   #
+# ---------------- #
 baseurl: "https://pathbox.github.io"
+url: "https://pathbox.github.io"
+date_format: "ordinal"
+title: Yestoday you said tomorrow
+subtitle: 
+description: "Code Reading Study then go to the Gym"
+keywords: pathbox, Pathbox, pathbox博客
+timezone: Asia/Shanghai
+encoding: "utf-8"
 
-# social icons and sharing options
-social:
-  # - icon:	twitter
-  #   url:	https://twitter.com/dirkfabisch
-  #   desc: Follow me on twitter
-  #   share_url: http://twitter.com/share
-  #   share_title: ?text=
-  #   share_link: "&amp;url="
+# ---------------- #
+#      Author      #
+# ---------------- #
+author: Pathbox
+organization:
+organization_url:
+github_username: pathbox
+location: Beijing, China
+email: guijihe@163.com
 
-#  - icon:	facebook
-#    url:	https://facebook.com/???
-#    desc: Connect with me facebook
-#    share_url: //www.facebook.com/sharer.php
-#    share_title: ?t=
-#    share_link: "&amp;u="
+# ---------------- #
+#    Navigation    #
+# ---------------- #
+navs:
+  -
+    href: /
+    label: 首页
 
-  - icon:	github
-    url:	https://github.com/pathbox
-    desc:	Fork me on github
-    share_url:
-    share_title:
-    share_link:
+  -
+    href: /categories/
+    label: 分类
 
-#  - icon:	google-plus
-#    url:	https://google.com/???
-#    desc:	Add me on google+
-#    share_url:
-#    share_title:
-#    share_link:
+  -
+    href: /links/
+    label: 链接
+
+  -
+    href: /about/
+    label: 关于
+
+# ---------------- #
+#       RSS        #
+# ---------------- #
+subscribe_rss: /feed.xml
+
+# ---------------- #
+#      Jekyll      #
+# ---------------- #
+markdown: kramdown
+kramdown:
+    input: GFM
+highlighter: rouge
+paginate: 8
+lsi: false
+quiet: false
+excerpt_separator: "\n\n"
+permalink: /:year/:month/:day/:title/
+gems:
+    - jekyll-github-metadata
+    - rouge
+#     - jekyll-html-pipeline
+    - jekyll-paginate
+    - jekyll-sitemap
+    - jekyll-feed
+    - jemoji
+#     - jekyll-mentions
+
+repository: pathbox/pathbox.github.io
+
+# ---------------- #
+#      Comments    #
+# ---------------- #

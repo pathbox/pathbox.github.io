@@ -1,4 +1,7 @@
-_site
-.sass-cache
+_site/
+*.swp
+*.~vsd
+\#*\#
+*~
 .DS_Store
-pendding
+Gemfile.lock
