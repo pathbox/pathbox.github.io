@@ -17,11 +17,15 @@ image: /assets/images/post.jpg
 ##### 短网址原理
 长网址经过某种转换成为短网址，一个长网址可以拥有一个或多个短网址
 
+```
 long url => func() => short url
+```
 
 访问短网址，短网址经过 url重定向到长网址url。用户在页面上看到的短网址，最后是重定向到了真实的长网址
 
+```
 short url => short server => long url => backend server
+```
 
 例子： 访问  http://g.cn/R32DNa， 会访问 http://g.cn 地址的后台，后台通过 R32DNa短码，找到对应的长网址url，再重定向访问长地址url
 
@@ -160,9 +164,8 @@ func reverseString(s string) string {
 
 short_codes
 
-|   |   |
-|---|---|
-| 字段  |  含义 |   
+| 字段  |  含义 |
+|:------:|:------:|   
 |id|	自增序列id|
 |url|	长连接|
 |code|	短链接码（短码）|
@@ -170,7 +173,7 @@ short_codes
 |type|	系统: "system" 自定义: "custom"|
 |created_at|	创建时间 |
 |updated_at|	更新时间 |
----
+
 
 关于 点击量、访问的 ip 地域、用户使用的设备 等用户信息分析，还需要创建其他表帮助实现。
 
