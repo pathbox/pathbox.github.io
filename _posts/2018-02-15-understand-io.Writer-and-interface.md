@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  从io.Writer理解interface
-date:   2018-02-26 11:44:06
+date:   2018-02-15 10:00:06
 categories: Golang
 image: /assets/images/s1.jpeg
 ---
