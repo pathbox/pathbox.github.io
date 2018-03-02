@@ -525,3 +525,11 @@ http://www.cnblogs.com/chenpingzhao/p/5158791.html
 >这个问题的原因是由于socket.io的握手和最后的连接不是一次请求，当多服务器部署的时候，各个服务器之间不共享连接数据，出现的情况就是，握手包被负载到服务器A上，连接包被负载到服务器B上，B认为没有握手，直接返回错误。我们做了一个修改，就是使用redis来存储这些信息，而不是放到服务器的本地.
 
 使用Nginx ip_hash 可以解决这个问题.
+
+#####  理解golang 中的 json Encoder Decoder
+
+数据结构 --> 指定格式 = 序列化 或 编码（传输之前）
+指定格式 --> 数据格式 = 反序列化 或 解码（传输之后）
+序列化是在内存中把数据转换成指定格式（data -> string），反之亦然（string -> data structure）
+
+http://wiki.jikexueyuan.com/project/the-way-to-go/12.9.html
