@@ -533,3 +533,10 @@ http://www.cnblogs.com/chenpingzhao/p/5158791.html
 序列化是在内存中把数据转换成指定格式（data -> string），反之亦然（string -> data structure）
 
 http://wiki.jikexueyuan.com/project/the-way-to-go/12.9.html
+
+
+##### 关于URL大小写
+
+域名不区分大小写，url的path部分区分大小写
+
+https 对 header body path 部分加密
