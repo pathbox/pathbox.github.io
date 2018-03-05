@@ -52,7 +52,7 @@ SLB的WebSocket负载均衡不支持Socket.io Cluster. 使用的负载均衡算�
 
 SLB TCP 负载均衡可以支持Socket.io Cluster. 连接能够成功建立. 但是,由于SLB 使用的是TCP负载均衡,无法在SLB上设置SSL证书,第二是,如果SLB前面加高防,由于SLB TCP是四层代理, Socket.io 后端无法获得真实的client IP, 获得的是高防的IP.
 
-如果要使用https, 可以在socket.io 的前面挂一个Nginx, 在这个Nginx上配https. 这样又出现了Nginx连接数瓶颈的问题.而且,如果要http和https同时支持,极端情况,所有请求都是http,http在Nginx转为https的过程中,也是要占用端口数的.
+如果要使用https, 可以在socket.io 的前面挂一个Nginx, 在这个Nginx上配https. 这样又出现了Nginx连接数瓶颈的问题.而且,如果要http重定向为https,极端情况,所有请求都是http,http在Nginx转为https的过程中,也是要占用端口数的.所以建议同时支持http和https，而不把http强制重定向为https.
 
 不过这样和单独使用Nginx, 理论上能支持的并发连接数为: 65535*N(集群服务器数量)
 
@@ -95,7 +95,7 @@ server {
 
 3. Socket.io 想要获得Client IP, 使用 `Nginx(ip_hash) + Socket.io Cluster`
 
-4. 如果使用Nginx,舍弃支持http,要求只支持https,可以一定程度减少http请求占用连接端口的情况
+4. 如果使用Nginx,不要将http重定向为https,可以让两者同时支持.
 
 5. go-socket.io 现有业务,1w连接占2.5-2.8G内存
 
