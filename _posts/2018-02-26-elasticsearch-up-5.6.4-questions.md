@@ -90,6 +90,54 @@ curl -XPUT 'localhost:9200/_cluster/settings' -d '{
 threadpool.bulk.queue_size: 1000
 ```
 
+##### 对空串的查询会报语法错误
+
+content = params[:query] => ""
+
+前端传了空字符串
+
+```ruby
+{
+  bool:{
+    must: [
+      multi_match: {
+        type: "phrase",
+        query: content,
+        slop: 0,
+        fields: ["content.tokenized", "subject.tokenized"]
+      }
+    ],
+    filter:{
+      term: { company_id: company_id }
+    }
+  }
+}
+
+# 会报语法错误
+```
+
+优化为：
+
+```ruby
+query = {bool: {must: [], filter: {}}}
+
+if content.present?
+  match = { multi_match: {
+              type: "phrase",
+              query: content,
+              slop: 0,
+              fields: ["content.tokenized", "subject.tokenized"]
+            }
+          }
+  query[:bool][:must] << match
+end
+
+query[:filter] = { term: {company_id: company_id}}
+```
+
+当 content 不存在的时候，只是进行匹配查询
+
+
 
 参考链接：
 ```
