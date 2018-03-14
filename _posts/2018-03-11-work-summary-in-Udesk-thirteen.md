@@ -56,6 +56,8 @@ redis会开启一个后台子进程进行AOF重写程序。
 
 4）、当前AOF文件大小和最后一次重写后的大小之间的比率等于或者等于指定的增长百分比（在配置文件设置了auto-aof-rewrite-percentage参数，不设置默认为100%）
 
-
-
 如果前面三个条件都满足，并且当前AOF文件大小比最后一次AOF重写时的大小要大于指定的百分比，那么触发自动AOF重写。
+
+##### RPOPLPUSH 不支持 redis cluster 模式
+
+RPOPLPUSH 不支持 redis cluster 模式, Sidekiq底层队列实现是使用的redis POPLPUSH, 所以 redis cluster 不支持Sidekiq
