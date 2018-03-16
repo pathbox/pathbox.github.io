@@ -66,3 +66,7 @@ RPOPLPUSH 不支持 redis cluster 模式, Sidekiq底层队列实现是使用的r
 Ubuntu 14.04 tmp 文件夹下,手动创建的文件夹,在重启系统之后,刚才手动创建的文件夹已被删除
 
 ##### 线上的操作,放在访问量少的时候,要考虑对线上的影响
+
+##### find . -name "*.go" | xargs wc -l
+
+统计你的目录下 go代码行数
