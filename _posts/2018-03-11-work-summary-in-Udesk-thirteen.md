@@ -61,3 +61,8 @@ redis会开启一个后台子进程进行AOF重写程序。
 ##### RPOPLPUSH 不支持 redis cluster 模式
 
 RPOPLPUSH 不支持 redis cluster 模式, Sidekiq底层队列实现是使用的redis POPLPUSH, 所以 redis cluster 不支持Sidekiq
+
+##### Ubuntu 14.04 tmp 文件夹
+Ubuntu 14.04 tmp 文件夹下,手动创建的文件夹,在重启系统之后,刚才手动创建的文件夹已被删除
+
+##### 线上的操作,放在访问量少的时候,要考虑对线上的影响
