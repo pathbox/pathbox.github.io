@@ -77,11 +77,61 @@ TCP连接是全双工连接，可以同时发送和接收数据。建立连接�
 
 简单描述：
 
-第一次挥手：A发送通知告诉B我要关闭连接了，
+第一次挥手：A发送通知告诉B我要关闭连接了
+
 第二次挥手：B收到了通知回复A，B发一个ACK通知给A：好的我知道了，我不会再接收你的数据，但我还有数据没有发完
+
 第三次挥手：B的数据发完了（A作为接收数据方，是不知道发送方什么时候停止发送正常数据），B再发送一个通知给A告诉A我的数据也发完了，我不会再接收和发送数据了，你可以关闭连接了
+
 第四次挥手： A收到了B的第二个通知，A最后再发一个通知给B：好的我不会再接收和发送数据了，你也不会再接收了发送数据了，关闭连接吧
 
 连接关闭
 
 个人认为四次挥手的原因是AB两方由全双工变为半双工再继续关闭连接，需要四次通信才能稳定的停止互相发送和接收数据，然后关闭连接，和三次握手创建TCP连接不同，因为创建连接的时候，只有一方在发送数据，另一方在接收数据。而不像连接建立后，双方都可以在发送和接收数据。
+
+##### ab 压测工具结果描述简记
+
+命令：
+
+```
+ab -n 100 -c 100 -H “Cookie: Key1=Value1; Key2=Value2” http://test.com/
+```
+
+```ruby
+Server Software:        nginx                                               #表示访问的是nginx服务器
+Server Hostname:        127.0.0.1
+Server Port:            9011
+
+Document Path:          /
+Document Length:        2 bytes                                            #http相应的内容长度
+Concurrency Level:      10000                                              #并发请求数 -c的参数
+Time taken for tests:   0.772 seconds                                      #整个测试持续时间
+Complete requests:      10000                                              #完成的请求数
+Failed requests:        0                                                  #失败的请求数
+Total transferred:      1180000 bytes                                      #整个场景的网络传输量
+HTML transferred:       20000 bytes                                        #整个场景HTML内容传输量
+Requests per second:    12954.54 [#/sec] (mean)                            #1.吞吐率， 每秒请求数
+Time per request:       771.930 [ms] (mean)                                #2.用户平均请求等待时间，相当于 LR 中的平均事务响应时间，后面括号中的 mean 表示这是一个平均值
+Time per request:       0.077 [ms] (mean, across all concurrent requests)  #3.务器平均请求处理时间
+Transfer rate:          1492.81 [Kbytes/sec] received                      #平均每秒网络上的流量，可以帮助排除是否存在网络流量过大导致响应时间延长的问题
+
+Connection Times (ms)                                                     #网络上消耗的时间的分解
+              min  mean[+/-sd] median   max
+Connect:      186  234  24.7    233     292
+Processing:   141  244  46.5    234     377
+Waiting:       98  218  60.5    209     372
+Total:        376  478  37.9    468     613
+
+#个请求处理时间的分布情况，50%的处理时间在4930ms内，66%的处理时间在5008ms内...，重要的是看90%的处理时间
+Percentage of the requests served within a certain time (ms)      
+  50%    468
+  66%    487
+  75%    507
+  80%    524
+  90%    532
+  95%    537
+  98%    547
+  99%    569
+ 100%    613 (longest request)
+
+```
