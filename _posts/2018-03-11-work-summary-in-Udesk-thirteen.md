@@ -135,3 +135,9 @@ Percentage of the requests served within a certain time (ms)
  100%    613 (longest request)
 
 ```
+
+##### systemd 文件目录
+
+把编写好的 xxx.service 文件放入 `/lib/systemd/system`
+
+在 `/usr/lib/systemd` 有systemd相关的其他文件
