@@ -159,3 +159,31 @@ Percentage of the requests served within a certain time (ms)
 ```
 sudo ntpdate time.windows.com
 ```
+
+##### Understand Nginx with 65535
+
+A 代表客户端们
+
+B代表服务器
+
+B的前面挂着一个Nginx做负载均衡和代理转发
+
+对A来说访问B服务器，其实先访问的是Nginx，Nginx作为服务器，可以接受65535个来自A的请求，或者是A发起的长连接，Websocket连接或gRPC连接
+
+此时Nginx是作为反向代理`服务端`，对A来说，是不受IP端口的限制，Nginx可以建立或处理的连接数不受65535的限制，而是根据内存资源、文件描述符资源和Nginx配置的值来确定可以最多接受多少请求或长连接
+
+简单描述一下Nginx的处理请求的原理： 首先是master worker，会监听普通worker（数量一般设为CPU核心进程数）。每个普通worker有连接池，每个连接池的大小是设置的 worker_connections。Nginx通过多路复用+事件驱动的模式，来处理这些连接请求。
+
+worker_connections 的总数是可以超过65535的
+
+然后，Nginx作为Client的形式，将请求代理转发给后面的B服务器。在 `upstream`中，Nginx理论上最多可以配 65535个 server，对，这里收到了65535端口数的限制。
+
+在某个时刻，B服务器收到来自某一个Nginx的请求或连接处理理论上最多为 65535个。因为此时Nginx是作为客户端进行代理转发，转发给B服务器的时候，就收到了IP端口数量的限制。
+
+A => (no 65535 limit) => Nginx (65535 limie) => B
+
+所以，从A来看，某个时刻，A可以发起了超过65535的长连接或请求到Nginx， Nginx某个时刻代理转发最多65535个请求或长连接到B服务器
+
+如果，Nginx upstream中的server不是代理的端口，而是B服务的sock文件，则Nginx转发给B的时候，不再受65535的限制（只是听Leader说的）
+
+接下来，准备搭建测试环境，证明上述的观点。至少需要四台机器
