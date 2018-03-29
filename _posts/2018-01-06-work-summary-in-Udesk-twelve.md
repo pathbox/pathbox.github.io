@@ -21,7 +21,7 @@ net.ipv4.tcp_tw_recycle = 1
 select，poll，epoll都是IO多路复用的机制。I/O多路复用就通过一种机制，可以监视多个描述符，一旦某个描述符就绪（一般是读就绪或者写就绪），能够通知程序进行相应的读写操作。
 
 select 的缺点：
-``
+```
 1. 每次调用select，都需要把fd集合从用户态拷贝到内核态，这个开销在fd很多的时候会很大
 2. 同时每次调用select，都需要在内核轮询遍历传递进来的所有fd，这个开销在fd很多的时候也很大
 3. select支持的文件描述符数量太小了，默认是1024
@@ -43,6 +43,7 @@ epoll既然是对select和poll的改进，就应该能避免上述的三个缺�
 
 https://www.cnblogs.com/Anker/p/3265058.html
 
+```
 ##### RPC、IPC、进程内通信
 
 RPC（Remote Procedure Call） 远程程序调用。

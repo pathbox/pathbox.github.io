@@ -187,3 +187,11 @@ A => (no 65535 limit) => Nginx (65535 limie) => B
 如果，Nginx upstream中的server不是代理的端口，而是B服务的sock文件，则Nginx转发给B的时候，不再受65535的限制（只是听Leader说的）
 
 接下来，准备搭建测试环境，证明上述的观点。至少需要四台机器
+
+##### socket.io 的连接断开
+当浏览器页面关闭时，客户端 socket.io 不需要实现disconnection，只需要服务端实现disconnection的监听方法就可以，服务端会监听到客户端连接关闭了，然后再进行操作。
+
+```go
+so.On("disconnection", func(data map[string]string) {
+})
+```
