@@ -250,3 +250,8 @@ Stack<String> b = new Stack<String>(100);
 
 3.无需类型转换。
 ```
+
+##### Golang对参数的处理报错或null pointer 会导致整个服务崩溃
+Golang对参数的处理报错或null pointer 会导致服务崩溃，所以如果不确定具体参数类型时，可以进行接口话，再通过 val.(type)来处理不同的值类型。 在从map中取值的时候，善用ok， 如果key不存在，ok是false，就可以return而不再继续执行，继续执行会报错导致整个服务崩溃
+
+使用 defer recover()， 让服务不会因为这次处理而崩溃
