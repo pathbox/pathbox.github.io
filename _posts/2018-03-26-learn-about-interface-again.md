@@ -174,6 +174,42 @@ InitUserID(userID string)
 
 通过这个实践和阅读这段源码，我知道今后在代码设计中，通过设计合理的开放interface，将需要的方法暴露给外部，除此之外，外部不需要关心或入侵内部的具体实现方法逻辑或struct的属性。这样能够很好的保护内部的实现。
 
+用interface时,可以将这个interface赋值为nil,然后在判断的时候,就可以直接判断是否nil,这是具体struct无法做到的
+
+```go
+package main
+
+import "fmt"
+
+type Man interface {
+	MyName() string
+}
+
+type Boy struct {
+	Name string
+}
+
+func (b *Boy) MyName() string {
+	return b.Name
+}
+
+func main() {
+	var m Man
+	m = NewMan()
+
+	if m == nil {
+		fmt.Println("No Man")
+	} else {
+		fmt.Println(m.MyName())
+	}
+}
+
+func NewMan() Man {
+	return nil
+  // return &Boy{Name: "Joe"}
+}
+```
+
 参考链接：
 
 ```
