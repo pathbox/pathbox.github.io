@@ -174,3 +174,7 @@ http://wiki.jikexueyuan.com/project/go-command-tutorial/0.12.html
 https://studygolang.com/articles/5844
 https://tonybai.com/2014/10/22/golang-testing-techniques/
 ```
+
+##### 最简单的理解正向代理和反向代理
++ 正向代理是在客户端的，代理客户端向服务端发起请求，正向代理的IP往往和客户端IP在同一个网络 （shadowsock）
++ 反向代理是在服务端的，代理服务端接受客户端的请求，反向代理的IP往往和服务器IP在同一个网络 （Nginx LVS）
