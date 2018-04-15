@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Interface is not real, the real is the data and methods that interface defines
+title:  Interface is not real
 date:   2018-03-26 20:30:06
 categories: Golang
 image: /assets/images/post.jpg
@@ -209,6 +209,8 @@ func NewMan() Man {
   // return &Boy{Name: "Joe"}
 }
 ```
+
+> Interface is not real, the real is the data and methods that interface declares
 
 参考链接：
 
