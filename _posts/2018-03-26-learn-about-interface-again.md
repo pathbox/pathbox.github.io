@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Learn about interface in Go again
+title:  Interface is not real, the real is the data and methods that interface defines
 date:   2018-03-26 20:30:06
 categories: Golang
 image: /assets/images/post.jpg
