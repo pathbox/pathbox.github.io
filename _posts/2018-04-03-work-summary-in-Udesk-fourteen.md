@@ -290,3 +290,6 @@ ps aux | grep msyql => /usr/sbin/mysqld 说明MySQL正常启动，否则很有�
 查看字段编码：
 `SHOW FULL COLUMNS FROM tbl_name;`
 ```
+
+##### HTTPS加密的内容
+除域名,ip,端口外其它都加密
