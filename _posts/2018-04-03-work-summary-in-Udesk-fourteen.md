@@ -245,3 +245,48 @@ for k, _ := range m {
 map = nil
 ```
 之后等待GC进行回收。如果用 map 做缓存，而每次更新只是部分更新，更新的 key 如果偏差比较大，有可能会有内存逐渐增长而不释放的问题
+
+##### 修改MySQL 默认、数据库、表、字段字符集
+
+`MySQL版本：5.7.21`
+
++ SHOW VARIABLES LIKE 'char%'; 查看MySQL编码
+
++ sudo vim /etc/mysql/mysql.conf.d/mysqld.cnf， lc-messages-dir = /usr/share/mysql 语句后添加 character-set-server=utf8
+
++ sudo vim /etc/mysql/conf.d/mysql.cnf 添加 default-character-set=utf8
+
+sudo systemctl restart mysql.service 重启MySQL
+
+ps aux | grep msyql => /usr/sbin/mysqld 说明MySQL正常启动，否则很有可能是配置文件有错误
+
+```
+
+修改数据库字符集：
+
+`ALTER DATABASE db_name DEFAULT CHARACTER SET character_name [COLLATE ...];`
+
+把表默认的字符集和所有字符列（CHAR,VARCHAR,TEXT）改为新的字符集：
+
+`ALTER TABLE tbl_name CONVERT TO CHARACTER SET character_name [COLLATE ...]`
+如：`ALTER TABLE logtest CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;`
+
+只是修改表的默认字符集：
+
+`ALTER TABLE tbl_name DEFAULT CHARACTER SET character_name [COLLATE...];`
+如：`ALTER TABLE logtest DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;`
+
+修改字段的字符集：
+`ALTER TABLE tbl_name CHANGE c_name c_name CHARACTER SET character_name [COLLATE ...];`
+
+如：`ALTER TABLE logtest CHANGE title title VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci;`
+
+查看数据库编码：
+`SHOW CREATE DATABASE db_name;`
+
+查看表编码：
+`SHOW CREATE TABLE tbl_name;`
+
+查看字段编码：
+`SHOW FULL COLUMNS FROM tbl_name;`
+```
