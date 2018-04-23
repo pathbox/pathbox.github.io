@@ -390,3 +390,10 @@ $ sudo journalctl --vacuum-size=1G
 # 指定日志文件保存多久
 $ sudo journalctl --vacuum-time=1years
 ```
+
+##### Websocket 可以在建立连接(Upgrade之前)这一步进行鉴权
+Websocket 可以在建立连接这一步进行鉴权，将参数和token加载ws 的URL上，
+
+如果token鉴定不正确，则不进行 Upgrade操作，从而长连接不会建立，返回错误
+
+这样可以一定程度减少不合法的连接的建立
