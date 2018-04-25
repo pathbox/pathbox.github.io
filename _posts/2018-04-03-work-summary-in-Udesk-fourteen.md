@@ -428,3 +428,13 @@ clients与用户数：
 
 https://blog.csdn.net/sole_cc/article/details/52433353
 ```
+
+##### 快速创建一个指定大小的文件
+
+如果你只要一个指定大小的文件，不需要关系文件中的内容用于做测试或实验，可以这样：
+
+```
+head -c 10M < /dev/urandom > ./log-file
+```
+
+利用 `/dev/urandom` 这样创造的文件内容是二进制的，而不是文本内容
