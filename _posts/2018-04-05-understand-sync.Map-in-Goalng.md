@@ -57,6 +57,19 @@ type entry struct {
 
 `read`并不是只是读操作,也有原子写操作.在读操作的时候,是使用了`atomic.Value的Load()`,没有用锁,达到了在线程安全的情况下读性能的大大提高
 
+```go
+func (m *Map) Store(key, value interface{}) {
+	read, _ := m.read.Load().(readOnly)
+	if e, ok := read.m[key]; ok && e.tryStore(&value) { // 如果 key在read.m中，相当于update操作，会直接修改read(cache层),而不会再去dirty进行加锁的赋值操作
+		return
+	}
+	// ...
+}
+```
+
+而同时也会把dirty中的对应的值给修改了，因为相同key的entry，在read和dirty中存的是entry的指针，两个指针没有变，指针的值改了，所以read和dirty 对应的entry同时改变。
+为什么呢？因为当key不在map中，会进行map新建记录操作，相同的key既会在read中新建，也会在dirty中新建，新建的就是相应entry的指针： `key=>*(entry)`。这样，当进行update操作时，就直接修改read，而不需要再加锁操作dirty，性能好多了。
+
 而将`read`中的值同步到`dirty`或对`dirty`进行读或写操作时,使用了互斥量锁`Mutex`.
 写操作分为新增和更新.新增的时候,需要把这个值指针存到`dirty`.更新的时候,更新一个没有被标记过expunged的key,直接对read进行`atomic.CompareAndSwapPointer`操作就可以,如果之前expunged过,将key同步到dirty.
 而在Store、Delete操作的时候,都要进行`m.read.Load().(readOnly)`操作.根据上文中推荐的文章进行的benchmark的结果,`sync.Map`的写、删除性能不尽如意,这个结果可以预料到.
@@ -84,7 +97,7 @@ misses 的作用就是，当从read读取值没有读取到，从`dirty`中读�
 
 在进行`Store`和`Load`的时候,其实都是先操作`read`,如果`read`中存在并且对应值没有被expunged过,就执行返回了,如果`read`中不存在,或者对应值被expunged,就需要对`dirty`进行操作,将这个key同步到`dirty`中.
 
-综上所述,如果你的map使用 `读远大于写操作`,`sync.Map`会是很好的选择,而读写性能都比较优秀的的map,Golang中是[current-map](https://github.com/orcaman/concurrent-map).下回也好好阅读一下`current-map`的实现代码.
+综上所述,如果你的map使用 `读远大于写操作`(这里的写是指新增和删除key, 修改key还是用的原子性操作),`sync.Map`会是很好的选择,而读写性能都比较优秀的的map,Golang中是[current-map](https://github.com/orcaman/concurrent-map).下回也好好阅读一下`current-map`的实现代码.
 
 
 参考连接:
