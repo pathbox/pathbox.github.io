@@ -492,8 +492,12 @@ server {
   location /http/ {
   proxy_pass http://http_backend;
   proxy_http_version 1.1;
-  proxy_set_header Connection ""; 
+  proxy_set_header Connection "";
   }
 }
 
 ```
+
+##### 手动执行 logrotate
+
+`logrotate -d -f /etc/logrotate.d/nginx`
