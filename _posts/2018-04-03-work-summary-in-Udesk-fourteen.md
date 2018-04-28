@@ -438,3 +438,62 @@ head -c 10M < /dev/urandom > ./log-file
 ```
 
 利用 `/dev/urandom` 这样创造的文件内容是二进制的，而不是文本内容
+
+##### Nginx 配置小记
+
+```
+tcp_nodelay on; # sets TCP_NODELAY flag, used on keep-alive connections 让最后一个小包不受到延迟ACK的影响，不会等到200ms之后发送
+
+sendfile on;
+
+tcp_nopush # 与 tcp_nodelay 相反。不是为了尽可能快地推送数据包，它的目标是一次性优化数据的发送量。
+
+# 在发送给客户端之前，它将强制等待包达到最大长度(MSS)。而且这个指令只有在 sendfile 开启时才起作用
+
+gzip on; # enable gzip
+gzip_http_version 1.1; # turn on gzip for http 1.1 and above
+gzip_disable "msie6"; # IE 6 had issues with gzip
+gzip_comp_level 5; # inc compresion level, and CPU usage  使用3-5级别是一个经验值
+gzip_min_length 100; # minimal weight to gzip file
+gzip_proxied any; # enable gzip for proxied requests (e.g. CDN)
+gzip_buffers 16 8k; # compression buffers (if we exceed this value, disk will be used instead of RAM)
+gzip_vary on; # add header Vary Accept-Encoding (more on that in Caching section)
+# define files which should be compressed
+gzip_types text/plain;
+gzip_types text/css;
+gzip_types application/javascript;
+gzip_types application/json;
+gzip_types application/vnd.ms-fontobject;
+gzip_types application/x-font-ttf;
+gzip_types font/opentype;
+gzip_types image/svg+xml;
+gzip_types image/x-icon;
+
+client_body_buffer_size 16K; # 16K 一般情况都足够用，这是又一个可以产生巨大影响的设置，必须谨慎使用。太小了，则 nginx 会不断地使用 I/O 把剩余的部分写入文件。太大了，则当攻击者可以打开所有连接但你无法在系统上分配足够缓冲来处理这些连接时，你可能容易受到 DOS 攻击
+client_header_buffer_size 1k;
+large_client_header_buffers 2 1k;
+client_max_body_size 8m; # 如果您希望允许用户上传文件，调整此配置以满足您的需要
+
+# keep-alive
+
+# 在客户端和 nginx 之间 keep-alive
+keepalive_disable msie6; # disable selected browsers.
+# The number of requests a client can make over a single keepalive connection. The default is 100, but a much higher value can be especially useful for testing with a load‑generation tool, which generally sends a large number of requests from a single client.
+keepalive_requests 100000;
+# How long an idle keepalive connection remains open.
+keepalive_timeout 60;
+
+# 在 nginx 和上游服务器之间 keep-alive
+upstream backend {
+# The number of idle keepalive connections to an upstream server that remain open for each worker process
+keepalive 16;
+}
+server {
+  location /http/ {
+  proxy_pass http://http_backend;
+  proxy_http_version 1.1;
+  proxy_set_header Connection ""; 
+  }
+}
+
+```
