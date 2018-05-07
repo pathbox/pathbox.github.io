@@ -18,3 +18,17 @@ image: /assets/images/post.jpg
 规律：临界区没有加写锁，可以被多个线程获取读锁读和一个线程获取写锁写；资源加了读锁，只能被其他线程获取读锁读。
 
 而互斥锁不分读写，保护临界区某个时段只有一个线程对临界区进行读写操作。相比读写锁，损失了读的并发性能。
+
+### Restarting without closing the socket
+
+Graceful Restart in Golang
+
+- Fork a new process which inherits the listening socket
+- The child performs initialization and starts accepting connections on the socket
+- Immediately after, child sends a signal to the parent causing the parent to stop accepting connections and terminate
+
+- Fork 一个新的进程，这个进程继承正在监听的socket的所有属性信息
+- 子进程执行初始化，之后开始接受新的socket连接
+- 之后，子进程马上发送signal信号通知父进程停止接受新的连接然后终止
+
+> https://grisha.org/blog/2014/06/03/graceful-restart-in-golang/
