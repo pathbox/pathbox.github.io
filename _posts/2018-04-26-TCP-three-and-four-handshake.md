@@ -47,9 +47,8 @@ SYN_SENT：应用已经开始，打开一个连接
 ESTABLISHED：正常数据传输状态
 FIN_WAIT1：应用说它已经完成
 FIN_WAIT2：另一边已同意释放
-ITMED_WAIT：等待所有分组死掉
 CLOSING：两边同时尝试关闭
-TIME_WAIT：另一边已初始化一个释放
+TIME_WAIT：等待所有分组死掉
 LAST_ACK：等待所有分组死掉
 ```
 
@@ -61,8 +60,8 @@ TIME_WAIT状态有两个存在的理由：
 
 - 可靠地实现TCP全双工连接的终止
 
-在主动关闭方发送的最后一个 ack(fin) ，有可能丢失，这时被动方会重新发
-fin, 如果这时主动方处于 CLOSED 状态 ，就会响应 rst 而不是 ack。所以
+在主动关闭方发送的最后一个 ack(ACK N+1) ，有可能丢失，这时被动方会重新发
+fin(FIN N), 如果这时主动方处于 CLOSED 状态 ，就会响应 rst 而不是 ack。所以
 主动方要处于 TIME_WAIT 状态，而不能是 CLOSED
 
 - 允许老的重复分节在网络中消逝
@@ -81,6 +80,8 @@ fin, 如果这时主动方处于 CLOSED 状态 ，就会响应 rst 而不是 ack
 - 所以合理设置 keepAlive，能够降低短连接的频繁创建
 - 为服务设计连接池(例如为MySQL配置连接池)
 - 开启快速回收`TIME_WAIT` TCP连接设置
+- 增加服务器
+- 限流降级策略
 
 ```
 sudo vim /etc/sysctl.conf

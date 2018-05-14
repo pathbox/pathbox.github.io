@@ -191,6 +191,8 @@ https://tonybai.com/2014/10/22/golang-testing-techniques/
 
 >Interface is not real, the real is the data and methods that interface declares
 
+interface 帮助同一管理、封装、对外一致、对内具体实现
+
 ##### 多播、广播、单播
 + 多播支持在IPv4中是可选的，在IPv6中是必需的
 + IPv6不支持广播。使用广播的任何IPv4应用程序一旦移植到IPv6就必需改用多播重新编写
@@ -239,7 +241,7 @@ for k, _ := range m {
 
 + map 被清空。执行完之后调用len函数，结果肯定是0；
 + 内存没有释放。清空只是修改了一个标记，底层内存还是被占用了；
-+ 循环遍历了len(m)次。上面的代码每一次遍历都会删除一个元素，而遍历的次数并不会因为之前每次删一个元素导致减少
++ 循环遍历了len(m)次。上面的代码每一次遍历都会删除一个元素，而遍历的次数并不会因为之前每次删一个元素导致减少。 delete 的是实体，遍历的是copy
 
 ```go
 map = nil
