@@ -91,6 +91,7 @@ net.ipv4.tcp_syncookies = 1
 net.ipv4.tcp_tw_reuse = 1
 net.ipv4.tcp_tw_recycle = 1
 net.ipv4.tcp_fin_timeout = 30
+// net.ipv4.tcp_max_tw_buckets=100000 //还可以设置TIME_WAIT 最多存在的数量，系统会将多余的TIME_WAIT删除掉，此时系统日志里可能会显示：「TCP: time wait bucket table overflow」，不过除非不得已，否则不要轻易使用
 
 然后执行/sbin/sysctl -p让参数生效。
 
