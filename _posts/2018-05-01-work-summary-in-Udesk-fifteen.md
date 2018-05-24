@@ -163,3 +163,7 @@ fmt.Println("rune len:", len([]rune(str)))   // 5
 fmt.Println("int32 len:", len([]int32(str))) // 5
 fmt.Println("Byte len", len(str))            // 15
 ```
+
+##### 使用Gateway进行灰度发布思考
+
+当请求进入到Gateway，对头部的参数进行分析，或者对Body的参数进行分析(比解析头部慢)。如果某个参数满足一定条件，则转发到灰度发布的服务器上。比如按公司ID、IP地址归属地、手机号归属地、版本号或按照一定规则抽取等。转到灰度发布服务器的请求一般不要太大量。
