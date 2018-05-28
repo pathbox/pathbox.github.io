@@ -221,3 +221,26 @@ Redis分布式锁的bug情况：
 如果使用 ZooKeeper 做锁服务的话，那么可以使用 zxid 或 znode 的版本号来做这个 fence 版本号
 
 >需要分清楚：我是用来做修改某个共享源的，还是用来做不同进程间的同步或是互斥的。如果使用 CAS 这样的方式（无锁方式）来更新数据，那么我们是不需要使用分布式锁服务的，而后者可能是需要的。所以，这是我们在决定使用分布式锁服务前需要考虑的第一个问题——我们是否需要？
+
+##### zgrep 使用
+`zgrep`帮你不用解压就能grep `.gz`压缩文件
+
+```sh
+zgrep "/api" access_log.gz
+zgrep "/api" access_log.gz access_log_1.gz
+```
+
+延伸：
+
+```sh
+zcat access.tar.gz | grep -a '/api'
+zgrep -a "/api" access.tar.gz
+zcat  解压文件并将内容输出到标准输出
+zcmp  解压文件并且 byte by byte 比较两个文件
+zdiff 解压文件并且 line by line 比较两个文件
+zgrep 解压文件并且根据正则搜索文件内容
+ztest - Tests integrity of compressed files.
+zupdate - Recompresses files to lzip format.
+```
+
+这些命令支持 bzip2, gzip, lzip and xz 格式
