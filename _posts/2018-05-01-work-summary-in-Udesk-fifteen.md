@@ -244,3 +244,20 @@ zupdate - Recompresses files to lzip format.
 ```
 
 这些命令支持 bzip2, gzip, lzip and xz 格式
+
+##### interface conversion: interface {} is func() string, not string
+
+```go
+interface conversion: interface {} is func() string, not string
+```
+
+这个报错，是由于给变量赋的值是接口的方法名，而不是字符串。例子：
+
+```go
+func (p Person) GetName() string {...}
+p := &Person{}
+m := make(map[string]string)
+m["name"] = p.GetName // Wrong
+// 正确的是
+m["name"] = p.GetName()
+```
