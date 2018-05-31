@@ -261,3 +261,16 @@ m["name"] = p.GetName // Wrong
 // 正确的是
 m["name"] = p.GetName()
 ```
+
+##### Golang func()类型变量之间转换
+type JobFunc func()
+
+func (j JobFunc) Run() {
+	j()
+}
+
+JobFunc 这个 adapter 的设计很有技巧。首先，JobFunc也是一种类型，和struct是同等的，类型就是 func()JobFunc 实现了Run 方法，复合Job接口，这样就实现了Job接口，所以可以赋值给Corn
+
+定义一个 j := func(){...具体代码}，j是一个func类型的变量，要将j转为 JobFunc类型，只要 jNow := JobFunc(j)就OK啦！ 这个和 i := 32; i64 := int64(i) 原理是一样的。 因为j的底层类型是fun()和 JobFunc的底层类型func()是一样的，Golang是允许他们可以互相转换的。方法就是 Type() 这样，非常简便。
+
+反过来说，如果两个变量的底层类型是不能互相转换的，就无法使用上述的方法
