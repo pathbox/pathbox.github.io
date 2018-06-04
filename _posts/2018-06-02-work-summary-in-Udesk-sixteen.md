@@ -36,3 +36,9 @@ int main() {
 
 所有的帧都存放在 Stack，由于帧是一层层叠加的，所以 Stack 叫做栈。生成新的帧，叫做"入栈"，英文是 push；栈的回收叫做"出栈"，英文是 pop。Stack 的特点就是，最晚入栈的帧最早出栈（因为最内层的函数调用，最先结束运行），这就叫做"后进先出"的数据结构。每一次函数执行结束，就自动释放一个帧，所有函数执行结束，整个 Stack 就都释放了。
 ```
+
+##### Algorithms Behind Modern Storage Systems
+
+Different uses for read-optimized B-trees and write-optimized LSM-trees
+
+>https://queue.acm.org/detail.cfm?id=3220266
