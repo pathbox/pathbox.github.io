@@ -42,3 +42,8 @@ int main() {
 Different uses for read-optimized B-trees and write-optimized LSM-trees
 
 >https://queue.acm.org/detail.cfm?id=3220266
+
+##### quick find in Linux
+
+- sudo find ~/ -name 完整名称 在home 目录寻找文件
+- sudo find / -name 完整名称 在整个根目录寻找文件
