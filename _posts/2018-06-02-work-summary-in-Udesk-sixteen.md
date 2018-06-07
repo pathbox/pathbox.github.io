@@ -47,3 +47,12 @@ Different uses for read-optimized B-trees and write-optimized LSM-trees
 
 - sudo find ~/ -name 完整名称 在home 目录寻找文件
 - sudo find / -name 完整名称 在整个根目录寻找文件
+
+##### Golang 交叉编译 在Mac下编译Linux二进制文件
+```
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build main.go
+
+#写到Makefile中
+
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ${LDFLAGS} -o bin/udesk_ivr udesk/ivr
+```
