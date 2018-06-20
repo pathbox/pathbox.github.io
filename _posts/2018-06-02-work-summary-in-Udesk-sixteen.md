@@ -151,3 +151,11 @@ Go语言内置的gob格式就是一种二进制协议，而JSON、XML等则是�
 二进制传输协议提交更小，占用网络带宽更小，序列化的时候性能比文本协议快，适合需要更高性能的传输场景，比如微服务场景
 
 文本传输协议利于阅读识别和调试，更适合浏览器等客户端渲染场景
+
+##### Systemd 目录(详细)
+
+- /lib/systemd/system/vsftpd.service：官方释出的默认配置文件；将xxx.service文件放到这个目录下
+- Systemd 默认从目录/etc/systemd/system/读取配置文件。但是，里面存放的大部分文件都是符号链接，指向目录/usr/lib/systemd/system/或/lib/systemd/system，真正的配置文件存放在那个目录
+- /etc/systemd/system/vsftpd.service.d/custom.conf：在 /etc/systemd/system 下面创建与配置文件相同文件名的目录，但是要加上 .d 的扩展名。然后在该目录下创建配置文件即可。另外，配置文件最好附文件名取名为 .conf 较佳！ 在这个目录下的文件会“累加其他设置”进入 /usr/lib/systemd/system/vsftpd.service 内喔！
+- /etc/systemd/system/vsftpd.service.wants/*：此目录内的文件为链接文件，设置相依服务的链接。意思是启动了 vsftpd.service 之后，最好再加上这目录下面建议的服务。
+- /etc/systemd/system/vsftpd.service.requires/*：此目录内的文件为链接文件，设置相依服务的链接。意思是在启动 vsftpd.service 之前，需要事先启动哪些服务的意思
