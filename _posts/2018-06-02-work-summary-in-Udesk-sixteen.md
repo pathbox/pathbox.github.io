@@ -159,3 +159,12 @@ Go语言内置的gob格式就是一种二进制协议，而JSON、XML等则是�
 - /etc/systemd/system/vsftpd.service.d/custom.conf：在 /etc/systemd/system 下面创建与配置文件相同文件名的目录，但是要加上 .d 的扩展名。然后在该目录下创建配置文件即可。另外，配置文件最好附文件名取名为 .conf 较佳！ 在这个目录下的文件会“累加其他设置”进入 /usr/lib/systemd/system/vsftpd.service 内喔！
 - /etc/systemd/system/vsftpd.service.wants/*：此目录内的文件为链接文件，设置相依服务的链接。意思是启动了 vsftpd.service 之后，最好再加上这目录下面建议的服务。
 - /etc/systemd/system/vsftpd.service.requires/*：此目录内的文件为链接文件，设置相依服务的链接。意思是在启动 vsftpd.service 之前，需要事先启动哪些服务的意思
+
+##### B+树和B-树
+B+Tree相对于B-Tree有几点不同：
+
+1. 非叶子节点只存储键值信息。
+
+2. 所有叶子节点之间都有一个链指针。
+
+3. 数据记录都存放在叶子节点中。
