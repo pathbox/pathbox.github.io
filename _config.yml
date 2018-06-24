@@ -5,8 +5,8 @@ baseurl: "https://pathbox.github.io"
 url: "https://pathbox.github.io"
 date_format: "ordinal"
 title: Yestoday you said tomorrow
-subtitle: "Code Reading Study then go to the Gym"
-description: "Code Reading Study then go to the Gym"
+subtitle: "Coding reading study then go to the Gym"
+description: "Coding reading study then go to the Gym"
 keywords: pathbox, Pathbox, pathbox博客
 timezone: Asia/Shanghai
 encoding: "utf-8"
@@ -19,7 +19,7 @@ author: Pathbox
 organization:
 organization_url:
 github_username: pathbox
-location: Beijing, China
+location: Shanghai, China
 email: guijihe@163.com
 
 # ---------------- #

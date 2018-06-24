@@ -8,9 +8,9 @@ menu: 关于
 permalink: /about/
 ---
 
-Rubist、Gopher、Body Builder
+Rubist、Gopher
 
-Love Coding、reading and cooking
+Love Coding、reading、cooking and fitness
 
 Interested in high performance high concurrence high available and distributed systems
 

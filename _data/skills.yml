@@ -13,7 +13,7 @@
       - Beego
       - Gorilla
       - Gin
-      - HTML CSS Jquery
+      - HTML CSS JQuery
 
 - name: Service Framework
   keywords:
