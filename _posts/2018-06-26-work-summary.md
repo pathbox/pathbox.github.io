@@ -42,3 +42,32 @@ WAL机制一方面是为了确保数据即使写入缓存丢失也可以恢复�
 http://m.blog.itpub.net/15498/viewspace-2134411/
 
 http://hbasefly.com/2016/12/10/hbase-parctice-write/
+
+### gorilla/websocket 的Write要加锁,解决并发写问题
+
+gorilla/websocket 的write操作在高并发时会有报错导致write操作失败，解决方式是加锁。例子：
+
+```go
+func (socket *TSocket) WriteMessage(message []byte) error {
+	socket.Lock()
+	defer socket.Unlock()
+	err := socket.Conn.WriteMessage(TextMsg, message)
+	if err != nil {
+		socket.Logger.Error("TSocket WriteMessage Error", err)
+	}
+	return err
+}
+
+func (s *TSocket) Write(b []byte) (n int, err error) {
+  s.Lock()
+  defer s.Unlock()
+
+  var w io.WriteCloser
+  if w, err = s.Conn.NextWriter(websocket.BinaryMessage); err == nil {
+    if n, err = w.Write(b); err == nil {
+      err = w.Close()
+    }
+  }
+  return
+}
+```
