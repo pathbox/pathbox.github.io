@@ -84,7 +84,7 @@ Pipeline: A=>B=>C
 
 So let’s increase our QOS value to “5”. Now our Consumer reads from the Queue at a rate of 5 messages at a time. Our Queue is now empty. But what’s happening at the Consumer? The Consumer manages its own Shared Queue in memory. This Shared Queue is a local representation of an AMQP Queue. When a Consumer de-queues a message, that message is cached in the Consumer’s Shared Queue, and processed accordingly.
 
-配置了，消费者可以一次取多个消息(根据配置情况)，放到消费者本地的共享缓存队列中，再一个一个操作消息。这样在一定程度上可以减少消费者取队列的操作。
+配置了，消费者可以一次取多个消息(根据配置情况)，放到消费者本地的共享缓存队列中，再一个一个操作消息。这样在一定程度上可以减少消费者取队列的操作，减少network traffic involve time。
 
 prefetchCount和prefetchSize配置不是越大越好。
 
