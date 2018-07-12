@@ -75,3 +75,27 @@ Pipeline: A=>B=>C
 计算机指令被拆分为多个步骤，并通过多个硬件处理单元并行执行来加快指令的执行速度。这句话是关键，这样，CPU只要进行流水线的调度，将代码执行分配到硬件处理单元处理，实现并行处理。这样自然比完成一个一个完整的指令的串行化快多了,不过这是一种更微观的并行，这种并行已经不是在CPU层面，而是更下面的指令硬件处理单元层面。
 
 `That's amazing world.`
+
+### RabbitMQ Quality of Service (QOS)
+
+三个参数：prefetchCount, prefetchSize int, global bool
+
+如果没有配置，默认情况：消息是一个一个出队列，然后被消费者消费，再Ack。
+
+So let’s increase our QOS value to “5”. Now our Consumer reads from the Queue at a rate of 5 messages at a time. Our Queue is now empty. But what’s happening at the Consumer? The Consumer manages its own Shared Queue in memory. This Shared Queue is a local representation of an AMQP Queue. When a Consumer de-queues a message, that message is cached in the Consumer’s Shared Queue, and processed accordingly.
+
+配置了，消费者可以一次取多个消息(根据配置情况)，放到消费者本地的共享缓存队列中，再一个一个操作消息。这样在一定程度上可以减少消费者取队列的操作。
+
+prefetchCount和prefetchSize配置不是越大越好。
+
+1. 太大会增加消费者共享缓存队列的大小，增加了内存消耗
+2. 在消费者共享缓存中取消息操作，同样需要循环的时间，消费单个消息的时间并没有减少
+3. 当有多个消费者的时候，A消费者取了100个消费，B消费者取了剩下的10个消息，这时候A消费者的工作负载就更大，B消费者消费完10个消息后，一段时间没有新的消息，则这段时间B消费者处于闲置idle状态，浪费的处理资源。也就是配置数量越大，越容易导致多消费者消费负载不够均衡(not adequately balanced)
+4. 如果是对实时性要求比较高的，增加集群数量和消费者数量，提高并发性才是正确的方式，而进行QOS配置会降低实时性的并发性
+
+`适合处理实时性不那么高的场景`，合适的配置可以加快整体的消费时间
+
+```
+https://insidethecpu.com/2014/11/11/rabbitmq-qos-vs-competing-consumers/
+https://stackoverflow.com/questions/21652517/amqp-acknowledgement-and-prefetching
+```
