@@ -99,3 +99,8 @@ prefetchCount和prefetchSize配置不是越大越好。
 https://insidethecpu.com/2014/11/11/rabbitmq-qos-vs-competing-consumers/
 https://stackoverflow.com/questions/21652517/amqp-acknowledgement-and-prefetching
 ```
+
+### Go语言的传参都是值传递
+Go语言中所有的传参都是值传递（传值），都是一个副本，一个拷贝。因为拷贝的内容有时候是`非引用类型`（int、string、struct等这些），这样就在函数中就无法修改原内容数据；有的是`引用类型`（指针、map、slice、chan等这些），这样就可以修改原内容数据。
+
+一句话总结就是：Go语言的传参都是值传递，分为`非引用类型`不可修改原内容数据还是`引用类型`可以修改原内容数据 
