@@ -110,3 +110,5 @@ Go语言中所有的传参都是值传递（传值），都是一个副本，一
 - HTTP的keep-alive是为了让TCP连接存活久一点以便复用连接完成更多HTTP请求，提高连接利用率。
 
 - TCP的Keepalive是一种TCP连接的探测机制，使其一直保持可用
+
+http://blog.51cto.com/littledevil/2062101
