@@ -103,4 +103,10 @@ https://stackoverflow.com/questions/21652517/amqp-acknowledgement-and-prefetchin
 ### Go语言的传参都是值传递
 Go语言中所有的传参都是值传递（传值），都是一个副本，一个拷贝。因为拷贝的内容有时候是`非引用类型`（int、string、struct等这些），这样就在函数中就无法修改原内容数据；有的是`引用类型`（指针、map、slice、chan等这些），这样就可以修改原内容数据。
 
-一句话总结就是：Go语言的传参都是值传递，分为`非引用类型`不可修改原内容数据还是`引用类型`可以修改原内容数据 
+一句话总结就是：Go语言的传参都是值传递，分为`非引用类型`不可修改原内容数据还是`引用类型`可以修改原内容数据
+
+### keep-alive and keepalive
+
+- HTTP的keep-alive是为了让TCP连接存活久一点以便复用连接完成更多HTTP请求，提高连接利用率。
+
+- TCP的Keepalive是一种TCP连接的探测机制，使其一直保持可用
