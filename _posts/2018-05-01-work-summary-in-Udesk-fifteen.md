@@ -190,6 +190,8 @@ end
 
 通过上述的方式释放锁，能够避免client释放了其他client申请的锁，client的解锁操作只会解锁自己曾经加锁的资源。
 
+my_uuid_value 的随机唯一性，`redis.call("get",KEYS[1]) == my_uuid_value` 在删除锁之前先做判断，可以防止其他命令操作(非本client解锁操作)，把KEYS[1]这个锁key给删除了, my_uuid_value相当于是身份标记
+
 关于value的生成，官方推荐从 /dev/urandom 中取20个byte做为随机数。更简单的是使用`时间戳+客户端编号`的方式产生随机数。
 
 Redis分布式锁的bug情况：
