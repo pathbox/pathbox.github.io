@@ -112,3 +112,17 @@ Go语言中所有的传参都是值传递（传值），都是一个副本，一
 - TCP的Keepalive是一种TCP连接的探测机制，使其一直保持可用
 
 http://blog.51cto.com/littledevil/2062101
+
+### 关于Java Thread and Goroutine
+
+Java JVM默认为每个线程1MB堆栈。所以，在一般机器，比如16G内存的服务器，可能最多也只要1w+的thread，实际情况可能还要少
+
+Golang 新的goroutine只有大约4KB的堆栈。每个堆栈4KB，你可以在一个GB的RAM中放置250万个goroutine - 这比Java每个线程的1MB有了很大的改进
+
+由于JVM使用操作系统线程，因此它依赖于操作系统内核来安排它们
+
+Golang实现了自己的调度程序，goroutine是在用户态中，允许许多Goroutines在同一个OS线程上运行
+
+Golang首先开始使用分段堆栈模型，其中堆栈实际上会扩展到单独的内存区域，使用一些聪明的标记来跟踪。后来的实现改进了特定情况下的性能，而不是使用连续堆栈而不是拆分堆栈，就像调整散列表大小，分配新的大堆栈并通过一些非常棘手的指针操作，所有内容都被小心地复制到新的，更大，堆栈
+
+https://rcoh.me/posts/why-you-can-have-a-million-go-routines-but-only-1000-java-threads/
