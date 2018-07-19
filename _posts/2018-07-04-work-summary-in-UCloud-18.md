@@ -126,3 +126,20 @@ Golang实现了自己的调度程序，goroutine是在用户态中，允许许�
 Golang首先开始使用分段堆栈模型，其中堆栈实际上会扩展到单独的内存区域，使用一些聪明的标记来跟踪。后来的实现改进了特定情况下的性能，而不是使用连续堆栈而不是拆分堆栈，就像调整散列表大小，分配新的大堆栈并通过一些非常棘手的指针操作，所有内容都被小心地复制到新的，更大，堆栈
 
 https://rcoh.me/posts/why-you-can-have-a-million-go-routines-but-only-1000-java-threads/
+
+### TCP四次挥手再简记
+
+- 主动关闭连接的一方，调用close()；协议层发送FIN包
+- 被动关闭的一方收到FIN包后，协议层回复ACK；然后被动关闭的一方，进入CLOSE_WAIT状态，主动关闭的一方等待对方关闭，则进入FIN_WAIT_2状态；此时，主动关闭的一方 等待 被动关闭一方的应用程序，调用close操作
+- 被动关闭的一方在完成所有数据发送后，调用close()操作；此时，协议层发送FIN包给主动关闭的一方，等待对方的ACK，被动关闭的一方进入LAST_ACK状态；
+- 主动关闭的一方收到FIN包，协议层回复ACK；此时，主动关闭连接的一方，进入TIME_WAIT状态；而被动关闭的一方，进入CLOSED状态
+- 等待2MSL时间，主动关闭的一方，结束TIME_WAIT，进入CLOSED状态
+
+FIN_WAIT_2：主动关闭方
+CLOSE_WAIT：被动关闭方
+LAST_ACK：被动关闭方
+TIME_WAIT：主动关闭方
+CLOSED：被动关闭方
+CLOSED：主动关闭方
+
+TIME_WAIT: 属于tcp正常的一个状态，是为了解决网络的丢包和网络不稳定锁存在的一个状态
