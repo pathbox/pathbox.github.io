@@ -143,3 +143,7 @@ CLOSED：被动关闭方
 CLOSED：主动关闭方
 
 TIME_WAIT: 属于tcp正常的一个状态，是为了解决网络的丢包和网络不稳定锁存在的一个状态
+
+### Go is a value-oriented language
+
+>Go is a value-oriented language in the tradition of C-like systems languages rather than reference-oriented language in the tradition of most managed runtime languages
