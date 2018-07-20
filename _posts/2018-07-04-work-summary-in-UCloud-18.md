@@ -147,3 +147,6 @@ TIME_WAIT: 属于tcp正常的一个状态，是为了解决网络的丢包和网
 ### Go is a value-oriented language
 
 >Go is a value-oriented language in the tradition of C-like systems languages rather than reference-oriented language in the tradition of most managed runtime languages
+
+### 了解一个项目代码逻辑的最好的方式是‘将项目重构一遍’
+Yeah, this is a joke.
