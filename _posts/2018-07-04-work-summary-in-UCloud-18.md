@@ -150,3 +150,6 @@ TIME_WAIT: 属于tcp正常的一个状态，是为了解决网络的丢包和网
 
 ### 了解一个项目代码逻辑的最好的方式是‘将项目重构一遍’
 Yeah, this is a joke.
+
+### makefile中常见的错误—missing separator. Stop.—原因命令行缺少tab键
+出现问题的原因是：在makefile中，命令行要以tab键开头, 而不是两个空格
