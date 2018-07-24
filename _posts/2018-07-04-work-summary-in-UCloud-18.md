@@ -153,3 +153,19 @@ Yeah, this is a joke.
 
 ### makefile中常见的错误—missing separator. Stop.—原因命令行缺少tab键
 出现问题的原因是：在makefile中，命令行要以tab键开头, 而不是两个空格
+
+### 新人培训小结
+
+1. 云是什么？云是服务器集群
+2. 为什么有云？为了解决服务资源贡献问题
+3. 云的未来。大数据、AI、区块链、物联网
+
+Google和AWS在几乎同一年开始云服务产品，为什么AWS完全碾压了Google？
+
+Google早期是走PaaS路线，AWS是走IaaS路线。由于将IDC模式转到IaaS比PaaS更容易，兼容性更好，成功率高。所以，早期较多的用户选择了AWS。之后AWS不断完善产品，使得他们成为了世界云计算市场的最大赢家。现在，Google也开始发力IaaS，但已经较难追赶上AWS了。
+
+Google的三篇著名分布式计算、存储相关论文：
+
+- Google FS
+- MapReduce
+- BigTable
