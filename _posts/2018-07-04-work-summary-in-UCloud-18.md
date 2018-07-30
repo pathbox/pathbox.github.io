@@ -193,3 +193,16 @@ Blocking I/O Non-Blocking I/O asynchronous I/O
 - 非阻塞：调用是指在不能立刻得到结果之前，该函数不会阻塞当前线程，而会立刻返回
 - 同步：在发出一个同步调用时，在没有得到结果之前，该调用就不返回
 - 异步：在发出一个异步调用后，调用者不会立刻得到结果，该调用就返回了
+
+### Golang Goroutine Schedule(Goroutine调度)
+
+```go
+runtime.schedule() {
+    // only 1/61 of the time, check the global runnable queue for a G.
+    // if not found, check the local queue.
+    // if not found,
+    //     try to steal from other Ps.
+    //     if not, check the global runnable queue.
+    //     if not found, poll network.
+}
+```
