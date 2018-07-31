@@ -206,3 +206,19 @@ runtime.schedule() {
     //     if not found, poll network.
 }
 ```
+
+### RabbitMQ 报错问题
+
+```
+inequivalent arg 'durable' for exchange 'csExchange' in vhost '/': received
+```
+
+使用不同的MQ客户端时，常常会出现以上错误信息。
+
+比如用node作为product,使用java, Go, ruby, python作为consume.
+
+最常见的原因是: durable,auto_delete,passive参数不一致，保持参数一致性就ok了
+
+例子：使用node代码第一次创建了 exchange 和 queue，它们都有配置相关参数，然后又使用另一套node代码或者其他语言如Go代码的客户端也使用创建好的exchange和queue
+
+这时候要保证相关参数一致，否则会报错，而失败
