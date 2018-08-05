@@ -151,6 +151,16 @@ query[:filter] = { term: {company_id: company_id}}
 
 ##### 创建索引时，尽可能把查询比较慢的索引和快的索引物理分离
 
+##### 善用filter query
+
+filter使用bitsets进行布尔运算，query使用倒排索引进行计算，bitsets的优势体现在：
+
+- bitsetcache在内存里面，永远不消失(除非被LRU)
+- bitsets利用CPU原生支持的位运算操作，比倒排索引快一个数量级
+- 多个bitsets的与运算也是非常快的
+- bitsets在内存的存储是独立于query的，有很强的复用性
+- 如果一个bitset片段全是0，计算会自动跳过这些片段，让bitsets在数据稀疏情况下同样表现优于倒排索引
+
 
 参考链接：
 ```
