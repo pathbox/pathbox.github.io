@@ -55,20 +55,20 @@ es_rejected_execution_exception
 经过排查，应该是有bulk操作失败了。这是由于这些bulk操作的Elasticsearch thread_pool在那个时刻满了，再来bulk操作，就会被 Elasticsearch rejected 处理。
 
 ```
-curl -XGET 'http://localhost:9200/_nodes/stats?pretty'  
+curl -XGET 'http://localhost:9200/_nodes/stats?pretty'
 ```
 
 通过上面的命令，得到信息，查看发现有一个node
 ```
-"thread_pool" : {  
-    "bulk" : {  
-      "threads" : 16,  
-      "queue" : 0,  
-      "active" : 0,  
-      "rejected" : 68,  
-      "largest" : 16,  
-      "completed" : 84695441  
-    },  
+"thread_pool" : {
+    "bulk" : {
+      "threads" : 16,
+      "queue" : 0,
+      "active" : 0,
+      "rejected" : 68,
+      "largest" : 16,
+      "completed" : 84695441
+    },
 ```
 
 说明有68个bulk操作失败了。
@@ -78,12 +78,12 @@ curl -XGET 'http://localhost:9200/_nodes/stats?pretty'
 暂时设置：
 
 ```
-curl -XPUT 'localhost:9200/_cluster/settings' -d '{  
-    "transient": {  
+curl -XPUT 'localhost:9200/_cluster/settings' -d '{
+    "transient": {
         "threadpool.bulk.type": "fixed",    批量请求线程池类型 固定线程池大小
         "threadpool.bulk.size": 32,         线程池大小
         "threadpool.bulk.queue_size": 1000  队列大小
-    }  
+    }
 }'
 
 
@@ -137,6 +137,19 @@ query[:filter] = { term: {company_id: company_id}}
 
 当 content 不存在的时候，只是进行匹配查询
 
+##### 线上集群关闭分片自动均衡
+
+分片的自动均衡主要目的防止更新造成各个分片数据分布不均匀。但是如果线上一个节点挂掉了，很容易触发自动均衡，此时集群内部的数据移动占用所有带宽。建议采用闲时定时均衡策略来保证数据的均匀。
+
+##### 尽可能延长refresh时间间隔
+
+为了确保实时索引ES索引刷新时间间隔默认1s，索引刷新会导致查询性能受影响，在确保业务时效性的基础上可以适当延长refresh时间间隔保证查询的性能
+
+##### 除非有必要，把all字段去掉
+
+索引默认除了索引每个字段外，还有额外创建一个all的字段，保存所有文本，去掉这个字段可以把索引大小降低50%
+
+##### 创建索引时，尽可能把查询比较慢的索引和快的索引物理分离
 
 
 参考链接：
