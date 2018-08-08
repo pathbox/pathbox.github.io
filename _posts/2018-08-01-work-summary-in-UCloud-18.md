@@ -65,3 +65,12 @@ JWT_token = base64(header) + "." + base64(payload) + "." + sign
 
 https://www.jianshu.com/p/576dbf44b2ae
 
+### MySQL导出数据为excel文件
+
+mysql链接信息 数据库 用户名 密码 然后执行查询语句，定向输出
+
+```
+mysql database -h127.0.0.1 -P3306 -uroot -p -e "select * from users" > sql_data.xls
+```
+
+这样的缺点就是，如果查询语句耗时很长，会导致慢查询或查询阻塞，如果是线上操作，就可能影响到线上的MySQL服务
