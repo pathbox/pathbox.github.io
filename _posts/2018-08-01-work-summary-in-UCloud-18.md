@@ -74,3 +74,7 @@ mysql database -h127.0.0.1 -P3306 -uroot -p -e "select * from users" > sql_data.
 ```
 
 这样的缺点就是，如果查询语句耗时很长，会导致慢查询或查询阻塞，如果是线上操作，就可能影响到线上的MySQL服务
+
+### HashMap、Map是无序的
+
+HashMap、Map是无序的，当你使用它们发生诡异的事情时，也许就是因为无序的属性，而你的代码逻辑却按照有序的往下走而导致的
