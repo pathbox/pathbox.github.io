@@ -78,3 +78,9 @@ mysql database -h127.0.0.1 -P3306 -uroot -p -e "select * from users" > sql_data.
 ### HashMap、Map是无序的
 
 HashMap、Map是无序的，当你使用它们发生诡异的事情时，也许就是因为无序的属性，而你的代码逻辑却按照有序的往下走而导致的
+
+### OpenSSL rand for hex string
+
+openssl rand -hex 20
+
+快速创建随机hex字符串哟
