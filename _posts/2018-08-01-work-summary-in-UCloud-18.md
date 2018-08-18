@@ -88,3 +88,18 @@ openssl rand -hex 20
 ### 系统性能优化建议
 
 性能优化离不开的一些套路：异步、去锁、复用、零拷贝、批量等
+
+### Redis 作为消息队列的Broker
+
+Redis作为消息队列框架或多任务异步队列框架的Broker，往往使用的是Redis的 List 数据结构。无论这个消息消息队列框架功能多么复杂强大，目的都是将参数或message序列化后，
+在publisher端：
+
+```
+"RPUSH" queueName msg
+```
+
+在consumer端不断循环执行：
+
+```
+"BLPOP" queueName 1 // 1 只是一个超时时间参数，表示会在1s的时间内，阻塞从queueName读取数据，读取到数据则返回，1s内没读取到数据，超时返回
+```
