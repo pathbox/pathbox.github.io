@@ -103,3 +103,17 @@ Redis作为消息队列框架或多任务异步队列框架的Broker，往往使
 ```
 "BLPOP" queueName 1 // 1 只是一个超时时间参数，表示会在1s的时间内，阻塞从queueName读取数据，读取到数据则返回，1s内没读取到数据，超时返回
 ```
+
+### Golang 链式方法调用
+
+```go
+
+type item struct{}
+
+A() *item { return *item}
+(s *item) B() *item { return *item}
+(s *item) C() *item { return *item}
+
+A().B().C()
+```
+Golang的链式方法调用，需要前面链接的方法返回相同的struct
