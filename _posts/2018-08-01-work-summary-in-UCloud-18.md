@@ -152,3 +152,24 @@ TiDB query性能果然碉堡
 
 假想，新版本的MySQL能帮你自动转换，然后使用到索引？
 
+### GC知识小记
+
+Mark-Sweep
+
+- mark，从 root 开始进行树遍历，每个访问的对象标注为「使用中」
+- sweep，扫描整个内存区域，对于标注为「使用中」的对象去掉该标志，对于没有该标注的对象直接回收掉
+
+缺点：
+
+- 在进行 GC 期间，整个系统会被挂起（暂停，Stop-the-world），所以在一些实现中，会采用各种措施来减少这个暂停时间
+- heap 容易出现碎片。实现中一般会进行 move 或 compact。（需要说明一点，所有 heap 回收机制都会这个问题）
+- 在 GC 工作一段时间后，heap 中连续地址上存在 age 不同的对象，这非常不利于引用的本地化（locality of reference）
+- 回收时间与 heap 大小成正比
+
+逃逸分析（Escape_analysis）
+
+将在heap中分配的对象分配到stack中。如果一个对象的使用只出现在某一函数内，即没有escape，那么这个对象就完全可以分配在该函数的stack中，减少GC的工作量
+
+GC回收的是heap中分配的对象
+
+https://liujiacai.net/blog/2018/06/15/garbage-collection-intro/
