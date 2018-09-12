@@ -21,3 +21,7 @@ image: /assets/images/post.jpg
 5. 主从复制不需要用图状结构，全从Master复制，Master的压力会增加。可以用单向链表结构更为稳定：Master <- Slave1 <- Slave2 <- Slave3...
 
 这样的结构方便解决单点故障问题，实现Slave对Master的替换。如果Master挂了，可以立刻启用Slave1做Master，其他不变。但这样时效性高的Slave只有一台Slave1，当Master和Slave1同时挂掉了，才有可能出现较多的数据丢失的情况
+
+### son goroutine when to close
+
+当main执行结束时，所派生的所有goroutine都会close。如果是father goroutine中创建了son goroutine， father goroutine执行结束了，不会影响son goroutine
