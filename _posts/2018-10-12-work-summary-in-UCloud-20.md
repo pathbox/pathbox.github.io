@@ -40,3 +40,5 @@ if err != nil {
 ```sh
 ./my_sql_cmd -account=xxx -password=xxx -host=127.0.0.1 -port=3306
 ```
+
+### 跑完脚本还是要进行严格验证呀
