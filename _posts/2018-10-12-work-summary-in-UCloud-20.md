@@ -42,3 +42,7 @@ if err != nil {
 ```
 
 ### 跑完脚本还是要进行严格验证呀
+
+### 图片相似度算法介绍
+
+https://github.com/nivance/image-similarity
