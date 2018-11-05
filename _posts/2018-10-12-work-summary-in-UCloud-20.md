@@ -46,3 +46,7 @@ if err != nil {
 ### 图片相似度算法介绍
 
 https://github.com/nivance/image-similarity
+
+### HashMap
+
+HashMap = hash function + array of buckets
