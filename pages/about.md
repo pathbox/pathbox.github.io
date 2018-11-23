@@ -8,7 +8,7 @@ menu: 关于
 permalink: /about/
 ---
 
-Rubist、Gopher
+Minimalist、 Rubist、Gopher
 
 Love Coding、reading、cooking and fitness
 
