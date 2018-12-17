@@ -19,3 +19,22 @@ PDF的文字域填充只能填一次，比如我有六个文字域，第一次�
 ### e签宝签署接口
 
 e签宝的接口，如果没有传accountId的，比如填充文字域接口，说明没有用到证书进行签名，只是操作PDF文件。有传accountId的，说明会用到证书对PDF文件进行签名，这接口操作是具有法律效力的
+
+### MySQL ON DUPLICATE KEY UPDATE 对自增id的影响
+
+MySQL主键自增有个参数 innodb_autonic_lock_mode,有三种值 0，1，2
+
+0:自增时加表锁
+1:不会锁表，建议值
+2:不加锁，会有安全问题
+
+REPLACE INTO ...每次插入的时候如果唯一索引对应的数据已存在，会删除原数据，然后重新插入新的数据，会导致id增大，但实际希望的情况是更新原有那条记录数据
+
+INSERT INTO ...  ON DUPLICATE KEY UPDATE... 对主键id的影响
+
+插入影响行数为1，更新影响行数为2
+
+解决方案：
+
+- 将ON DUPLICATE KEY UPDATE拆成两条SQL查询
+- 不使用自增id主键
