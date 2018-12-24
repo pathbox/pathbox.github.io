@@ -118,3 +118,7 @@ func SendToEvernote(user, password, host, to, subject,  body string) error {
     return err
 }
 ```
+
+### 不要在home主页做太多复杂的逻辑或不稳定的逻辑
+
+不要在home主页做太多复杂的逻辑或不稳定的逻辑，主页是主入口，需要保证100%的可用性
