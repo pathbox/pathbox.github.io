@@ -126,3 +126,27 @@ func SendToEvernote(user, password, host, to, subject,  body string) error {
 ### 邮箱注册应该需要邮箱验证，手机号注册需要验证手机号，以防止恶意注册攻击
 邮箱注册应该需要邮箱验证，以防止恶意注册攻击；同理手机号注册需要手机验证码验证，防止恶意注册攻击。
 要不写一个脚本，不断的调用注册接口，生成的用户都是垃圾无效用户，还会把数据库给爆了。就变成了恶意的数据库攻击了
+
+### PUT 是幂等的，而 PATCH 不是幂等的
+
+PATCH是局部更新，PUT是所有字段更新
+
+### Golang image 包处理图片注意点
+
+```go
+file, _ := os.Open(imagePath)
+defer file.Close()
+
+img, _, err := image.Decode(file)
+if err != nil {
+	return "", err
+}
+```
+在不知道file图片格式的时候，统一使用image包的Decode，这要求默认导入图片格式对应的包
+```go
+"image"
+_ "image/gif"
+_ "image/jpeg"
+"image/png"
+```
+比如这样，file就可以是gif、jpeg、jpg、png这几种格式的图片了
