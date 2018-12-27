@@ -150,3 +150,6 @@ _ "image/jpeg"
 "image/png"
 ```
 比如这样，file就可以是gif、jpeg、jpg、png这几种格式的图片了
+
+### rm -rf .git
+将某个包copy到vendor目录下的时候，要将 `.git`这个目录删除，否则会导致无法将包正确git push
