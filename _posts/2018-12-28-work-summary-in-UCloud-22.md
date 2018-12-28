@@ -36,3 +36,21 @@ docker rmi image-id
 - 默认启动容器内服务 `docker run -idt container_id /bin/start-service.sh, ps:start-service.sh为镜像内的脚本`
 
 - `ctop` 简单查看docker container的状态
+
+### docker 列出每个容器的IP
+
+常用方法有两种:
+方法一:
+
+docker inspect 容器ID | grep IPAddress
+
+方法二:
+
+```
+查看docker name：
+sudo docker inspect -f='{{.Name}}' $(sudo docker ps -a -q)
+查看dockers ip：
+sudo docker inspect -f='{{.NetworkSettings.IPAddress}}' $(sudo docker ps -a -q)
+综上，我们可以写出以下脚本列出所有容器对应的名称，端口，及ip
+docker inspect -f='{{.Name}} {{.NetworkSettings.IPAddress}} {{.HostConfig.PortBindings}}' $(docker ps -aq)
+```
