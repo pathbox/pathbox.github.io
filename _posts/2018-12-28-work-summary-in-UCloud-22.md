@@ -54,3 +54,6 @@ sudo docker inspect -f='{{.NetworkSettings.IPAddress}}' $(sudo docker ps 
 综上，我们可以写出以下脚本列出所有容器对应的名称，端口，及ip
 docker inspect -f='{{.Name}} {{.NetworkSettings.IPAddress}} {{.HostConfig.PortBindings}}' $(docker ps -aq)
 ```
+
+### 支付的时候要校验价格和付的钱是否一致
+支付的时候要校验价格和付的钱是否一致，要不然可能会出现用实际支付了1元购买1万元产品的情况，这就是系统漏洞
