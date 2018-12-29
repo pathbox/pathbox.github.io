@@ -57,3 +57,11 @@ docker inspect -f='{{.Name}} {{.NetworkSettings.IPAddress}} {{.HostConfig.PortBi
 
 ### 支付的时候要校验价格和付的钱是否一致
 支付的时候要校验价格和付的钱是否一致，要不然可能会出现用实际支付了1元购买1万元产品的情况，这就是系统漏洞
+
+### Cookie 的安全属性
+
+##### Secure
+>Cookie通信只限于加密传输，指示浏览器仅仅在通过安全/加密连接才能使用该Cookie。如果一个Web服务器从一个非安全连接里设置了一个带有secure属性的Cookie，当Cookie被发送到客户端时，它仍然能通过中间人攻击来拦截。
+
+##### HttpOnly
+>Cookie的HttpOnly属性，指示浏览器不要在除HTTP（和 HTTPS)请求之外暴露Cookie。一个有HttpOnly属性的Cookie，不能通过非HTTP方式来访问，例如通过调用JavaScript(例如，引用document.cookie），因此，不可能通过跨域脚本（一种非常普通的攻击技术）来偷走这种Cookie
