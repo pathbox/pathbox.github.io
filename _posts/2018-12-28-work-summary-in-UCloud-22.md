@@ -65,3 +65,8 @@ docker inspect -f='{{.Name}} {{.NetworkSettings.IPAddress}} {{.HostConfig.PortBi
 
 ##### HttpOnly
 >Cookie的HttpOnly属性，指示浏览器不要在除HTTP（和 HTTPS)请求之外暴露Cookie。一个有HttpOnly属性的Cookie，不能通过非HTTP方式来访问，例如通过调用JavaScript(例如，引用document.cookie），因此，不可能通过跨域脚本（一种非常普通的攻击技术）来偷走这种Cookie
+
+### Nginx Worker With CPU
+
+Nginx 希望每个 Worker 进程从头到尾占有一个 CPU，所以往往不止要把 Worker 进程的数量配置与服务器的 CPU 核数一致以外，还需要把每一个 Worker 进程与某一个 CPU 核绑定在一起。这样可以更好的使用每个 CPU 核上面的 CPU 缓存，提高缓存的命中率。
+不仅仅是缓存的原因，一个进程从头到尾占有一个 CPU，减少 CPU 上下文切换的次数和耗时，让 CPU 更多的时间用在运行进程上
