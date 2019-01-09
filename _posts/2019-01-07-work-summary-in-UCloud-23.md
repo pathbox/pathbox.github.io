@@ -39,3 +39,29 @@ order by 能使用最左前缀索引:
 - WHERE a = const ORDER BY c 四队b索引
 - WHERE a = const ORDER BY a,d d不是索引的一部分
 - WHERE a in (...) ORDER BY b,c 对于排序来说，多个相等条件也是范围查询
+
+### Docker的RUN、CMD
+
+RUN 有两种格式：
+1. Shell 格式：RUN 
+2. Exec 格式：RUN ["executable", "param1", "param2"] 
+
+RUN会在镜像上构造新的一层
+
+```
+RUN apt-get update && apt-get install -y \  
+ bzr \
+ cvs \
+ git \
+ mercurial \
+ subversion
+```
+
+此命令会在容器启动且 docker run 没有指定其他命令时运行。
+1. 如果 docker run 指定了其他命令，CMD 指定的默认命令将被忽略。 
+2. 如果 Dockerfile 中有多个 CMD 指令，只有最后一个 CMD 有效。 
+
+CMD 有三种格式：
+1. Exec 格式：CMD ["executable","param1","param2"] 这是 CMD 的推荐格式。 
+2. CMD ["param1","param2"] 为 ENTRYPOINT 提供额外的参数，此时 ENTRYPOINT 必须使用 Exec 格式。 
+3. Shell 格式：CMD command param1 param2  
