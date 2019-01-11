@@ -65,3 +65,11 @@ CMD 有三种格式：
 1. Exec 格式：CMD ["executable","param1","param2"] 这是 CMD 的推荐格式。 
 2. CMD ["param1","param2"] 为 ENTRYPOINT 提供额外的参数，此时 ENTRYPOINT 必须使用 Exec 格式。 
 3. Shell 格式：CMD command param1 param2  
+
+### Be a coach, not a leader
+
+不要想去成为团队的Leader，而是去成为团队的Coach
+
+教练领导者：是镜子，是向导
+
+有效对话：层层深入的提问 不断地问问题 直到员工把最深层次的问题告诉你
