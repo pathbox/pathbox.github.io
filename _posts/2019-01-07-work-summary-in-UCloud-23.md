@@ -73,3 +73,36 @@ CMD 有三种格式：
 教练领导者：是镜子，是向导
 
 有效对话：层层深入的提问 不断地问问题 直到员工把最深层次的问题告诉你
+
+### pm2 简单命令教程
+
+```
+pm2 start my_server(go编译后的二进制文件) --name=my_server -i 0
+
+--name=my_server 命名为my_server
+-i 0  根据CPU核数启动进程个数
+
+最简单的启动就是： pm2 start my_server
+
+pm2 start app.js --watch      # 当文件变化时自动重启应用，相当于热reload功能
+pm2 start script.sh           # 启动bash脚本
+pm2 list/l                    # 列表 PM2 启动的所有的应用程序
+pm2 monit(monit id/name)      # 显示每个/某个应用程序的CPU和内存占用情况
+pm2 show(id/name)             # 显示应用程序的所有信息
+pm2 logs(id/name)             # 显示所有应用程序的日志
+pm2 stop all                  # 停止所有的应用程序
+pm2 stop(id/name)             # 停止 id为 0的指定应用程序
+pm2 restart all               # 重启所有应用
+pm2 reload all                # 重启 cluster mode下的所有应用
+pm2 delete all                # 关闭并删除所有应用
+pm2 delete 0                  # 删除指定应用 id 0
+pm2 scale api 10              # 把名字叫api的应用扩展到10个实例pm2 reset [app-name]          # 重置重启数量
+pm2 startup                   # 创建开机自启动命令
+pm2 save                      # 保存当前应用列表
+pm2 dump                      # 保存当前应用列表
+pm2 resurrect                 # 重新加载保存的应用列表
+pm2 start app.js --max-memory-restart 20M #内存使用超过上限自动重启 可以加上--max-memory-restart参数
+
+pm2 startup
+pm2 save    来开机启动监控的程序
+```
