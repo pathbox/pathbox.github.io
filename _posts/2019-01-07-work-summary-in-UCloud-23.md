@@ -134,3 +134,33 @@ pm2 save    来开机启动监控的程序
 - http
 - RPC  
 - MQ消息队列
+
+### Man-in-the-middle_attack
+
+理解中间人攻击: 中间人替换了Alice的Bob公钥为自己的公钥,之后就能假扮为Bob给Alice发送数据，而Alice以为是Bob发的
+
+```
+1.Alice sends a message to Bob, which is intercepted by Mallory:
+Alice "Hi Bob, it's Alice. Give me your key." →     Mallory     Bob
+
+2.Mallory relays this message to Bob; Bob cannot tell it is not really from Alice:
+Alice     Mallory "Hi Bob, it's Alice. Give me your key." →     Bob
+
+3.Bob responds with his encryption key:
+Alice     Mallory     ← [Bob's key] Bob
+
+4.Mallory replaces Bob's key with her own, and relays this to Alice, claiming that it is Bob's key:
+Alice     ← [Mallory's key] Mallory     Bob
+
+5.Alice encrypts a message with what she believes to be Bob's key, thinking that only Bob can read it:
+Alice "Meet me at the bus stop!" [encrypted with Mallory's key] →     Mallory     Bob
+
+6.However, because it was actually encrypted with Mallory's key, Mallory can decrypt it, read it, modify it (if desired), re-encrypt with Bob's key, and forward it to Bob:
+Alice     Mallory "Meet me at the van down by the river!" [encrypted with Bob's key] →     Bob
+
+7.Bob thinks that this message is a secure communication from Alice.
+8.Bob goes to the van down by the river and gets robbed by Mallory.
+9.Alice does not know that Bob was robbed by Mallory thinking Bob is late.
+10.Not seeing Bob for a while, she determines something happened to Bob.
+```
+>https://en.wikipedia.org/wiki/Man-in-the-middle_attack
