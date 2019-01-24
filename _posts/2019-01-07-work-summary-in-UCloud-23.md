@@ -166,3 +166,5 @@ Alice     Mallory "Meet me at the van down by the river!" [encrypted with Bob's 
 >https://en.wikipedia.org/wiki/Man-in-the-middle_attack
 
 ### 不学的还是不学，想去上课的还是会去上课
+
+### 开发接口文档，越简单越好，越无脑越好
