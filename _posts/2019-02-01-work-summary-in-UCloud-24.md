@@ -76,6 +76,7 @@ TiDB实现了全局索引，所以"索引和Table中的数据并不一定在一�
 
 - 动画链接：http://www.exa.unicen.edu.ar/catedras/comdat1/material/Filminas3_Practico3.swf
 - https://blog.csdn.net/yao5hed/article/details/81046945
+- https://www.cnblogs.com/diegodu/p/4538897.html
 
 窗口的概念
 
@@ -105,6 +106,21 @@ TiDB实现了全局索引，所以"索引和Table中的数据并不一定在一�
 遵循快速重传、累计确认、选择确认等规则。
 
 发送方发的window size = 8192;就是接收端最多发送8192字节，这个8192一般就是发送方接收缓存的大小。
+
+TCP滑动窗口为了解决:可靠传输以及包乱序（reordering）的问题
+
+>TCP头里有一个字段叫Window，又叫Advertised-Window，这个字段是接收端告诉发送端自己还有多少缓冲区可以接收数据。于是发送端就可以根据这个接收端的处理能力来发送数据，而不会导致接收端处理不过来
+
+接收端在给发送端回ACK中会汇报自己的AdvertisedWindow = MaxRcvBuffer – LastByteRcvd – 1
+
+>如果网络上的延时突然增加，那么，TCP对这个事做出的应对只有重传数据，但是，重传会导致网络的负担更重，于是会导致更大的延迟以及更多的丢包，于是，这个情况就会进入恶性循环被不断地放大。试想一下，如果一个网络内有成千上万的TCP连接都这么行事，那么马上就会形成“网络风暴”，TCP这个协议就会拖垮整个网络
+
+拥塞控制主要是四个算法：
+
+1.慢启动
+2.拥塞避免
+3.拥塞发生
+4.快速恢复
 
 ### 连接的五元组
 同一个连接需要五元组来确定（src_ip, src_port, dst_ip, dst_port）和协议(TCP、UDP)
