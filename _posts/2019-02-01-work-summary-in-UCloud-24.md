@@ -207,3 +207,7 @@ go mod init
 资源系统的查询要尽可能的快
 
 ### 掌握更多的工具，弥补智力的不足
+
+### redis 一个key或value大小最大是512M
+- The maximum allowed key size is 512MB
+- A value can't be bigger than 512MB
