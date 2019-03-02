@@ -211,3 +211,13 @@ go mod init
 ### redis 一个key或value大小最大是512M
 - The maximum allowed key size is 512MB
 - A value can't be bigger than 512MB
+
+### 什么场景下用到runtime.LockOSThread
+```
+golang的scheduler可以理解为公平协作调度和抢占的综合体，他不支持优先级调度。当你开了几十万个goroutine，并且大多数协程已经在runq等待调度了, 那么如果你有一个重要的周期性的协程需要优先执行该怎么办？
+可以借助runtime.LockOSThread()方法来绑定线程，绑定线程M后的好处在于，他可以由system kernel内核来调度，因为他本质是线程了。  
+先前我们有在定时器场景中使用runtime.LockOSThread，达到少许的优先级效果。效果不明显的原因是，我们自定义的定时器需要time.sleep来解决cpu忙讯轮，但time.sleep又依赖于go自身的heap定时器…. 解决方法是，独立一个M线程后，使用syscall来实现时间等待. 
+
+总结:
+runtime.LockOSThread会锁定当前协程只跑在一个系统线程上，这个线程里也只跑该协程。他们是相互牵制的 
+```
