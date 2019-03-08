@@ -49,3 +49,7 @@ type Person struct {
 ```
 
 要用大写开头的Field
+
+### etcd：从应用场景到实现原理的全方位解读
+
+https://infoq.cn/article/etcd-interpretation-application-scenario-implement-principle
