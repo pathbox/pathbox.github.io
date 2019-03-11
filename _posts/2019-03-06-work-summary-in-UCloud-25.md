@@ -87,7 +87,7 @@ type Queue struct {
 
 一个数学计算表达式如何用程序实现(最简单的计算器):
 
-将一个数学计算表达式(infix:中缀表达式) => 后缀表达式(postfix) => 利用堆栈stack结构存储计算，如果是数字，不断的入栈，当遇到一个操作符时，不入栈而是取出最top的两个数字和这个操作符进行eval，得到新的数值入栈
+将一个数学计算表达式(infix:中缀表达式) => 后缀表达式(postfix 逆波兰表达式) => 利用堆栈stack结构存储计算，如果是数字，不断的入栈，当遇到一个操作符时，不入栈而是取出最top的两个数字和这个操作符进行eval，得到新的数值入栈
 
 ```
 sk = new stack
@@ -121,3 +121,6 @@ evalExpTree(root) {
     return evaluate(firstOperand, root, secondOperand)
 }
 ```
+
+### Shunting-yard algorithm
+Shunting-yard algorithm 调度场算法将中序表达式转为后续表达式(逆波兰表达式)
