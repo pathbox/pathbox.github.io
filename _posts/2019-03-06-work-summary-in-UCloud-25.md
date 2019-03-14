@@ -128,3 +128,6 @@ Shunting-yard algorithm 调度场算法将中序表达式转为后续表达式(�
 ### 计算机互联网软件Logo搜索网站
 
 https://www.vectorlogo.zone/
+
+### 应该努力做好一位"前人"
+在工作中应该尽力做好一位"前人"，为后人栽树，而不是挖沟、挖坑
