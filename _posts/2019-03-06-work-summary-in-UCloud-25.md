@@ -131,3 +131,11 @@ https://www.vectorlogo.zone/
 
 ### 应该努力做好一位"前人"
 在工作中应该尽力做好一位"前人"，为后人栽树，而不是挖沟、挖坑
+
+### 权限系统 RBAC、ABAC
+
+RBAC: Role-Based Access Control。用户关联角色，角色关联权限
+
+ABAC: Attribute-Based Access Control。属性通常来说分为四类：用户属性（如用户年龄），环境属性（如当前时间），操作属性（如读取）和对象属性（如一篇文章，又称资源属性）。“允许所有班主任在上课时间自由进出校门”这条规则，其中，“班主任”是用户的角色属性，“上课时间”是环境属性，“进出”是操作属性，而“校门”就是对象属性了。为了实现便捷的规则设置和规则判断执行，ABAC通常有配置文件（XML、YAML等）或DSL配合规则解析引擎使用。XACML（eXtensible Access Control Markup Language）是ABAC的一个实现
+
+RBAC比ABAC流行，因为对于大多数系统，RBAC简单但足够使用，ABAC对于他们来说往往过于复杂
