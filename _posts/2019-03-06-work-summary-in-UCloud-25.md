@@ -173,3 +173,86 @@ Leader Node挂了，选举的时候就会从其他Follower中选出新的Leader 
 在使用这种第三方外网服务的API的时候，也要思考服务器是否能访问外网
 
 现在的坑是，测试环境是可以访问的，生产环境无法访问外网，结果导致测试测过了，以为通过了，到发布生产的时候出了问题
+
+### K8s Docker 时区问题解决tips
+
+先看看没有设置前，容器的情况
+
+```
+docker run -it --rm centos
+date
+cat /etc/localtime
+```
+
+1. 通过环境变量的方式来改变容器的时区
+```
+docker run -it --rm -e "TZ=Asia/Shanghai" centos
+date
+cat /etc/localtime
+```
+
+2. 挂载主机的时区文件到容器中
+```
+docker run -it --rm -v /etc/localtime:/etc/localtime  centos
+date
+cat /etc/localtime
+```
+
+3. Kubernetes的时区设置方式,直接设置env环境变量
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-env-tz
+spec:
+  containers:
+  - name: ngx
+    image: nginx:latest
+    imagePullPolicy: IfNotPresent
+    env:
+      - name: TZ
+        value: Asia/Shanghai
+```
+
+4. 通过挂载主机时区文件设置
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-vol-tz
+spec:
+  containers:
+  - name: ngx
+    image: nginx:latest
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - name: tz-config
+      mountPath: /etc/localtime
+      readOnly: true
+  volumes:
+  - name: tz-config
+    hostPath:
+      path: /etc/localtime
+```
+
+5. 通过Pod Preset预设置时区环境变量
+激活Pod Preset
+
+编辑/etc/kubernetes/manifests/kube-apiserver.yaml，
+
+- 在-runtime-config增加settings.k8s.io/v1alpha1=true
+- 在--admission-control增加PodPreset`
+
+```yml
+apiVersion: settings.k8s.io/v1alpha1
+kind: PodPreset
+metadata:
+  name: allow-tz-env
+spec:
+  selector:
+    matchLabels:
+  env:
+    - name: TZ
+      value: Asia/Shanghai
+```
+一定需要写selector...matchLabels，但是matchLabels为空，标示应用于所有容器，这个正式我们所期望的
