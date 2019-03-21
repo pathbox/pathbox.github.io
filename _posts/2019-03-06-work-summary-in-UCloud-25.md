@@ -163,3 +163,6 @@ RBAC比ABAC流行，因为对于大多数系统，RBAC简单但足够使用，AB
 进行写操作前，会进行选举出Leader Node，由Leader Node进行写数据操作，再同步给Follower Node，Follower Node 可以负责读操作
 
 Leader Node挂了，选举的时候就会从其他Follower中选出新的Leader Node
+
+### 在测试环境，没有把线上环境所具有的条件情况都测过，拒绝上线
+测试环境和线上环境有几个不同也是坑
