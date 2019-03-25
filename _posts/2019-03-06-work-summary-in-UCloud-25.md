@@ -262,3 +262,11 @@ spec:
 
 ### 关于反馈和授教指导
 告诉对方答案 => 授人以渔，告诉对方方法 => 激发对方潜能
+
+### K8s port 简单理解
+
+- port: 集群内client访问服务(内网)
+- nodePort: 集群外client访问服务(外网)
+- targetPod: pod容器用的端口
+
+从这两个端口到来的数据都需要经过反向代理kube-proxy流入后端pod的targetPod，从而到达pod上的容器内
