@@ -270,3 +270,10 @@ spec:
 - targetPod: pod容器用的端口
 
 从这两个端口到来的数据都需要经过反向代理kube-proxy流入后端pod的targetPod，从而到达pod上的容器内
+
+### kubernetes中的pause容器
+
+kubernetes中的pause容器便被设计成为每个业务容器提供以下功能
+
+- 在pod中担任Linux命名空间共享的基础；
+- 启用pid命名空间，开启init进程
