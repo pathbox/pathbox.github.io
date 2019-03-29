@@ -277,3 +277,17 @@ kubernetes中的pause容器便被设计成为每个业务容器提供以下功�
 
 - 在pod中担任Linux命名空间共享的基础；
 - 启用pid命名空间，开启init进程
+
+### redis cluster 集群slot原理
+
+slot Count is 16384(16K: 0-16383)
+
+redis cluster Node Count is N
+
+slot 会大概平均分到 N个节点中，每个节点得到的slot数量大致平均
+
+hash(key)值得到一个整数kn
+
+kn & (slotCount-1: 16383) 得到的数就是这个key对应的slot号
+
+redis cluster知道这个slot号在哪个节点，于是将这个key-value存到这个节点上，之后的读写操作就会通过上述的方式，找到该node节点，再进行读写操作
