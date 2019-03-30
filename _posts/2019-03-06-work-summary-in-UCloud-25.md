@@ -291,3 +291,5 @@ hash(key)值得到一个整数kn
 kn & (slotCount-1: 16383) 得到的数就是这个key对应的slot号
 
 redis cluster知道这个slot号在哪个节点，于是将这个key-value存到这个节点上，之后的读写操作就会通过上述的方式，找到该node节点，再进行读写操作
+
+### 数据是新时代的“石油”
