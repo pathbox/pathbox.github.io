@@ -18,3 +18,6 @@ image: /assets/images/post.jpg
 - API Management                     API管理
 - Resilience & Fault Tolerance       服务弹力性和失败容忍，节流
 - Service Discovery & LB             服务发现与负载均衡
+
+### slice的扩容规则
+当原 slice 容量小于 1024 的时候，新 slice 容量变成原来的 2 倍；原 slice 容量超过 1024，新 slice 容量变成原来的>=1.25倍，因为进行了内存对齐操作
