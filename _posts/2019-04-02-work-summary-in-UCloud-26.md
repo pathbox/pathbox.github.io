@@ -130,3 +130,10 @@ Links
 - [Multi-Mechanize | Performance Test Framework](http://testutils.org/multi-mechanize/)
 - [Performance test tools list](http://www.opensourcetesting.org/performance.php)
 - [REST API client](https://insomnia.rest/) - simple, beautiful, and free REST API client (`Mac`, `Windows`, and `Linux`)
+
+### The Four Pillars of Observability
+分布式系统，微服务 四个可观察性的关键支柱
+- Logging: Recording of discrete events
+- Metrics: Aggregation of similar events to gain a higher level of insight
+- Tracing: Recording, oedering and binging of data from connected events to provide context.
+- Alerting: Notification when event behavior fallsoutside of acceptable threshold and could potentially become problematic
