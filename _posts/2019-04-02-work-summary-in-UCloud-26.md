@@ -137,3 +137,25 @@ Links
 - Metrics: Aggregation of similar events to gain a higher level of insight
 - Tracing: Recording, oedering and binging of data from connected events to provide context.
 - Alerting: Notification when event behavior fallsoutside of acceptable threshold and could potentially become problematic
+
+### Big Endian and Little Endian
+
+big endian是指低地址存放最高有效字节（MSB），而little endian则是低地址存放最低有效字节（LSB）
+
+比如数字0x12345678在两种不同字节序CPU中的存储顺序如下所示：
+
+Big Endian
+
+低地址                                            高地址
+----------------------------------------->
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|     12     |      34    |     56      |     78    |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Little Endian
+
+低地址                                            高地址
+----------------------------------------->
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|     78     |      56    |     34      |     12    |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
