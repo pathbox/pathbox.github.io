@@ -162,3 +162,81 @@ Little Endian
 
 ### 一个多选其一的参数搜索问题方式的思考
 可以传多个参数，但只会选择其中一个进行过滤搜索，你会选择强制要求只传一个，还是可以传多个，但会按照参数一定的优先级来判断进行搜索呢。我觉得从接口友好度的情况出发，我会选择`按照参数一定的优先级`来判断进行搜索，这个优先级可以根据业务需求定义，可以根据性能角度定义
+
+### 当并发超过连接池连接时，查询会完全僵死，而之前使用的连接又不得close归还到连接池中
+
+解决方法: 增大连接池大小
+
+```go
+package main
+
+import (
+	"database/sql"
+	"fmt"
+	"time"
+
+	_ "github.com/go-sql-driver/mysql"
+)
+
+// 当并发超过连接池连接时，查询会完全僵死，而之前使用的连接又不得close归还到连接池中  
+
+func main() {
+	url := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&timeout=3s&readTimeout=30s&writeTimeout=60s",
+		"xxx", "xxx.cn", "xxx", 3306, "xxx")
+
+	db, err := sql.Open("mysql", url)
+	if err != nil {
+		panic(err)
+	}
+
+	// db setting
+	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(20)
+
+	for i := 0; i < 100; i++ {
+		fmt.Printf("Num:%d\n", i)
+		go query(db, i)
+	}
+
+	c := make(chan int)
+	<-c
+}
+
+func query(db *sql.DB, i int) {
+
+	var companyID int
+
+	sqlS := `
+		SELECT company_id
+		FROM t_company
+		WHERE company_id= 100 limit 1
+		`
+	rows, err := db.Query(sqlS)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		rows.Scan(&companyID)
+		sql2 := `
+		SELECT company_id
+		FROM t_member
+		WHERE company_id= 100
+		`
+		fmt.Println("Start...")
+		rows, err = db.Query(sql2)
+		if err != nil {
+			panic(err)
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			rows.Scan(&companyID)
+		}
+		fmt.Printf("Company ID: %d\n", companyID)
+	}
+	fmt.Printf("Number: %d\n", i)
+}
+```
