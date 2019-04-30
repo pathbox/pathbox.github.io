@@ -240,3 +240,8 @@ func query(db *sql.DB, i int) {
 	fmt.Printf("Number: %d\n", i)
 }
 ```
+
+### macOS下解决Excel中身份证号被科学计数问题
+- 数据库导出csv文件
+- 使用Numbers打开csv文件,Numbers打开的csv文件，身份证号码保持不变
+- 另存为excel文件
