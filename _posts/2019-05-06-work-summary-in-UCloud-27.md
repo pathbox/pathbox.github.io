@@ -125,3 +125,11 @@ SELECT * FROM posts where match(title,content) against('第二章' IN NATURAL LA
 
 ### flutter in action
 https://github.com/flutterchina/flutter-in-action/blob/master/docs/SUMMARY.md
+
+### Golang构造hook函数方式的思路
+
+- 数据结构: 利用map[string]func() 存储func()
+
+- 注册: 初始化或有方法可以将func()注册到map中
+
+- 执行: 在需要hook 函数的地方，从map中取出相应的func() f, 执行 f()
