@@ -17,41 +17,28 @@ image: /assets/images/post.jpg
 - 正常情况下，同一个一级域名下的两个二级域名如www.helloweenvsfei.com和 images.helloweenvsfei.com也不能交互使用Cookie，因为二者的域名并不严格相同。如果想所有 helloweenvsfei.com名下的二级域名都可以使用该Cookie，需要设置Cookie的domain参数，例如：
 ```
 Cookie cookie = new Cookie("time","20080808"); // 新建Cookie
-
 cookie.setDomain(".helloweenvsfei.com");           // 设置域名
-
 cookie.setPath("/");                              // 设置路径
-
 cookie.setMaxAge(Integer.MAX_VALUE);               // 设置有效期
-
 response.addCookie(cookie);                       // 输出到客户端
 ```
 
 - Cookie的路径
 ```
 domain属性决定运行访问Cookie的域名，而path属性决定允许访问Cookie的路径（ContextPath）。例如，如果只允许/sessionWeb/下的程序使用Cookie，可以这么写：
-
 Cookie cookie = new Cookie("time","20080808");     // 新建Cookie
-
 cookie.setPath("/session/");                          // 设置路径
-
 response.addCookie(cookie);                           // 输出到客户端
-
 设置为“/”时允许所有路径使用Cookie。path属性需要使用符号“/”结尾。name相同但domain相同的两个Cookie也是两个不同的Cookie。
-
 注意：页面只能获取它属于的Path的Cookie。例如/session/test/a.jsp不能获取到路径为/session/abc/的Cookie。使用时一定要注意。
 ```
 - Cookie的安全属性
 ```
 HTTP协议不仅是无状态的，而且是不安全的。使用HTTP协议的数据不经过任何加密就直接在网络上传播，有被截获的可 能。使用HTTP协议传输很机密的内容是一种隐患。如果不希望Cookie在HTTP等非安全协议中传输，可以设置Cookie的secure属性为 true。浏览器只会在HTTPS和SSL等安全协议中传输此类Cookie。下面的代码设置secure属性为true：
 
-
 Cookie cookie = new Cookie("time", "20080808"); // 新建Cookie
-
 cookie.setSecure(true);                           // 设置安全属性
-
 response.addCookie(cookie);                        // 输出到客户端
-
 提示：secure属性并不能对Cookie内容加密，因而不能保证绝对的安全性。如果需要高安全性，需要在程序中对Cookie内容加密、解密，以防泄密。
 
 ```
@@ -78,3 +65,63 @@ Session生成后，只要用户继续访问，服务器就会更新Session的最
 1. session数据可以存储在cookie中，为了避免安全信息暴露，需要加密存与cookie
 2. session存于redis中，但需要一个Session ID(或session key)存于cookie，用于客户端唯一标记信息。请求时，cookie中带有Session ID 服务端能够取到，则可以在redis中根据Session ID 获取到具体的session数据用于逻辑操作。
 3. 浏览器将cookie关了，则session功能也会失效，需要存于URL中
+
+### 快速尝试MySQL Full-Text Searching
+
+MySQL 5.6以上版本支持了 Full-Text Searching，5.7.6 之后支持了中日韩文的全文检索
+
+查看本机MySQL版本：
+```
+mysql --version
+mysql  Ver 14.14 Distrib 5.7.19, for osx10.12 (x86_64) using  EditLine wrapper
+```
+
+新增测试表:
+```
+CREATE TABLE `posts` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `content` text,
+  PRIMARY KEY (`id`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+给content字段增加全文索引:
+```sql
+ALTER TABLE `mars`.`posts`
+ADD FULLTEXT INDEX `ft_content` (`content` ASC)  WITH PARSER ngram;
+```
+
+给(title,content)字段增加联合的全文索引:
+```sql
+ALTER TABLE `posts`
+ADD FULLTEXT INDEX `ft_posts_title_body` (`title`, `content`) WITH PARSER ngram;
+```
+
+插入一些测试数据
+
+使用全文索引查询:
+```sql
+mysql> SELECT title FROM posts where match(content) against('没有' IN NATURAL LANGUAGE MODE);
++------------------------------+
+| title                        |
++------------------------------+
+| 第一章                       |
+| 第二章-如果是个索引          |
++------------------------------+
+2 rows in set (0.00 sec)
+
+SELECT * FROM posts where match(title,content) against('第二章' IN NATURAL LANGUAGE MODE);
++----+------------------------------+--------------------------------------------------+
+| id | title                        | content                                          |
++----+------------------------------+--------------------------------------------------+
+|  2 | 第二章-如果是个索引          | 火星上没有火星人只有泥土和环形山                 |
++----+------------------------------+--------------------------------------------------+
+1 row in set (0.01 sec)
+```
+- WITH PARSER ngram: 表示索引使用的分词器
+- IN NATURAL LANGUAGE MODE: 表示匹配时的模式
+- 如果使用的是多字段联合的全文索引，只要任一个字段中能匹配成功，则得到该记录
+
+### flutter in action
+https://github.com/flutterchina/flutter-in-action/blob/master/docs/SUMMARY.md
