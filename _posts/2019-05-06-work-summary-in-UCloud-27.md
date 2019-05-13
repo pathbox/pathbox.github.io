@@ -178,3 +178,19 @@ name: {
 也可以直接 使用*string, 会返回 "my name" or null,当是null时，在response之前想要进行一些逻辑操作就会有困难
 
 最好的方式, 将表的字段都设为Not Allow, 设置对应的Default值
+
+### npm替换为淘宝源
+```
+1.得到原本的镜像地址
+
+npm get registry
+
+> https://registry.npmjs.org/
+设成淘宝的
+
+npm config set registry https://registry.npm.taobao.org/
+yarn config set registry https://registry.npm.taobao.org/
+
+2.换成原来的
+npm config set registry https://registry.npmjs.org/
+```
