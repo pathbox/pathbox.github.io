@@ -6,6 +6,15 @@ categories: Work
 image: /assets/images/post.jpg
 ---
 
+### Golang构造hook函数方式的思路
+
+- 数据结构: 利用map[string]func() 存储func()
+
+- 注册: 初始化或有方法可以将func()注册到map中
+
+- 执行: 在需要hook 函数的地方，从map中取出相应的func() f, 执行 f()
+
+
 ### ASFK-理解cookie和session
 - Cookie由浏览器管理
 - Cookie是明文的，用于存储非敏感机密数据
@@ -123,13 +132,49 @@ SELECT * FROM posts where match(title,content) against('第二章' IN NATURAL LA
 - IN NATURAL LANGUAGE MODE: 表示匹配时的模式
 - 如果使用的是多字段联合的全文索引，只要任一个字段中能匹配成功，则得到该记录
 
+```
+● IN BOOLEAN MODE的特色：
+          ·不剔除50%以上符合的row。
+          ·不自动以相关性反向排序。
+          ·可以对没有FULLTEXT index的字段进行搜寻，但会非常慢。
+          ·限制最长与最短的字符串。
+          ·套用Stopwords。
+
+● 搜索语法规则：
+ +   一定要有(不含有该关键词的数据条均被忽略)。
+ -   不可以有(排除指定关键词，含有该关键词的均被忽略)。
+ >   提高该条匹配数据的权重值。
+ <   降低该条匹配数据的权重值。
+ ~   将其相关性由正转负，表示拥有该字会降低相关性(但不像 - 将之排除)，只是排在较后面权重值降低。
+ *   万用字，不像其他语法放在前面，这个要接在字符串后面。
+ " " 用双引号将一段句子包起来表示要完全相符，不可拆字
+ 1、预设搜寻是不分大小写，若要分大小写，columne 的 character set要从utf8改成utf8_bin。
+ 2、预设 MATCH...AGAINST 是以相关性排序，由高到低。
+ 3、MATCH(title, content)里的字段必须和FULLTEXT(title, content)里的字段一模一样。如果只要单查title或content一个字段，那得另外再建一个 FULLTEXT(title) 或 FULLTEXT(content)，也因为如此，MATCH()的字段一定不能跨table，但是另外两种搜寻方式好像可以
+```
+
 ### flutter in action
 https://github.com/flutterchina/flutter-in-action/blob/master/docs/SUMMARY.md
 
-### Golang构造hook函数方式的思路
+### 在Golang系统中,处理MySQL null字段值, 为所有字段都设置Default是最好的
+Golang sql 包提供了比如：
 
-- 数据结构: 利用map[string]func() 存储func()
+sql.NullString 这样的字段类型
+```go
+type NullString string {
+  String string
+  Valid bool // Valid is true if String is not NULL
+}
+```
+但这样，进行json.Marshal的时候，返回的就会是：
+```
+name: {
+  "String": "my name",
+  "Valid": true
+}
+```
+这样的结构，实际希望的是 "my name" or ""
 
-- 注册: 初始化或有方法可以将func()注册到map中
+也可以直接 使用*string, 会返回 "my name" or null,当是null时，在response之前想要进行一些逻辑操作就会有困难
 
-- 执行: 在需要hook 函数的地方，从map中取出相应的func() f, 执行 f()
+最好的方式, 将表的字段都设为Not Allow, 设置对应的Default值
