@@ -194,3 +194,18 @@ yarn config set registry https://registry.npm.taobao.org/
 2.换成原来的
 npm config set registry https://registry.npmjs.org/
 ```
+
+### LEFT JOIN ON 多个条件 用的是AND 而不是WHERE
+
+```
+1. SELECT * FROM product LEFT JOIN product_details
+         ON (product.id = product_details.id)
+         AND product_details.id=2;
+2. SELECT * FROM product LEFT JOIN product_details
+         ON (product.id = product_details.id)
+         WHERE product_details.id=2;
+```
+1、2两个查询是完全不同的。
+
+1: 得到的结果数量是product的数量。是真正`LEFT JOIN` 的结果
+2: 得到的结果数量是满足`product_details.id=2`条件的记录数量, 是WHERE条件过滤后的结果
