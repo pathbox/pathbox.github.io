@@ -98,7 +98,6 @@ func bindConsumer() {
 			return
 		}
 
-		// consumer 实际上和 exchange和queue不一定要在同一个代码或服务器中定义，完全可以将consumer单独作为一个服务，建立conn，取一个chan，然后消费对应的队列
 		deliveries, err := mqChan.Consume( // consume read message from queue
 			oplogsQueue,
 			code.OplogConsumer,
@@ -205,3 +204,11 @@ inequivalent arg 'durable' for exchange 'csExchange' in vhost '/': received
 例子：使用node代码第一次创建了 exchange 和 queue，它们都有配置相关参数，然后又使用另一套node代码或者其他语言如Go代码的客户端也使用创建好的exchange和queue
 
 这时候要保证相关参数一致，否则会报错，而失败
+
+### Exchange规则
+生产者消息通过Exchange规则路由到匹配的queue中进行消费
+
+- fanout: 把所有发送到该Exchange的消息路由到所有与它绑定的Queue中
+- direct: Routing Key==Binding Key
+- topic: Routing Key 增加*#简单方式匹配 Binding Key
+- headers: 不依赖于routing key与binding key的匹配规则来路由消息，而是根据发送的消息内容中的headers属性进行匹配
