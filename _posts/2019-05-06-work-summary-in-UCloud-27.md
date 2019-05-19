@@ -223,3 +223,19 @@ npm config set registry https://registry.npmjs.org/
 - Builder模式主要用于“分步骤构建一个复杂的对象”。在这其中“分步骤”是一个稳定的算法，而复杂的对象的各个部分则经常变化
 - 变化点在哪里，封装哪里。Builder模式主要在于应对“复杂对象各个部分”的频繁需求变动。其缺点在于难以应对“分步骤构建算法”的需求变动
 - 数据库ORM设计中，就可以分为Builder部分(准备SQL语句)和执行部分(执行SQL语句)
+
+### 双检查锁设计失效
+```
+if (m_instance==nullptr) {
+  Lock lock; // 加锁
+  if (m_instance == nullptr) {
+    m_instance = new Signleton();
+  }
+  return m_instance
+}
+```
+由于内存读写reorder会导致双检查锁失效。
+正常顺序 分配内存、实现构造器Signleton()、赋值给m_instance
+reorder 的顺序 分配内存、赋值给m_instance、实现构造器Signleton(),则造成m_instance!=nullptr而直接返回，但此时的m_instance是不能用的
+
+不同语言的编译器开始有对其做优化，避免reorder
