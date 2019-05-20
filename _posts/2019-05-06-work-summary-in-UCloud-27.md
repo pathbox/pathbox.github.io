@@ -239,3 +239,8 @@ if (m_instance==nullptr) {
 reorder 的顺序 分配内存、赋值给m_instance、实现构造器Signleton(),则造成m_instance!=nullptr而直接返回，但此时的m_instance是不能用的
 
 不同语言的编译器开始有对其做优化，避免reorder
+
+### 私有(安全)下载
+- 是否需要权限，比如登入和下载权限校验
+- 下载URL是否具有时效性
+如果将上述两种条件况结合到一起使用，安全效果是最好的，既校验了用户权限，又能避免下载URL被恶意传播后还能下载
