@@ -246,3 +246,65 @@ reorder 的顺序 分配内存、赋值给m_instance、实现构造器Signleton(
 如果将上述两种条件况结合到一起使用，安全效果是最好的，既校验了用户权限，又能避免下载URL被恶意传播后还能下载
 
 ### ASFK 邮箱、手机、银行账户的真实性
+
+### Golang 的 struct method 调用者是struct或&struct{}
+```go
+package main
+
+import (
+	"fmt"
+	"reflect"
+)
+
+func main() {
+	s1 := S{}
+	s2 := &S{}
+	s1.Name()
+	s1.Age()
+
+	s2.Name()
+	s2.Age()
+
+	t1 := reflect.TypeOf(s1)
+	fmt.Println("===============t1")
+	for i := 0; i < t1.NumMethod(); i++ {
+		fmt.Println(t1.Method(i).Name)
+	}
+
+	t2 := reflect.TypeOf(s2)
+	fmt.Println("===============t2")
+	for i := 0; i < t2.NumMethod(); i++ {
+		fmt.Println(t2.Method(i).Name)
+	}
+
+  t3 := t2.Elem() // It is t3
+  fmt.Println("===============t3")
+	for i := 0; i < t3.NumMethod(); i++ {
+		fmt.Println(t3.Method(i).Name)
+	}
+}
+
+type S struct {
+}
+
+func (s S) Name() {
+	fmt.Println("Name")
+}
+
+func (s *S) Age() {
+	fmt.Println("Age")
+}
+```
+
+```
+Name
+Age
+Name
+Age
+
+===============t1
+Name
+===============t2
+Age
+Name
+```
