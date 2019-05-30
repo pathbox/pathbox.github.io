@@ -319,3 +319,12 @@ Name
 - 商品交易、价格计算、积分累积：外部交易金融系统
 
 统一数据平台服务层:UDSL，对接了多种数据源数据库数据类型，对开发使用者来说不知道有多种不同的数据源数据库，只根据UDSL的API接口来获取查询得到想要的数据
+
+### Redis RDB AOF同时存在,AOF先被加载
+Redis RDB and AOF同时存在， redis-server 启动时，会先加载AOF文件
+如果AOF文件有错误，无法启动服务
+可以执行:
+```
+redis-check-aof --fix appendonly.aof
+```
+会将不合法的记录删除，保证appendonly.aof文件合法性，redis能够成功加载
