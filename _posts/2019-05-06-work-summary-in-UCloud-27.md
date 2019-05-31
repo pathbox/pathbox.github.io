@@ -333,3 +333,14 @@ redis-check-aof --fix appendonly.aof
 - RDB文件只用作后备用途，建议只在Slave上持久化RDB文件，而且只要15分钟备份一次，只保留save 900 1 这条规则
 - AOF 的优点是：在恶劣情况下也只会丢失不超过2秒的数据，启动脚本简单只load自己的AOF文件即可，代价是带来了持续的IO，AOFrewrite过程中产生的新数据写到新闻界造成的阻塞几乎是不可避免的，只要音频许可，应该尽量减少AOF rewrite的频率，AOF重写的基础大小默认值64M太小了，可以设到5G以上，默认超过原大小100%大小时，重写可以改到适当的数值
 - 如果AOF没有开启，仅靠Master-Slave Replication实现高可用性也可以，能省掉一大笔IO也减少了rewrite时带来的系统被动，代价是如果Master/Slave同时挂掉，会丢失十几分钟的数据，启动脚本也要比较两个Master/Slave中RDB文件，载入较多的那个，微博选用的是这种架构
+
+### time.Duration 作为timeout参数类型，别传整数
+
+在一些方法需要传入超时参数值，超时参数的类型是 time.Duration,当你传比如30，这不是表示30s超时，而是30纳秒，这样你的client请求可能还没进行第一次握手就超时了，这时会收到
+
+```go
+net/http: request canceled (Client.Timeout exceeded while awaiting headers)
+```
+的报错
+
+正确使用方式参数值为: `30 * time.Second`
