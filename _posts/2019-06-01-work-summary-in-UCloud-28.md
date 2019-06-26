@@ -43,3 +43,6 @@ panic: runtime error: invalid memory address or nil pointer dereference
 [signal SIGSEGV: segmentation violation code=0x1 addr=0x40 pc=0x1612327]
 ```
 原因是编译执行到这里的时候，config.Common还没有初始化好，所以报错了
+
+### 缓存与缓存效果的预生成文件的变更问题
+缓存与缓存效果的预生成文件相关的信息变更了，缓存与缓存效果的预生成文件也需要重新生成，否则就会出现新老数据不一致的情况
