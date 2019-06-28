@@ -46,3 +46,5 @@ panic: runtime error: invalid memory address or nil pointer dereference
 
 ### 缓存与缓存效果的预生成文件的变更问题
 缓存与缓存效果的预生成文件相关的信息变更了，缓存与缓存效果的预生成文件也需要重新生成，否则就会出现新老数据不一致的情况
+
+### UFile 的CDN地址的host配置只能用于上传和下载，无法用于删除和更改
