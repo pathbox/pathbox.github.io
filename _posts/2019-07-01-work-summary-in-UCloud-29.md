@@ -66,3 +66,9 @@ exit status 2
 其实不是，因为在网络的某一处信道的容量难以满足传输率的要求后，你的计算机作为接收方很长时间没有收到某个包，就无法发出接收完成的信息，传送信息的服务器就不断重新传输那些没有得到接收确认的数据包。传输就永远无法完成了。
 
 思考如何能够增加个人的信息带宽容量?无论是学习过程中，生活上，与人交往上等等
+
+### docker 容器服务的自动重启
+- 查看容器的重启次数: docker inspect -f "{{ .RestartCount }}" my-container
+- 获取上一次容器重启时间: docker inspect -f "{{ .State.StartedAt }}" my-container
+- 设置容器服务always自动重启: docker run --restart=always my-container-server
+- 设置容器服务自动重启策略: docker run --restart=on-failure:10 my-container-server
