@@ -700,4 +700,343 @@ index 5fce584..c8410fd 100644
   +
    	return nil
    }
+
+   diff --git a/contrib/raftexample/raft.go b/contrib/raftexample/raft.go
+   index 555f2f5..753cc2a 100644
+   --- a/contrib/raftexample/raft.go
+   +++ b/contrib/raftexample/raft.go
+   @@ -184,21 +184,23 @@ func (rc *raftNode) serveChannels() {
+    	ticker := time.NewTicker(100 * time.Millisecond)
+    	defer ticker.Stop()
+
+   -	// event loop on client proposals and raft updates
+   +	// send proposals over raft
+   +	stopc := make(chan struct{}, 1)
+   +	go func() {
+   +		for prop := range rc.proposeC {
+   +			// blocks until accepted by raft state machine
+   +			rc.node.Propose(context.TODO(), []byte(prop))
+   +		}
+   +		// client closed channel; shutdown raft if not already
+   +		stopc <- struct{}{}
+   +	}()
+   +
+   +	// event loop on raft state machine updates
+    	for {
+    		select {
+    		case <-ticker.C:
+    			rc.node.Tick()
+
+   -		// send proposals over raft
+   -		case prop, ok := <-rc.proposeC:
+   -			if !ok {
+   -				// client closed channel; shut down
+   -				rc.stop()
+   -				return
+   -			}
+   -			rc.node.Propose(context.TODO(), []byte(prop))
+   -
+    		// store raft entries to wal, then publish over commit channel
+    		case rd := <-rc.node.Ready():
+    			rc.wal.Save(rd.HardState, rd.Entries)
+   @@ -210,6 +212,10 @@ func (rc *raftNode) serveChannels() {
+    		case err := <-rc.transport.ErrorC:
+    			rc.writeError(err)
+    			return
+   +
+   +		case <-stopc:
+   +			rc.stop()
+   +			return
+    		}
+    	}
+    }
+
+    diff --git a/client/client.go b/client/client.go
+    index da86a0b..ece4cc0 100644
+    --- a/client/client.go
+    +++ b/client/client.go
+    @@ -378,9 +378,12 @@ func (c *simpleHTTPClient) Do(ctx context.Context, act httpAction) (*http.Respon
+     		return nil, nil, err
+     	}
+
+    -	hctx, hcancel := context.WithCancel(ctx)
+    +	var hctx context.Context
+    +	var hcancel context.CancelFunc
+     	if c.headerTimeout > 0 {
+     		hctx, hcancel = context.WithTimeout(ctx, c.headerTimeout)
+    +	} else {
+    +		hctx, hcancel = context.WithCancel(ctx)
+     	}
+    defer hcancel()
+
+    diff --git a/clientv3/client.go b/clientv3/client.go
+    index 4ec061d..99ea726 100644
+    --- a/clientv3/client.go
+    +++ b/clientv3/client.go
+    @@ -87,12 +87,13 @@ func NewFromURL(url string) (*Client, error) {
+     // Close shuts down the client's etcd connections.
+     func (c *Client) Close() error {
+     	c.mu.Lock()
+    -	defer c.mu.Unlock()
+     	if c.cancel == nil {
+    +		c.mu.Unlock()
+     		return nil
+     	}
+     	c.cancel()
+     	c.cancel = nil
+    +	c.mu.Unlock()
+     	c.Watcher.Close()
+     	c.Lease.Close()
+     	return c.conn.Close()
+    @@ -126,14 +127,22 @@ func (c *Client) Dial(endpoint string) (*grpc.ClientConn, error) {
+     	} else {
+     		opts = append(opts, grpc.WithInsecure())
+     	}
+    +
+    +	proto := "tcp"
+     	if url, uerr := url.Parse(endpoint); uerr == nil && url.Scheme == "unix" {
+    -		f := func(a string, t time.Duration) (net.Conn, error) {
+    -			return net.DialTimeout("unix", a, t)
+    -		}
+    +		proto = "unix"
+     		// strip unix:// prefix so certs work
+     		endpoint = url.Host
+    -		opts = append(opts, grpc.WithDialer(f))
+     	}
+    +	f := func(a string, t time.Duration) (net.Conn, error) {
+    +		select {
+    +		case <-c.ctx.Done():
+    +			return nil, c.ctx.Err()
+    +		default:
+    +		}
+    +		return net.DialTimeout(proto, a, t)
+    +	}
+    +	opts = append(opts, grpc.WithDialer(f))
+
+     	conn, err := grpc.Dial(endpoint, opts...)
+     	if err != nil {
+    @@ -156,11 +165,11 @@ func newClient(cfg *Config) (*Client, error) {
+     		creds = &c
+     	}
+     	// use a temporary skeleton client to bootstrap first connection
+    -	conn, err := cfg.RetryDialer(&Client{cfg: *cfg, creds: creds})
+    +	ctx, cancel := context.WithCancel(context.TODO())
+    +	conn, err := cfg.RetryDialer(&Client{cfg: *cfg, creds: creds, ctx: ctx})
+     	if err != nil {
+     		return nil, err
+     	}
+    -	ctx, cancel := context.WithCancel(context.TODO())
+     	client := &Client{
+     		conn:   conn,
+     		cfg:    *cfg,
+    @@ -198,6 +207,13 @@ func (c *Client) retryConnection(oldConn *grpc.ClientConn, err error) (*grpc.Cli
+     		// conn has already been updated
+     		return c.conn, nil
+     	}
+    +
+    +	oldConn.Close()
+    +	if st, _ := oldConn.State(); st != grpc.Shutdown {
+    +		// wait for shutdown so grpc doesn't leak sleeping goroutines
+    +		oldConn.WaitForStateChange(c.ctx, st)
+    +	}
+    +
+     	conn, dialErr := c.cfg.RetryDialer(c)
+     	if dialErr != nil {
+     		c.errors = append(c.errors, dialErr)
+```
+
+#### grpc-go
+
+```go
+diff --git a/balancer.go b/balancer.go
+index 2acc882..57c20c6 100644
+--- a/balancer.go
++++ b/balancer.go
+@@ -201,6 +201,10 @@ func (rr *roundRobin) watchAddrUpdates() error {
+ 	if rr.done {
+ 		return ErrClientConnClosing
+ 	}
++	select {
++	case <-rr.addrCh:
++	default:
++	}
+ 	rr.addrCh <- open
+ 	return nil
+ }
+
+ diff --git a/stream.go b/stream.go
+ index 0ee572c..537d4b3 100644
+ --- a/stream.go
+ +++ b/stream.go
+ @@ -133,8 +133,12 @@ func NewClientStream(ctx context.Context, desc *StreamDesc, cc *ClientConn, meth
+  	// Listen on ctx.Done() to detect cancellation when there is no pending
+  	// I/O operations on this stream.
+  	go func() {
+ -		<-s.Context().Done()
+ -		cs.closeTransportStream(transport.ContextErr(s.Context().Err()))
+ +		select {
+ +		case <-t.Error():
+ +			// Incur transport error, simply exit.
+ +		case <-s.Context().Done():
+ +			cs.closeTransportStream(transport.ContextErr(s.Context().Err()))
+ +		}
+  	}()
+  	return cs, nil
+  }
+
+  diff --git a/benchmark/worker/benchmark_client.go b/benchmark/worker/benchmark_client.go
+  index 7d14007..2ee5dbb 100644
+  --- a/benchmark/worker/benchmark_client.go
+  +++ b/benchmark/worker/benchmark_client.go
+  @@ -200,8 +200,8 @@ func (bc *benchmarkClient) doCloseLoopUnary(conns []*grpc.ClientConn, rpcCountPe
+   		for j := 0; j < rpcCountPerConn; j++ {
+   			go func(client testpb.BenchmarkServiceClient) {
+   				defer wg.Done()
+  +				done := make(chan bool)
+   				for {
+  -					done := make(chan bool)
+   					go func() {
+   						start := time.Now()
+   						if err := benchmark.DoUnaryCall(client, reqSize, respSize); err != nil {
+  @@ -212,7 +212,10 @@ func (bc *benchmarkClient) doCloseLoopUnary(conns []*grpc.ClientConn, rpcCountPe
+   						bc.mu.Lock()
+   						bc.histogram.Add(int64(elapse / time.Nanosecond))
+   						bc.mu.Unlock()
+  -						done <- true
+  +						select {
+  +						case <-bc.stop:
+  +						case done <- true:
+  +						}
+   					}()
+   					select {
+   					case <-bc.stop:
+  @@ -259,8 +262,8 @@ func (bc *benchmarkClient) doCloseLoopStreaming(conns []*grpc.ClientConn, rpcCou
+   		for j := 0; j < rpcCountPerConn; j++ {
+   			go func(stream testpb.BenchmarkService_StreamingCallClient) {
+   				defer wg.Done()
+  +				done := make(chan bool)
+   				for {
+  -					done := make(chan bool) // 在for中make chan 会产生大量的chan
+   					go func() {
+   						start := time.Now()
+   						if err := doRPC(stream, reqSize, respSize); err != nil {
+  @@ -271,7 +274,10 @@ func (bc *benchmarkClient) doCloseLoopStreaming(conns []*grpc.ClientConn, rpcCou
+   						bc.mu.Lock()
+   						bc.histogram.Add(int64(elapse / time.Nanosecond))
+   						bc.mu.Unlock()
+  -						done <- true
+  +						select {
+  +						case <-bc.stop:
+  +						case done <- true:
+  +						}
+   					}()
+
+select 是非确定性的，stopCh 和 ticker 同时发生时，不一定会执行 stopChan 的分支，正确做法是先检查一次 stopCh
+
+select {
+case <-bc.stop:
+ticker := time.NewTicker()
+for {
+    select{
+        case <- stopCh:
+            return
+        default:
+    }
+    f()
+    select {
+        case <- stopCh:
+            return
+        case <- ticker:
+    }
+}
+
+var group sync.WaitGroup
+group.Add(len(pm.plugins))
+for_, p := range pm.plugins {
+    go func(p *plugin) {
+        defer group.Done()
+    }
+    group.Wait() // 阻塞
+}
+// 应该在这里group.Wait()
+
+func goroutine1() {
+    m.Lock()
+    ch <- request // 阻塞
+    m.Unlock()
+}
+
+func goroutine2() {
+    for{
+        m.Lock()    // 阻塞
+        m.Unlock()
+        request <- ch
+    }
+}
+
+
+diff --git a/daemon/logger/jsonfilelog/read.go b/daemon/logger/jsonfilelog/read.go
+index 0ac0cb3..8794e89 100644
+--- a/daemon/logger/jsonfilelog/read.go
++++ b/daemon/logger/jsonfilelog/read.go
+@@ -9,6 +9,7 @@ import (
+ 	"os"
+ 	"time"
+
++	"golang.org/x/net/context"
+ 	"gopkg.in/fsnotify.v1"
+
+ 	"github.com/Sirupsen/logrus"
+@@ -172,9 +173,22 @@ func followLogs(f *os.File, logWatcher *logger.LogWatcher, notifyRotate chan int
+ 	}
+ 	defer func() {
+ 		f.Close()
++		fileWatcher.Remove(name)
+ 		fileWatcher.Close()
+ 	}()
+
++	ctx, cancel := context.WithCancel(context.Background())
++	defer cancel()
++	go func() {
++		select {
++		case <-logWatcher.WatchClose():
++			fileWatcher.Remove(name)
++			cancel()
++		case <-ctx.Done():
++			return
++		}
++	}()
++
+ 	var retries int
+ 	handleRotate := func() error {
+ 		f.Close()
+@@ -209,8 +223,7 @@ func followLogs(f *os.File, logWatcher *logger.LogWatcher, notifyRotate chan int
+ 			case fsnotify.Rename, fsnotify.Remove:
+ 				select {
+ 				case <-notifyRotate:
+-				case <-logWatcher.WatchClose():
+-					fileWatcher.Remove(name)
++				case <-ctx.Done():
+ 					return errDone
+ 				}
+ 				if err := handleRotate(); err != nil {
+@@ -232,8 +245,7 @@ func followLogs(f *os.File, logWatcher *logger.LogWatcher, notifyRotate chan int
+ 				return errRetry
+ 			}
+ 			return err
+-		case <-logWatcher.WatchClose():
+-			fileWatcher.Remove(name)
++		case <-ctx.Done():
+ 			return errDone
+ 		}
+ 	}
+@@ -290,7 +302,7 @@ func followLogs(f *os.File, logWatcher *logger.LogWatcher, notifyRotate chan int
+ 		}
+ 		select {
+ 		case logWatcher.Msg <- msg:
+-		case <-logWatcher.WatchClose():
++		case <-ctx.Done():
+ 			logWatcher.Msg <- msg
+ 			for {
+ 				msg, err := decodeLogLine(dec, l)
 ```
