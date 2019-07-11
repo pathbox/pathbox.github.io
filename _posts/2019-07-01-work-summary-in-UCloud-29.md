@@ -72,3 +72,15 @@ exit status 2
 - 获取上一次容器重启时间: docker inspect -f "{{ .State.StartedAt }}" my-container
 - 设置容器服务always自动重启: docker run --restart=always my-container-server
 - 设置容器服务自动重启策略: docker run --restart=on-failure:10 my-container-server
+
+### redis配置登入密码
+配置文件redis.conf增加: `requirepass 123456`
+
+redis-cli: `config set requirepass 123456` 这样不用重启也能增加密码，并且redis重启可以读取redis.conf中的配置内容
+
+```
+127.0.0.1:6379> keys *
+(error) NOAUTH Authentication required.
+127.0.0.1:6379> auth 123456
+OK
+```

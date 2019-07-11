@@ -1039,4 +1039,13 @@ index 0ac0cb3..8794e89 100644
  			logWatcher.Msg <- msg
  			for {
  				msg, err := decodeLogLine(dec, l)
+
+  for _, pair := range tests {
+-		go func() {
+-			srv.Write(pair[0])
+-		}()
++		go func(x []byte) {
++			srv.Write(x)
++		}(pair[0]) // write 复制的数据，避免race
+ 		n, err := l.Read(read)
 ```
