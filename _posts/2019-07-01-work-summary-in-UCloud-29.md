@@ -88,6 +88,8 @@ OK
 ### GOPATH 还是vendor
 一个加载配置文件内容的模块包， 有两个方法使用，一个是load方法，只需要在初始的时候调用一次，将配置文件内容加载到全局变量中，另一个是getkey方法，获取对应的配置值。有两个包中用到了配置文件，一个是main，一个是另一个包。main的init方法调用了load，在main处正常获得了配置值，而在另一个包获得的是nil值。代码逻辑上没有错，最后发现了，main出调用的config模块是加载自GOPATH的，而另一个包中调用的config模块加载自vendor，由于另一个包没有调用load方法，所以全局变量中的map值是空的，所以导致了获得的配置值是nil
 
+原因：没有从GOPATH/src进入到该项目进行build，从GOPATH/src 目录进去到该项目文件夹后，再进行build，就会都以vendor的包为加载优先了
+
 ### vendor和GOPATH谁优先使用，GOPATH优先使用
 
 如果一个包在vendor和GOPATH下面都存在那么谁会优先使用呢。
