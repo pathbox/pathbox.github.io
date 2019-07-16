@@ -165,6 +165,8 @@ https://blog.csdn.net/lrwwll/article/details/78069013
 4. 执行`go mod tidy`命令，它会添加缺失的模块以及移除不需要的模块。执行后会生成go.sum文件(模块下载条目)。添加参数-v，例如`go mod tidy -v`可以将执行的信息，即删除和添加的包打印到命令行；
 5. 执行命令`go mod verify`来检查当前模块的依赖是否全部下载下来，是否下载下来被修改过。如果所有的模块都没有被修改过，那么执行这条命令之后，会打印all modules verified。
 6. 执行命令`go mod vendor`生成vendor文件夹，该文件夹下将会放置你go.mod文件描述的依赖包，文件夹下同时还有一个文件modules.txt，它是你整个工程的所有模块。在执行这条命令之前，如果你工程之前有vendor目录，应该先进行删除。同理go mod vendor -v会将添加到
+7. go list -m -versions github.com/gin-gonic/gin 列出该模块的所有版本
+8. go list -m all xxx 打印当前模块依赖
 
 ```
 go mod init
