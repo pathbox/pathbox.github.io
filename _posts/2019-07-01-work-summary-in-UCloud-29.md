@@ -128,3 +128,6 @@ database/sql.Register(0x14ba2ae, 0x5, 0x1549280, 0x189a258)
 github.com/go-sql-driver/mysql.init.0()
 	/github.com/go-sql-driver/mysql/driver.go:161 +0x5c
 ```
+
+### 验证码的作用
+能够在一定程度上防止循环暴力匹配,得到信息
