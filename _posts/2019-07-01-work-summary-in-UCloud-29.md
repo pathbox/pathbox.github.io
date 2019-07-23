@@ -131,3 +131,8 @@ github.com/go-sql-driver/mysql.init.0()
 
 ### 验证码的作用
 能够在一定程度上防止循环暴力匹配,得到信息
+
+### 一个错误的SQL语句可能不报错且导致全表查询
+```sql
+select * from person where  name = "xxx" like '%xxx%' limit 10;
+```
