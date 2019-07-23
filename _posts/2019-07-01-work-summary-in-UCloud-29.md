@@ -117,3 +117,14 @@ OK
 7、不断更新--平衡的自我更新的原则，在四个基本生活方面，即生理、社会、情感、心智中，不断更新自己，这个习惯提升了其它六个习惯的实施效率。
 
 ### curl cip.cc 得到服务器的外网IP地址信息
+
+### 重复两次注册了 driver MySQL 会报错
+
+```
+panic: sql: Register called twice for driver mysql
+goroutine 1 [running]:
+database/sql.Register(0x14ba2ae, 0x5, 0x1549280, 0x189a258)
+	/usr/local/go/src/database/sql/sql.go:51 +0x189
+github.com/go-sql-driver/mysql.init.0()
+	/github.com/go-sql-driver/mysql/driver.go:161 +0x5c
+```
