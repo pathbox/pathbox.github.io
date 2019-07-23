@@ -136,3 +136,10 @@ github.com/go-sql-driver/mysql.init.0()
 ```sql
 select * from person where  name = "xxx" like '%xxx%' limit 10;
 ```
+
+### 快速记大小端的区别
+
+一段连续的内存:起始地址start和结束地址end
+
+- 大端模式: 位权大的的进制数值在start地址开始，位权大的排列在位权小的字节之前
+- 小端模式: 位权小的的进制数值在start地址开始，位权大的排列在位权小的字节之后
