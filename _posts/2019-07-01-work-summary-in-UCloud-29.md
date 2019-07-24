@@ -143,3 +143,77 @@ select * from person where  name = "xxx" like '%xxx%' limit 10;
 
 - 大端模式: 位权大的的进制数值在start地址开始，位权大的排列在位权小的字节之前
 - 小端模式: 位权小的的进制数值在start地址开始，位权大的排列在位权小的字节之后
+
+### Redis Cluster Config 配置例子
+https://juejin.im/post/5b625b9be51d4519956759d0
+
+主从复制功能的详细步骤可以分为7个步骤：
+
+- 设置主服务器的地址和端口
+- 建立套接字连接
+- 发送PING命令
+- 身份验证
+- 发送端口信息
+- 同步
+- 命令传播
+
+全量重同步的步骤如下
+- 主节点收到从服务器的全量重同步请求时，主服务器便开始执行bgsave命令，同时用一个缓冲区记录从现在开始执行的所有写命令。
+- 当主服务器的bgsave命令执行完毕后，会将生成的RDB文件发送给从服务器。从服务器接收到RDB文件时，会将数据文件保存到硬盘，然后加载到内存中。
+- 主服务器将缓冲区所有缓存的命令发送到从服务器，从服务器接收并执行这些命令，将从服务器同步至主服务器相同的状态。
+```
+info replication 可用查看集群Info
+
+192.168.17.103:6379> slaveof 192.168.17.101 6379
+OK  角色已经变成从服务器
+```
+
+#### config
+```
+################################# REPLICATION #################################
+
+# slaveof <主服务器ip> <主服务器端口>
+# slaveof <masterip> <masterport>
+
+# masterauth <主服务器Redis密码>
+# masterauth <master-password>
+
+# 当slave丢失master或者同步正在进行时，如果发生对slave的服务请求
+# yes则slave依然正常提供服务
+# no则slave返回client错误："SYNC with master in progress"
+slave-serve-stale-data yes
+
+# 指定slave是否只读
+slave-read-only yes
+
+# 无硬盘复制功能
+repl-diskless-sync no
+
+# 无硬盘复制功能间隔时间
+repl-diskless-sync-delay 5
+
+# 从服务器发送PING命令给主服务器的周期
+# repl-ping-slave-period 10
+
+# 超时时间
+# repl-timeout 60
+
+# 是否禁用socket的NO_DELAY选项
+repl-disable-tcp-nodelay no
+
+# 设置主从复制容量大小，这个backlog 是一个用来在 slaves 被断开连接时存放 slave 数据的 buffer
+# repl-backlog-size 1mb
+
+# master 不再连接 slave时backlog的存活时间。
+# repl-backlog-ttl 3600
+
+# slave的优先级
+slave-priority 100
+
+# 未达到下面两个条件时，写操作就不会被执行
+# 最少包含的从服务器
+# min-slaves-to-write 3
+# 延迟值
+# min-slaves-max-lag 10
+
+```
