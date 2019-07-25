@@ -212,3 +212,34 @@ inequivalent arg 'durable' for exchange 'csExchange' in vhost '/': received
 - direct: Routing Key==Binding Key
 - topic: Routing Key 增加*#简单方式匹配 Binding Key
 - headers: 不依赖于routing key与binding key的匹配规则来路由消息，而是根据发送的消息内容中的headers属性进行匹配
+
+### 消息序列化
+RabbitMQ使用ProtoBuf序列化消息,它可作为RabbitMQ的Message的数据格式进行传输,由于是结构化的数据,这样就极大的方便了Consumer的数据高效处理,当然也可以使用XML，与XML相比,ProtoBuf有以下优势:
+1. 简单
+2. size小了3-10倍
+3. 速度快了20-100倍
+4. 易于编程
+6. 减少了语义的歧义.
+
+ProtoBuf具有速度和空间的优势，使得它现在应用非常广泛
+
+### 消息持久化
+要持久化队列queue的持久化需要在声明时指定durable=True;
+这里要注意,队列的名字一定要是Broker中不存在的,不然不能改变此队列的任何属性
+队列和交换机有一个创建时候指定的标志durable,durable的唯一含义就是具有这个标志的队列和交换机会在重启之后重新建立,它不表示说在队列中的消息会在重启后恢复
+
+1. exchange持久化,在声明时指定durable => true
+```
+hannel.ExchangeDeclare(ExchangeName, "direct", durable: true, autoDelete: false, arguments: null);//声明消息队列，且为可持久化的
+```
+2. queue持久化,在声明时指定durable => true
+```
+channel.QueueDeclare(QueueName, durable: true, exclusive: false, autoDelete: false, arguments: null);//声明消息队列，且为可持久化的
+```
+3.消息持久化,在投递时指定delivery_mode => 2(1是非持久化)
+```
+channel.basicPublish("", queueName, MessageProperties.PERSISTENT_TEXT_PLAIN, msg.getBytes());  
+```
+
+如果exchange和queue都是持久化的,那么它们之间的binding也是持久化的,如果exchange和queue两者之间有一个持久化，一个非持久化,则不允许建立绑定.
+注意：一旦创建了队列和交换机,就不能修改其标志了,例如,创建了一个non-durable的队列,然后想把它改变成durable的,唯一的办法就是删除这个队列然后重现创建
