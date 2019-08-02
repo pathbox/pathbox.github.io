@@ -249,7 +249,7 @@ client.indices.put_mapping index: "articles", type: "article", body: {
 }
 ```
 
-得到的mappin 是：
+得到的mapping 是：
 
 ```ruby
 "organization": {
