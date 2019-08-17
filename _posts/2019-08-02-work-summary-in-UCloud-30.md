@@ -14,3 +14,7 @@ image: /assets/images/post.jpg
 fsync 在 Linux 中的意义在于同步数据到存储设备上。大多数块设备的数据都是通过缓存进行的，将数据写到文件上通常将该
 数据由内核复制到缓存中，如果缓存尚未写满，则不将其排入输出队列上，而是等待其写满或者当内核需要重用该缓存时，再 将该缓存排入输出队列，进而同步到设备上 。 这种策略的好处是减少了磁盘读写次数，不足的地方是降低了文件内容的更新速 度，使其不能时刻同步到存储设备上， 当系统发生故障时，这种机制很有可能导致了文件内容的丢失。因此，内核提供了 fsync
 接口，用户可以根据自己的需要通过此接口更新数据到存储设备上.
+
+### Rabbitmq 官方conf example
+
+https://github.com/rabbitmq/rabbitmq-server/blob/master/docs/rabbitmq.conf.example
