@@ -32,3 +32,21 @@ RabbitMQ 只要求在集群中至少有一个磁盘节点，所有其他节点�
 - 设置了TCP_NODELAY选项，则允许发送
 - 为设置TCP_CORK选项时，若所有发出去的小数据吧（包长度小于MSS）均被确认，则允许发送
 - 上述条件都未满足，但发生了超时（一般为200ms），则立即发送
+
+### 一次k8s服务访问网关接口异常问题
+pod的环境是IPv6，之前没有发生过，该接口一直正常使用，这周开始，该接口执行10次才有1次成功
+使用postman调用该接口，一切正常
+
+在pod中执行curl -v得到异常的结果:
+```
+Trying ipv6_ip_a...
+* Connected to api.myadmin.com (ipv6_ip_a) port 80 (#0)  http 正常的
+
+About to connect() to api.myadmin.com port 80 (#0)       
+*   Trying ipv6_ip_b...            http  不正常的
+* Connected to api.myadmin.com (ipv6_ip_b) port 80 (#0)
+```
+
+发现当调用失败时，Trying的是`ipv6_ip_b`这个ipv6的地址。
+最终排查到的结果: pod服务访问 api.myadmin.com会转到广州网关,  这个是根据我们内网dns返回的ipv4地址转换的
+但这台网关机器IPv6没有配置监听443。所以从pod访问时走IPv6会报错，将这台网关机器IPv6配置监听443即可
