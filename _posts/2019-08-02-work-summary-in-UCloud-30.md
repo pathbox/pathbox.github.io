@@ -50,3 +50,7 @@ About to connect() to api.myadmin.com port 80 (#0)
 发现当调用失败时，Trying的是`ipv6_ip_b`这个ipv6的地址。
 最终排查到的结果: pod服务访问 api.myadmin.com会转到广州网关,  这个是根据我们内网dns返回的ipv4地址转换的
 但这台网关机器IPv6没有配置监听443。所以从pod访问时走IPv6会报错，将这台网关机器IPv6配置监听443即可
+
+### INSERT INTO A SELECT * FROM B
+`INSERT INTO A SELECT * FROM B`
+如果需要这样简便的操作，同步记录需要 `A B两表的字段数量和类型完全一致`
