@@ -54,3 +54,21 @@ About to connect() to api.myadmin.com port 80 (#0)
 ### INSERT INTO A SELECT * FROM B
 `INSERT INTO A SELECT * FROM B`
 如果需要这样简便的操作，同步记录需要 `A B两表的字段数量和类型完全一致`
+
+### golang xor
+```go
+func xor(a, b []byte) []byte {
+	n := len(a)
+	if len(b) < n {
+		n = len(b)
+	}
+
+	res := make([]byte, n)
+
+	for i := 0; i < n; i++ {
+		res[i] = a[i] ^ b[i]
+	}
+
+	return res
+}
+```
