@@ -56,7 +56,13 @@ About to connect() to api.myadmin.com port 80 (#0)
 如果需要这样简便的操作，同步记录需要 `A B两表的字段数量和类型完全一致`
 
 ### golang xor
+
 ```go
+// xorToken XORs tokens ([]byte) to provide unique-per-request CSRF tokens. It
+// will return a masked token if the base token is XOR'ed with a one-time-pad.
+// An unmasked token will be returned if a masked token is XOR'ed with the
+// one-time-pad used to mask it.
+
 func xor(a, b []byte) []byte {
 	n := len(a)
 	if len(b) < n {
