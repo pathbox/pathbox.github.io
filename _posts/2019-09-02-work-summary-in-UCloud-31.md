@@ -5,3 +5,12 @@ date:  2019-09-02 19:55:06
 categories: Work
 image: /assets/images/post.jpg
 ---
+
+### 只需五步，自己动手写一个静态博客
+1. 收集markdown列表
+2. 解析markdown源
+3. 生成博客文章
+4. 生成博客首页索引
+5. 开始编译
+http://muxueqz.top/a-small-static-site-generator.html
+https://blog.thea.codes/a-small-static-site-generator/
