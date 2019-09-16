@@ -22,3 +22,5 @@ https://blog.thea.codes/a-small-static-site-generator/
 模式二："这就是我想要的，你自己想如何去做。"
 
 模式三："让我们一起弄清楚我们能做些什么
+
+### 单元测试如此重要,让你的代码更有信心
