@@ -35,3 +35,6 @@ https://blog.thea.codes/a-small-static-site-generator/
 
 ### Golang map 内存的释放
 Golang map delete 操作不会释放占用内存,会等到GC的时候,由GC选择释放。想要立即释放内存，需要将map设置为nil，即可立即释放所占内存
+
+### mock in test
+mock 在测试中的作用是解除外部依赖(数据库，文件依赖，第三方API调用)等，而不是为了测试依赖
