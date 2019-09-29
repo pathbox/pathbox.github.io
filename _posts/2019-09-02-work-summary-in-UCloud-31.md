@@ -49,3 +49,17 @@ Golang slice map 不是线程安全，如果定义了全局的slice和map，在�
 - 虚拟内存是对程序存储器的抽象
 - 进程是对一个正在运行的程序的抽象
 - 虚拟机,它提供整个计算机的抽象，包括操作系统、处理器和程序
+
+### Go 1.13 GO module 相关设置
+在Go 1.13中，我们可以通过GOPROXY来控制代理，以及通过GOPRIVATE控制私有库不走代理。
+
+设置GOPROXY代理：
+
+go env -w GOPROXY=https://goproxy.cn,direct
+设置GOPRIVATE来跳过私有库，比如常用的Gitlab或Gitee，中间使用逗号分隔：
+
+go env -w GOPRIVATE=*.gitlab.com,*.gitee.com
+
+如果在运行go mod vendor时，提示Get https://sum.golang.org/lookup/xxxxxx: dial tcp 216.58.200.49:443: i/o timeout，或者go mod init时会报13设置了默认的GOSUMDB的错误，则是因为Go 1.13设置了默认的GOSUMDB=sum.golang.org，这个网站是被墙了的，用于验证包的有效性，可以通过如下命令关闭：
+
+go env -w GOSUMDB=off
