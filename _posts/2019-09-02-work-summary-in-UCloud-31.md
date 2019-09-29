@@ -38,3 +38,6 @@ Golang map delete 操作不会释放占用内存,会等到GC的时候,由GC选�
 
 ### mock in test
 mock 在测试中的作用是解除外部依赖(数据库，文件依赖，第三方API调用)等，而不是为了测试依赖
+
+### Golang slice map不是线程安全
+Golang slice map 不是线程安全，如果定义了全局的slice和map，在读写slice和map数据时，请使用锁
