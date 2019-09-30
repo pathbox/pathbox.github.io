@@ -172,3 +172,10 @@ mysql> show variables like "%binlog_format%";
 1 row in set (0.00 sec)
 
 ```
+
+### Binlog基本配制与格式设定
+Mysql BInlog日志格式可以通过mysql的my.cnf文件的属性binlog_format指定。如以下：
+binlog_format        = MIXED                 //binlog日志格式
+log_bin              =目录/mysql-bin.log    //binlog日志名
+expire_logs_days     = 7                //binlog过期清理时间
+max_binlog_size      100m                    //binlog每个日志文件大小
