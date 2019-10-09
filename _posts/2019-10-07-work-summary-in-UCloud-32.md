@@ -16,3 +16,5 @@ Mixed reads and writes, go for a sharded map implementation. At the moment [1] i
 Other invariants to keep together with the map semantics: Write your own data structure or pick one implementation you like and fork it, then add those invariants there.
 Mixed value types, TTL, queries... You don't want a map, you want either a cache or an in-memory database, depending on your exact requirements. Check for example [3] and [4].
 Installation
+
+### Ruby中只有多线程IO操作时能实现并发，在等待IO的时候GIL会释放，这些线程可以穿插执行
