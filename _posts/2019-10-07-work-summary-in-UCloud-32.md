@@ -18,3 +18,7 @@ Mixed value types, TTL, queries... You don't want a map, you want either a cache
 Installation
 
 ### Ruby中只有多线程IO操作时能实现并发，在等待IO的时候GIL会释放，这些线程可以穿插执行
+
+### MySQL ERROR 1071 (42000): Specified key was too long; max key length is 767 bytes
+MySQL INNODB varchar字段的索引长度默认限制是767bytes，在utf8编码下，每个字符是3字节，所以varchar(255) 255*3=765 <767这样没有超过限制，如果将varchar(255)设为更大，则会导致报错。
+utf8mb4编码每个字符占4个字节，767/4=191，所以在utf8mb4编码下varchar(191)这样是合理的。
