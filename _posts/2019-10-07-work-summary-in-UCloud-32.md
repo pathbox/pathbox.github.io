@@ -22,3 +22,28 @@ Installation
 ### MySQL ERROR 1071 (42000): Specified key was too long; max key length is 767 bytes
 MySQL INNODB varchar字段的索引长度默认限制是767bytes，在utf8编码下，每个字符是3字节，所以varchar(255) 255*3=765 <767这样没有超过限制，如果将varchar(255)设为更大，则会导致报错。
 utf8mb4编码每个字符占4个字节，767/4=191，所以在utf8mb4编码下varchar(191)这样是合理的。
+
+### 线上一次大量 CLOSE_WAIT 复盘
+来源于：https://ms2008.github.io/2019/07/04/golang-redis-deadlock/
+学习总结：
+- 出现 CLOSE_WAIT 本质上是因为服务端收到客户端的 FIN 后，仅仅回复了 ACK（由系统的 TCP 协议栈自动发出），并没有发 4 次断开的第二轮 FIN
+- 在客户端关闭连接后，CLOSE_WAIT 依然不会消失，只能说明服务端 HANG 在了某处，没有调用 close
+- 有140w的goroutine没有释放，即使有超时机制也没释放
+- 是由于嵌套查询，导致了死锁,导致没有触发到超时，goroutine和连接全部死锁等待没有释放,从而导致大量的 CLOSE_WAIT。正常情况一次redis查询后，该次的连接请求应该正常释放
+
+```go
+func getFoo() {
+	c := redisPool.Get()
+	defer c.Close()
+
+	// XXX
+}
+
+func getBar() {
+	c := redisPool.Get()
+	defer c.Close()
+
+	getFoo()
+}
+```
+- redigo 也提供了一个更安全的获取连接的接口：GetContext()，通过显式传入一个 context 来控制 Get() 的超时
