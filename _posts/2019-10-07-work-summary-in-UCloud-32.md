@@ -47,3 +47,6 @@ func getBar() {
 }
 ```
 - redigo 也提供了一个更安全的获取连接的接口：GetContext()，通过显式传入一个 context 来控制 Get() 的超时
+
+### FFI(Foreign Function Interface)
+FFI(Foreign Function Interface)是用来与其它语言交互的接口，比如 A 语言写的函数如果想在 B 语言里面调用，这时一般有两种解决方案：一种是将函数做成一个服务，通过进程间通信(IPC)或网络协议通信(RPC, RESTful等)；另一种就是直接通过 FFI 调用。前者需要至少两个独立的进程才能实现，而后者直接将其它语言的接口内嵌到本语言中，所以调用效率比前者高
