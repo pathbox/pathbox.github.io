@@ -54,6 +54,16 @@ FFI(Foreign Function Interface)是用来与其它语言交互的接口，比如 
 ### What is an API Gateway?
 Reduce Code Duplication, Orchestrate Common Functionalities
                                             - Thibault Charbonnier
+- Dyanmic Load Balancer
+- Service Discovery
+- Authentication
+- Security
+- Traffic Control
+- Ops
+- Logging
+- Transformation  
+- Monitor
+
 ### 如何编写正确且高效的 OpenResty 应用
 https://segmentfault.com/a/1190000017563487
 
