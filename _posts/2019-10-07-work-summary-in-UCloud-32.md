@@ -68,4 +68,7 @@ Reduce Code Duplication, Orchestrate Common Functionalities
 https://segmentfault.com/a/1190000017563487
 
 ### Google的身份验证器（google-authenticator）基于时间的OTP
-google-authenticator 是基于TOTP的，基于时间的OTP算法。所以，如果客户端(手机App)的时间和服务端的时间不一致，相差超过30s 或60s(具体多少没有详细测试),就会导致即使手机App中给出了6位数字，在网页输入也对了，但还是校验失败，而不通过。我做的例子是：把手机对网络精准时间调快了2分钟，之后Google的身份验证发现了即使输入正确也不能通过
+google-authenticator 是基于TOTP的，基于时间的OTP算法。所以，如果客户端(手机App)的时间和服务端的时间不一致，相差超过30s 或60s(具体看服务端算法，一般情况差一个时间counter，但也有为了更好的兼容，会是2个counter),就会导致即使手机App中给出了6位数字，在网页输入也对了，但还是校验失败，而不通过。我做的例子是：把手机对网络精准时间调快了2分钟，之后Google的身份验证发现了即使输入正确也不能通过
+
+### TOPT算法
+TOPT算法是用 `当前时间戳 / 循环过期时间段(30s、60s) = counter` 再将counter代入到计算校验的算法中。所以，只要客户端和服务端之间的时间戳，不误差超过循环过期时间段，也就是不误差超过30s或60s，则客户端与服务端之间能够校验匹配
