@@ -5,3 +5,9 @@ date:  2019-11-05 11:12:06
 categories: Work
 image: /assets/images/post.jpg
 ---
+
+### Golang原始 IN SQL语句构造
+
+```
+fmt.Sprintf("SELECT user_id,user_email FROM user WHERE company_id = %d AND user_email IN (%s);", companyID, "'11','22','33'")
+```
