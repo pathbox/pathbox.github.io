@@ -15,3 +15,8 @@ fmt.Sprintf("SELECT user_id,user_email FROM user WHERE company_id = %d AND user_
 ### 优秀的独立博客收集列表
 
 `https://github.com/timqian/chinese-independent-blogs`
+
+### Go项目中强烈建议使用数据库ORM库来进行SQL操作
+
+- Go项目中强烈建议使用数据库ORM库来进行SQL操作
+- 用Go原生SQL库纯写SQL的方式实在太低效且非常难维护
