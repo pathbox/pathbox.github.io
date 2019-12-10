@@ -40,3 +40,11 @@ fmt.Sprintf("SELECT user_id,user_email FROM user WHERE company_id = %d AND user_
 5、新的子进程开始 Accet
 6、系统将新的请求转交新的子进程
 7、旧进程处理完所有旧连接后正常结束
+
+### TiDB工作小结
+- 加新字段不锁表
+- 加索引不锁表,时间根据数据记录大小
+- 将字符串长度改大可以，改小不行
+- 修改字段默认值不锁表
+- 当一个字段NOT Null 进行INSERT操作时，如果SQL语句没有该字段，会报错 `Field 'admin' doesn't have a default value`,而MySQL会自动帮你加入默认值而不报错
+- TiDB没有锁表机制 所以DDL操作都是不缩表的
