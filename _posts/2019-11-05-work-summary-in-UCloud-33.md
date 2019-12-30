@@ -48,3 +48,6 @@ fmt.Sprintf("SELECT user_id,user_email FROM user WHERE company_id = %d AND user_
 - 修改字段默认值不锁表
 - 当一个字段NOT Null 进行INSERT操作时，如果SQL语句没有该字段，会报错 `Field 'admin' doesn't have a default value`,而MySQL会自动帮你加入默认值而不报错
 - TiDB没有锁表机制 所以DDL操作都是不缩表的
+
+### 数据库用户权限限制IP地址访问段，增强安全性
+将数据库用户权限设置为内网地址的网段，能够增强数据库访问的安全性
