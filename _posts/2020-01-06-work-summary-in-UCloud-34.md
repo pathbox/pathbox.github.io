@@ -47,3 +47,6 @@ bm size: 4
 ### iptables学习
 
 http://www.zsythink.net/archives/tag/iptables/page/2/
+
+### 图论:哥尼斯堡桥问题
+“能够一笔画成的通路，所有顶点都是偶点(度数为偶数)或有两个奇点(度数为奇数)”
