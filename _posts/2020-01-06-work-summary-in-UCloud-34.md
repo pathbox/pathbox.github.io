@@ -54,3 +54,15 @@ http://www.zsythink.net/archives/tag/iptables/page/2/
 ### 二分查找是一种利用2的指数爆炸💥性质进行的查找，效率极其高
 
 ### 一个好的接口报错，当参数必填性、参数类型报错都要给予提示
+
+### fasthttp存在的并发问题
+https://cloud.tencent.com/developer/news/462918
+>fasthttp使用了一个ctxPool来维护RequestCtx，每次请求都先去ctxPool中获取。如果能获取到就用池中已经存在的，如果获取不到，new出一个新的RequestCtx。这也就是fasthttp性能高的一个主要原因，复用RequestCtx可以减少创建对象所有的时间以及减少内存使用率。但是随之而来的问题是：如果在高并发的场景下，如果整个请求链路中有另起的goroutine，前一个RequestCtx处理完成业务逻辑以后(另起的协程还没有完成)，立刻被第二个请求使用，那就会发生前文所述的错乱的request body。
+
+通过复制一个新的request来解决这个问题
+```go
+newRequest := &fasthttp.Request{}
+ctx.Request.CopyTo(newRequest)
+
+body := newRequest.Body()
+```
