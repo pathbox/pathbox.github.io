@@ -1,0 +1,131 @@
+---
+layout: post
+title: 最近工作总结(35)
+date:  2020-03-06 16:25:06
+categories: Work
+image: /assets/images/post.jpg
+---
+
+### Casbin API 简单了解
+
+```go
+//全局变量 e是执行者实例
+e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+//获取当前策略中显示的主题列表
+allSubjects := e.GetAllSubjects()
+
+//获取当前命名策略中显示的主题列表
+allNamedSubjects := e.GetAllNamedSubjects("p")
+
+//获取当前策略中显示的对象列表
+allObjects := e.GetAllObjects()
+
+//获取当前命名策略中显示的对象列表
+allNamedObjects := e.GetAllNamedObjects("p")
+
+//获取当前策略中显示的操作列表
+allActions := e.GetAllActions()
+
+//获取当前命名策略中显示的操作列表
+allNamedActions := e.GetAllNamedActions("p")
+
+//获取当前策略中显示的角色列表
+allRoles = e.GetAllRoles()
+
+//获取当前命名策略中显示的角色列表
+allNamedRoles := e.GetAllNamedRoles("g")
+
+//获取策略中的所有授权规则
+policy = e.GetPolicy()
+
+//获取策略中的所有授权规则，可以指定字段筛选器
+filteredPolicy := e.GetFilteredPolicy(0, "alice")
+
+//获取命名策略中的所有授权规则
+namedPolicy := e.GetNamedPolicy("p")
+
+//获取命名策略中的所有授权规则，可以指定字段过滤器
+filteredNamedPolicy = e.GetFilteredNamedPolicy("p", 0, "bob")
+
+//获取策略中的所有角色继承规则
+groupingPolicy := e.GetGroupingPolicy()
+
+//获取策略中的所有角色继承规则，可以指定字段筛选器
+filteredGroupingPolicy := e.GetFilteredGroupingPolicy(0, "alice")
+
+//获取策略中的所有角色继承规则
+namedGroupingPolicy := e.GetNamedGroupingPolicy("g")
+
+//获取策略中的所有角色继承规则
+namedGroupingPolicy := e.GetFilteredNamedGroupingPolicy("g", 0, "alice")
+
+// 确定是否存在授权规则
+hasPolicy := e.HasPolicy("data2_admin", "data2", "read")
+
+//确定是否存在命名授权规则
+hasNamedPolicy := e.HasNamedPolicy("p", "data2_admin", "data2", "read")
+
+//向当前策略添加授权规则。 如果规则已经存在，函数返回false，并且不会添加规则。 否则，函数通过添加新规则并返回true
+added := e.AddPolicy("eve", "data3", "read")
+
+// 向当前命名策略添加授权规则。 如果规则已经存在，函数返回false，并且不会添加规则。 否则，函数通过添加新规则并返回true
+added := e.AddNamedPolicy("p", "eve", "data3", "read")
+
+// 从当前策略中删除授权规则
+removed := e.RemovePolicy("alice", "data1", "read")
+
+// 移除当前策略中的授权规则，可以指定字段筛选器。 RemovePolicy 从当前策略中删除授权规则
+removed := e.RemoveFilteredPolicy(0, "alice", "data1", "read")
+
+//从当前命名策略中删除授权规则
+removed := e.RemoveNamedPolicy("p", "alice", "data1", "read")
+
+//从当前命名策略中移除授权规则，可以指定字段筛选器
+removed := e.RemoveFilteredNamedPolicy("p", 0, "alice", "data1", "read")
+
+//确定是否存在角色继承规则
+has := e.HasGroupingPolicy("alice", "data2_admin")
+
+//确定是否存在命名角色继承规则
+has := e.HasNamedGroupingPolicy("g", "alice", "data2_admin")
+
+// 向当前策略添加角色继承规则。 如果规则已经存在，函数返回false，并且不会添加规则。 如果规则已经存在，函数返回false，并且不会添加规则
+added := e.AddGroupingPolicy("group1", "data2_admin")
+
+//将命名角色继承规则添加到当前策略。 如果规则已经存在，函数返回false，并且不会添加规则。 否则，函数通过添加新规则并返回true
+added := e.AddNamedGroupingPolicy("g", "group1", "data2_admin")
+
+// 从当前策略中删除角色继承规则
+removed := e.RemoveGroupingPolicy("alice", "data2_admin")
+
+//从当前策略中移除角色继承规则，可以指定字段筛选器
+removed := e.RemoveFilteredGroupingPolicy(0, "alice")
+
+//从当前命名策略中移除角色继承规则
+removed := e.RemoveNamedGroupingPolicy("g", "alice")
+
+//当前命名策略中移除角色继承规则，可以指定字段筛选器
+removed := e.RemoveFilteredNamedGroupingPolicy("g", 0, "alice")
+
+//添加自定义函数
+func CustomFunction(key1 string, key2 string) bool {
+    if key1 == "/alice_data2/myid/using/res_id" && key2 == "/alice_data/:resource" {
+        return true
+    } else if key1 == "/alice_data2/myid/using/res_id" && key2 == "/alice_data2/:id/using/:resId" {
+        return true
+    } else {
+        return false
+    }
+}
+
+func CustomFunctionWrapper(args ...interface{}) (interface{}, error) {
+    key1 := args[0].(string)
+    key2 := args[1].(string)
+
+    return bool(CustomFunction(key1, key2)), nil
+}
+
+e.AddFunction("keyMatchCustom", CustomFunctionWrapper)
+```
+>https://blog.csdn.net/lk2684753/article/details/99680892?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task
