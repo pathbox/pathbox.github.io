@@ -129,3 +129,33 @@ func CustomFunctionWrapper(args ...interface{}) (interface{}, error) {
 e.AddFunction("keyMatchCustom", CustomFunctionWrapper)
 ```
 >https://blog.csdn.net/lk2684753/article/details/99680892?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task
+
+### Rabbitmq的producer和consumer
+producer产生message，将message 推送给rabbitmq，rabbitmq再将message推给consumer进行消费处理，那么producer和consumer之间是如何连接的呢？rabbitmq这里有几种选择方式，下面是简单描述常用的方式。
+
+producer 与rabbitmq指定的exchange绑定，并且指定Type类型:
+```go
+producer = uamqp.NewExchange(getMQNodes(), uamqp.ExchangeOptions{
+		Name:    "uaccount",
+		Type:    "topic",
+		Durable: true,
+	}).CreateProducer()
+```
+
+producer 定义routingKey:
+```go
+routingKey := fmt.Sprintf("key_pattern.%s", name)
+pubData := amqp.Publishing{
+	ContentType:  "application/json",
+	DeliveryMode: 2,
+	Body:         body,
+}
+
+err := producer.Publish(routingKey, pubData, false, false)
+```
+这样，当前定义的producer会往`Exchange:uaccount`推送消息，并且定义的routing key 是key_pattern.xxx这样的模式。
+
+consumer同样需要去绑定`Exchange:uaccount`,并且Type也是`topic`。
+consumer定义队列的名称，并且consumer绑定的是routing key 是key_pattern.xxx，这样，consumer定义的队列就和producer绑定到一起了。
+
+所以producer和consumer的连接关系是: exchange、type、routing key
