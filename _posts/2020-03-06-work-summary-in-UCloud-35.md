@@ -178,7 +178,7 @@ B树的树内存储数据，因此查询单条数据的时候，B树的查询效
 
 因为Mysql是关系型数据库，而Mongodb是非关系型数据。
 
-### SQL四种语言：DDL,DML,DCL,TCL 
+### SQL四种语言：DDL,DML,DCL,TCL
 
 ```
 1.DDL（Data Definition Language）数据库定义语言statements are used to define the database structure or schema.
@@ -223,3 +223,70 @@ SQL主要分成四部分：
 （3）数据控制。包括对基本表和视图的授权，完整性规则的描述，事务控制等内容。
 （4）嵌入式SQL的使用规定。涉及到SQL语句嵌入在宿主语言程序中使用的规则。
 ```
+
+### 为什么要使用bitset
+例如有N个需要存储，int resource=[1,2,4]
+由于一个int 占用4个字节，那么resource数组占用12个字节。
+如果使用bitset来储存long[0]=【0,1,1,0,1,...0】(总共64位,...全部用0填充)，原来一个整数占用内存是4个字节，现在用一个位来存储，比例32:1，简单的说用bitset按位存储可以省32倍的内存空间。
+效率优势：1(M)=1X1024X1024x8=8388608(bit)，用1m的空间可以存储839万个整数，1G大约可以存86亿个整数
+
+### MySQL Binlog 两种格式比较
+##### Statement 优点
+历史悠久，技术成熟；
+产生的 binlog 文件较小；
+binlog 中包含了所有数据库修改信息，可以据此来审核数据库的安全等情况；
+binlog 可以用于实时的还原，而不仅仅用于复制；
+主从版本可以不一样，从服务器版本可以比主服务器版本高；
+
+##### Statement 缺点：
+不是所有的 UPDATE 语句都能被复制，尤其是包含不确定操作的时候，DELETE 和 UPDATE 语句如果使用了 LIMIT 但是没有使用 ORDER BY，那么结果也是不确定的，也不能使用 Statement-Based 方式记录日志。
+调用具有不确定因素的 UDF 时复制也可能出现问题；
+运用以下函数的语句也不能被复制：
+使用了下面方法的语句不能使用 Statement-Based 方式记录日志：
+LOAD_FILE()
+UUID(), UUID_SHORT()
+USER()
+FOUND_ROWS()
+SYSDATE() (除非Master 和 Slave 在启动时都添加了 --sysdate-is-now 选项)
+GET_LOCK()
+IS_FREE_LOCK()
+IS_USER_LOCK()
+MASTER_POS_WAIT()
+RAND()
+RELEASE_LOCK()
+SLEEP()
+VERSION()
+INSERT … SELECT 会产生比 RBR 更多的行级锁；
+复制须要执行全表扫描 (WHERE 语句中没有运用到索引) 的 UPDATE 时，须要比 row 请求更多的行级锁；
+对于有 AUTO_INCREMENT 字段的 InnoDB 表而言，INSERT 语句会阻塞其他 INSERT 语句；
+对于一些复杂的语句，在从服务器上的耗资源情况会更严重，而 row 模式下，只会对那个发生变化的记录产生影响；
+存储函数(不是存储流程 )在被调用的同时也会执行一次 NOW() 函数，这个可以说是坏事也可能是好事；
+确定了的 UDF 也须要在从服务器上执行；
+Master 和 Slave 上的表结构必须完全一致。数据表必须几乎和主服务器保持一致才行，否则可能会导致复制出错；
+执行复杂语句如果出错的话，会消耗更多资源；
+
+>Note:
+更新数据库信息的语句，比如 GRANT,REVOKE 和对触发器、视图、存储程序（包括存储过程）的操作，都是使用 Statement-Based 方式写日志
+
+##### Row 优点
+任何情况都可以被复制，这对复制来说是最安全可靠的；
+和其他大多数数据库系统的复制技能一样；
+多数情况下，从服务器上的表如果有主键的话，复制就会快了很多；
+复制以下几种语句时的行锁更少：
+* INSERT … SELECT
+* 包含 AUTO_INCREMENT 字段的 INSERT
+* 没有附带条件或者并没有修改很多记录的 UPDATE 或 DELETE 语句
+执行 INSERT，UPDATE，DELETE 语句时锁更少；
+从服务器上采用多线程来执行复制成为可能；
+
+##### Row 缺点
+生成的 binlog 日志体积大了很多；
+复杂的回滚时 binlog 中会包含大量的数据；
+主服务器上执行 UPDATE 语句时，所有发生变化的记录都会写到 binlog 中，而 statement 只会写一次，这会导致频繁发生 binlog 的写并发请求；
+UDF 产生的大 BLOB 值会导致复制变慢；
+不能从 binlog 中看到都复制了写什么语句(加密过的)；
+当在非事务表上执行一段堆积的 SQL 语句时，最好采用 statement 模式，否则很容易导致主从服务器的数据不一致情况发生；
+另外，针对系统库 MySQL 里面的表发生变化时的处理准则如下：
+如果是采用 INSERT，UPDATE，DELETE 直接操作表的情况，则日志格式根据 binlog_format 的设定而记录；
+如果是采用 GRANT，REVOKE，SET PASSWORD 等管理语句来做的话，那么无论如何都要使用 statement 模式记录；
+使用 statement 模式后，能处理很多原先出现的主键重复问题
