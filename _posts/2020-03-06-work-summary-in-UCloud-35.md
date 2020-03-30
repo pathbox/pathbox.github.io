@@ -315,3 +315,38 @@ Events:
 
 image not found。可能是在build image的时候因为网络或别的原因，这个imagebuild失败了，或者是一些未知原因被删除释放了。
 修复:重新tag，构造image，然后再部署过
+
+### tcp KeepAlive
+```sh
+sysctl -a  |grep tcp_keepalive
+net.ipv4.tcp_keepalive_time = 1200  #tcp建立链接后1200 秒如果无数据传输，则会发出探活数据包
+net.ipv4.tcp_keepalive_probes = 9   #共发送9次
+net.ipv4.tcp_keepalive_intvl = 75   #每次间隔75秒
+```
+
+KeepAlive并不是默认开启的，在Linux系统上没有一个全局的选项去开启TCP的KeepAlive。需要开启KeepAlive的应用必须在TCP的socket中单独开启
+
+Nginx 开启tcp KeepAlive
+```nginx
+server {
+    listen 127.0.0.1:3306 so_keepalive=on;
+    proxy_pass 172.17.0.3:3306;
+
+    #建立连接时间
+    proxy_connect_timeout 5s;
+    #保持连接时间
+    proxy_timeout 3600s;
+    error_log /data/logs/my.log info;
+```
+
+so_keepalive=on|off|[keepidle]:[keepintvl]:[keepcnt]
+
+on: 开启，探测参数更加系统默认值
+off: 关闭
+keepidle: 等待时间
+keepintvl: 发送探测报文间隔
+keepcent: 探测报文发送次数
+proxy_timeout：建连后无数据时与后端服务器连接保持时间，默认75s
+proxy_connect_timeout：与后端服务器建立连接的超时, 不超过75s
+proxy_send_timeout：向后端服务器组发出write请求后，等待响应的超时间，默认为60秒
+proxy_read_timeout：向后端服务器组发出read请求后，等待响应的超时间，默认为60秒
