@@ -350,3 +350,6 @@ proxy_timeout：建连后无数据时与后端服务器连接保持时间，默�
 proxy_connect_timeout：与后端服务器建立连接的超时, 不超过75s
 proxy_send_timeout：向后端服务器组发出write请求后，等待响应的超时间，默认为60秒
 proxy_read_timeout：向后端服务器组发出read请求后，等待响应的超时间，默认为60秒
+
+### LVS为什么不反向代理
+LVS为什么不反向代理？因为响应数据太多。影响性能。所以响应数据就直接到客户端
