@@ -295,3 +295,23 @@ UDF 产生的大 BLOB 值会导致复制变慢；
 ### 关于递归代码的编写的思考总结！
 
 关于递归代码的编写，以树的遍历为例子，为什么我一定要纠结代码是如何写的呢？实际上递归就是不断的入栈，达到返回条件，则出栈，返回到上一层，继续递归或返回。如果能够明白树是如何递归遍历的，纠结于思考代码是怎么递归的也许是一个死胡同。而从实际中明白起递归遍历的方式，才是更好的方式
+
+### Kubernetes pod状态出现ImagePullBackOff的原因
+kubectl describe pod pod-6bcbb6d5c7-bpmhs -nxxx
+
+发现报错信息:
+```
+Events:
+  Type     Reason          Age                    From                   Message
+  ----     ------          ----                   ----                   -------
+  Normal   Scheduled       3m41s                  default-scheduler      Successfully assigned prj-pod-xxx-pre-6bcbb6d5c7-bpmhs to 172.22.10.66
+  Normal   Pulling         3m27s (x2 over 3m39s)  kubelet, 172.22.10.66  Pulling image "xxx.com/pod-xxx:pre_v0.0.37"
+  Warning  Failed          3m27s (x2 over 3m39s)  kubelet, 172.22.10.66  Failed to pull image "xxx.com/pod-xxx:pre_v0.0.37": rpc error: code = Unknown desc = Error response from daemon: manifest for xxx.com/pod-xxx:pre_v0.0.37 not found
+  Warning  Failed          3m27s (x2 over 3m39s)  kubelet, 172.22.10.66  Error: ErrImagePull
+  Normal   SandboxChanged  3m20s (x7 over 3m38s)  kubelet, 172.22.10.66  Pod sandbox changed, it will be killed and re-created.
+  Normal   BackOff         3m17s (x6 over 3m36s)  kubelet, 172.22.10.66  Back-off pulling image "xxx.com/pod-xxx:pre_v0.0.37"
+  Warning  Failed          3m17s (x6 over 3m36s)  kubelet, 172.22.10.66  Error: ImagePullBackOff
+```
+
+image not found。可能是在build image的时候因为网络或别的原因，这个imagebuild失败了，或者是一些未知原因被删除释放了。
+修复:重新tag，构造image，然后再部署过
