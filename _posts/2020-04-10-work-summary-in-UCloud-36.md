@@ -11,3 +11,8 @@ image: /assets/images/post.jpg
 export GOPROXY=https://goproxy.cn,direct
 export GOSUMDB=sum.golang.google.cn  (此地址未被墙)
 ```
+
+### tcpkali 进行websocket的压力测试
+```
+tcpkali --ws -c 100 -m 'hello world!!13212312!' -r 10k localhost:8081
+```
