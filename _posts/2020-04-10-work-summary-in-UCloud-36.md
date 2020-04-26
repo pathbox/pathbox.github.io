@@ -91,3 +91,11 @@ func waitTimeout(wg *sync.WaitGroup, timeout time.Duration) bool {
 这个 issue 中同时也给了下面这段代码，只有在 go run -race 时，才能看到导致 throw 的真正原因
 
 不要随便打印输出context，因为context底层是map存储，go的map读写不加锁有并发问题，而在外层用fmt 或没有锁的log打印和无锁read一样，会报并发读写崩溃
+
+### 二叉搜索树的特性：BST 的中序遍历是升序序列
+
+### grpc超时传递
+>客户端客户端发起 RPC 调用时传入了带 timeout 的 ctx
+gRPC 框架底层通过 HTTP2 协议发送 RPC 请求时，将 timeout 值写入到 grpc-timeout HEADERS Frame 中
+服务端接收 RPC 请求时，gRPC 框架底层解析 HTTP2 HEADERS 帧，读取 grpc-timeout 值，并覆盖透传到实际处理 RPC 请求的业务 gPRC Handle 中
+如果此时服务端又发起对其他 gRPC 服务的调用，且使用的是透传的 ctx，这个 timeout 会减去在本进程中耗时，从而导致这个 timeout 传递到下一个 gRPC 服务端时变短，这样即实现了所谓的 超时传递  
