@@ -99,3 +99,54 @@ func waitTimeout(wg *sync.WaitGroup, timeout time.Duration) bool {
 gRPC 框架底层通过 HTTP2 协议发送 RPC 请求时，将 timeout 值写入到 grpc-timeout HEADERS Frame 中
 服务端接收 RPC 请求时，gRPC 框架底层解析 HTTP2 HEADERS 帧，读取 grpc-timeout 值，并覆盖透传到实际处理 RPC 请求的业务 gPRC Handle 中
 如果此时服务端又发起对其他 gRPC 服务的调用，且使用的是透传的 ctx，这个 timeout 会减去在本进程中耗时，从而导致这个 timeout 传递到下一个 gRPC 服务端时变短，这样即实现了所谓的 超时传递  
+
+### grpc keepalive.ServerParameters 连接设置解释
+```go
+type ServerParameters struct {
+	// MaxConnectionIdle is a duration for the amount of time after which an
+	// idle connection would be closed by sending a GoAway. Idleness duration is
+	// defined since the most recent time the number of outstanding RPCs became
+	// zero or the connection establishment.
+  // 例子:链接如果在5分钟都没有请求使用，则会关闭
+	MaxConnectionIdle time.Duration // The current default value is infinity.
+	// MaxConnectionAge is a duration for the maximum amount of time a
+	// connection may exist before it will be closed by sending a GoAway. A
+	// random jitter of +/-10% will be added to MaxConnectionAge to spread out
+	// connection storms.
+  // 例子: 链接无论有在工作还是没有，在1小时后都会关闭
+	MaxConnectionAge time.Duration // The current default value is infinity.
+	// MaxConnectionAgeGrace is an additive period after MaxConnectionAge after
+	// which the connection will be forcibly closed.
+  // 在MaxConnectionAge到期后，增加的时间段，在这时间之后链接被强制关闭
+	MaxConnectionAgeGrace time.Duration // The current default value is infinity.
+	// After a duration of this time if the server doesn't see any activity it
+	// pings the client to see if the transport is still alive.
+	// If set below 1s, a minimum value of 1s will be used instead.
+	Time time.Duration // The current default value is 2 hours.
+	// After having pinged for keepalive check, the server waits for a duration
+	// of Timeout and if no activity is seen even after that the connection is
+	// closed.
+	Timeout time.Duration // The current default value is 20 seconds.
+}
+```
+
+进行测试:
+
+```go
+keepalive.ServerParameters{
+		MaxConnectionIdle:     5 * time.Second,
+		MaxConnectionAge:      1 * time.Second,
+		MaxConnectionAgeGrace: 5 * time.Second,
+		Time:                  5 * time.Second,
+		Timeout:               1 * time.Second,
+	}
+```
+并且在代码中sleep(30)秒，客户端没设超时时间，客户端得到了响应:
+```
+Response Data
+Unavailable (14)
+transport is closing
+```
+可以看到，`transport is closing` 链接关闭了，没有得到响应的数据。这个符合预测
+一个注意的事情是，链接关闭了，不代表代码不在执继续行了，通过监听日志输出，可以看到sleep之后，代码是继续执行的。
+grpc client 设置超时时间，我觉得是很有必要的
