@@ -150,3 +150,19 @@ transport is closing
 可以看到，`transport is closing` 链接关闭了，没有得到响应的数据。这个符合预测
 一个注意的事情是，链接关闭了，不代表代码不在执继续行了，通过监听日志输出，可以看到sleep之后，代码是继续执行的。
 grpc client 设置超时时间，我觉得是很有必要的
+
+### golang 对数组断言操作
+```go
+func valueToStringSlice(value interface{}) []string {
+	strSlice := make([]string, 0)
+	switch v := value.(type) {
+	case string:
+		strSlice = append(strSlice, v)
+	case []interface{}: // 数组中的每个元素也是interface, []string 这种是无效的
+		for _, val := range v {
+			strSlice = append(strSlice, val.(string))
+		}
+	}
+	return strSlice
+}
+```
