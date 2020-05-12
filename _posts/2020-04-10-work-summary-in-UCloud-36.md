@@ -1,7 +1,7 @@
 ---
 layout: post
-title: 最近工作总结(35)
-date:  2020-03-06 16:25:06
+title: 最近工作总结(36)
+date:  2020-04-10 16:25:06
 categories: Work
 image: /assets/images/post.jpg
 ---
@@ -183,3 +183,7 @@ func valueToStringSlice(value interface{}) []string {
 - 免费图床：使用sm.ms图床，用作公共图片上传使用，该图床不怎么稳定，不太建议使用
 - 七牛云存储：可同步七牛云存储的数据到系统，无需登录七牛云直接操作云数据
 - 支付宝支付：整合了支付宝支付并且提供了测试账号，可自行测试
+
+### 阿里redis规范
+http://www.jiangxinlingdu.com/redis/2019/02/27/redis-specification.html
+https://yq.aliyun.com/articles/117042 大key排查
