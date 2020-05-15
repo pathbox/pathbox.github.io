@@ -11,6 +11,8 @@ https://www.cnblogs.com/cider/p/11776088.html
 https://tech.meituan.com/2017/04/21/mt-leaf.html
 snowflake 会遇到时间回拨的问题，一种解决思路：https://juejin.im/post/5a7f9176f265da4e721c73a8
 
+对时间上有强依赖，则需要每隔几秒(3s)上报时间给ZooKeeper或etcd，在启动或重启服务的时候对进行集群节点的时间对比，超过阈值，则对应节点启动失败。如果该节点启动成功，可能当前节点会出现由于时间回拨过而导致生成一些列冲突的id。要保证时间是一直更大的，不能回拨
+
 ### 关于高可用服务的简单几点
 - 服务无状态
 - 幂等性
