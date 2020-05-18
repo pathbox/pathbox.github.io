@@ -135,3 +135,9 @@ https://zh.wikipedia.org/wiki/%E9%80%9A%E7%94%A8%E5%94%AF%E4%B8%80%E8%AF%86%E5%8
 - 版本2 - UUID是根据标识符（通常是组或用户ID）、时间和节点ID生成；
 - 版本3、版本5 - 确定性UUID 通过散列（hashing）名字空间（namespace）标识符和名称生成；
 - 版本4 - UUID 使用随机性或伪随机性生成。
+
+### 证书文件后缀
+证书(Certificate)
+- `*.cer *.crt私钥(Private Key)`
+- `*.key证书签名请求(Certificate signing request)`
+- `*.csr`至于pem和der，是编码方式，以上三类均可以使用这两种编码方式，因此*.pem和*.der(少见)不一定是以上三种(Cert,Key,CSR)中的某一种*.pem - base64编码*.der - 二进制编码
