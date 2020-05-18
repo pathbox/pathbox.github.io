@@ -138,6 +138,10 @@ https://zh.wikipedia.org/wiki/%E9%80%9A%E7%94%A8%E5%94%AF%E4%B8%80%E8%AF%86%E5%8
 
 ### 证书文件后缀
 证书(Certificate)
-- `*.cer *.crt私钥(Private Key)`
-- `*.key证书签名请求(Certificate signing request)`
-- `*.csr`至于pem和der，是编码方式，以上三类均可以使用这两种编码方式，因此*.pem和*.der(少见)不一定是以上三种(Cert,Key,CSR)中的某一种*.pem - base64编码*.der - 二进制编码
+- X.509：一种通用的整数格式，包含证书持有人的公钥，加密算法等信息
+- PKCS1-PKCS12：公钥加密(非对称加密)的一种标准，一般存储为*pN, `*.p12`是包含证书和密钥的封装格式
+- `*.der`：证书的二进制存储格式(不常用)
+- `*.pem`：证书或密钥的Base64文本存储格式，可以单独存放证书或密钥，也可以同时存放证书或密钥
+- `*.key`：单独存放的pem格式的密钥，一般保存为*.key
+- `*.cer *.crt`：两个指的都是证书，Linux下教crt，Windows下教cer；存储格式可以是pem，也可以是der
+- `*.csr`：证书签名请求，包含证书持有人的信息，如：国家，邮件，域名等信息
