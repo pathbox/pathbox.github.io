@@ -60,3 +60,66 @@ Redis::CommandError: CROSSSLOT Keys in request don’t hash to the same slot
 - 保证了每个操作的原子性，省去了很多上下文切换线程的时间
 - 单机多线程的上限也往往不能满足需要了，需要进一步摸索的是多服务器集群化的方案，这些方案中多线程的技术照样是用不上的.所以单线程、多进程的集群不失为一个时髦的解决方案(部署多个redis实例)
 -  redis 采用非阻塞IO多路复用技术（尽量减少网络IO的时间消耗）来实现网络并发操作，epoll
+
+### Golang的逃逸分析简记
+逃逸分析这种“骚操作”把变量合理地分配到它该去的地方，“找准自己的位置”。即使你是用new申请到的内存，如果我发现你竟然在退出函数后没有用了，那么就把你丢到栈上，毕竟栈上的内存分配比堆上快很多；反之，即使你表面上只是一个普通的变量，但是经过逃逸分析后发现在退出函数之后还有其他地方在引用，那我就把你分配到堆上。真正地做到“按需分配”，提前实现共产主义！
+
+如果变量都分配到堆上，堆不像栈可以自动清理。它会引起Go频繁地进行垃圾回收，而垃圾回收会占用比较大的系统开销（占用CPU容量的25%）
+堆和栈相比，堆适合不可预知大小的内存分配。但是为此付出的代价是分配速度较慢，而且会形成内存碎片。栈内存分配则会非常快。栈分配内存只需要两个CPU指令：“PUSH”和“RELEASE”，分配和释放；而堆分配内存首先需要去找到一块大小合适的内存块，之后要通过垃圾回收才能释放。
+
+通过逃逸分析，可以尽量把那些不需要分配到堆上的变量直接分配到栈上，堆上的变量少了，会减轻分配堆内存的开销，同时也会减少gc的压力，提高程序的运行速度
+
+编译器会根据变量是否被外部引用来决定是否逃逸：
+
+如果函数外部没有引用，则优先放到栈中；
+
+如果函数外部存在引用，则必定放到堆中；
+
+逃逸的常见情况
+
+发送指针的指针或值包含了指针到 channel 中，由于在编译阶段无法确定其作用域与传递的路径，所以一般都会逃逸到堆上分配。
+
+slices 中的值是指针的指针或包含指针字段。一个例子是类似`[]*string` 的类型。这总是导致 slice 的逃逸。即使切片的底层存储数组仍可能位于堆栈上，数据的引用也会转移到堆中。
+
+slice 由于 append 操作超出其容量，因此会导致 slice 重新分配。这种情况下，由于在编译时 slice 的初始大小的已知情况下，将会在栈上分配。如果 slice 的底层存储必须基于仅在运行时数据进行扩展，则它将分配在堆上。
+
+调用接口类型的方法。接口类型的方法调用是动态调度 - 实际使用的具体实现只能在运行时确定。考虑一个接口类型为 io.Reader 的变量 r。对 r.Read(b) 的调用将导致 r 的值和字节片b的后续转义并因此分配到堆上。 参考 http://npat-efault.github.io/programming/2016/10/10/escape-analysis-and-interfaces.html
+
+尽管能够符合分配到栈的场景，但是其大小不能够在在编译时候确定的情况，也会分配到堆上
+
+```go
+package main
+
+func main() {
+	a := f1()
+	*a++
+}
+
+//go:noinline
+func f1() *int {
+	i := 1
+	return &i
+}
+```
+```
+go build -gcflags '-m' escape.go
+ command-line-arguments
+./escape.go:3:6: can inline main
+./escape.go:11:9: &i escapes to heap
+./escape.go:10:2: moved to heap: i
+
+go tool compile -S escape.go | grep escape.go:10
+	0x001d 00029 (escape.go:10)	PCDATA	$2, $1
+	0x001d 00029 (escape.go:10)	PCDATA	$0, $0
+	0x001d 00029 (escape.go:10)	LEAQ	type.int(SB), AX
+	0x0024 00036 (escape.go:10)	PCDATA	$2, $0
+	0x0024 00036 (escape.go:10)	MOVQ	AX, (SP)
+	0x0028 00040 (escape.go:10)	CALL	runtime.newobject(SB)
+	0x002d 00045 (escape.go:10)	PCDATA	$2, $1
+	0x002d 00045 (escape.go:10)	MOVQ	8(SP), AX
+	0x0032 00050 (escape.go:10)	MOVQ	$1, (AX)
+
+这里的 00040 有调用 runtime.newobject(SB) 这个方法
+```
+
+堆heap数据量太多会导致GC压力增大

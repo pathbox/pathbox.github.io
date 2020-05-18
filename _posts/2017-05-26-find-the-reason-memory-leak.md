@@ -209,7 +209,7 @@ func clear(r *http.Request) {
 
 问题找到了，马上修复。上线代码，观察了３个多小时。
 
-The world has returned calm.
+The world is calm.
 
 1w+ 的socket　连接没有超过2g内存使用量。这才是Go应有的表现(百万连接不是梦)
 
