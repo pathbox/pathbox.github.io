@@ -123,3 +123,15 @@ go tool compile -S escape.go | grep escape.go:10
 ```
 
 堆heap数据量太多会导致GC压力增大
+
+### UUID 通用唯一识别码
+Universally Unique Identifier
+https://zh.wikipedia.org/wiki/%E9%80%9A%E7%94%A8%E5%94%AF%E4%B8%80%E8%AF%86%E5%88%AB%E7%A0%81
+
+- 128bit
+- UUID的标准型式包含32个16进制数字，以连字号分为五段，形式为 8-4-4-4-12 的32个字符。示例：550e8400-e29b-41d4-a716-446655440000
+
+- 版本1 - UUID 是根据时间和节点 ID（通常是MAC地址）生成；
+- 版本2 - UUID是根据标识符（通常是组或用户ID）、时间和节点ID生成；
+- 版本3、版本5 - 确定性UUID 通过散列（hashing）名字空间（namespace）标识符和名称生成；
+- 版本4 - UUID 使用随机性或伪随机性生成。
