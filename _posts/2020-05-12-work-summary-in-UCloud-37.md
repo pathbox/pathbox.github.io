@@ -168,3 +168,37 @@ http://cenalulu.github.io/linux/character-encoding/
 UTF-8是变长的字符编码:1-3个字节。
 
 那么解释UTF-8和Unicode的关系就比较简单了。Unicode就是上文中提到的编码字符集，而UTF-8就是字符编码，即Unicode规则字库的一种实现形式
+
+### Go 语言选择了传值的方式
+传值：函数调用时会对参数进行拷贝，被调用方和调用方两者持有不相关的两份数据；
+传引用：函数调用时会传递参数的指针，被调用方和调用方两者持有相同的数据，任意一方做出的修改都会影响另一方
+Go 语言选择了传值的方式，无论是传递基本类型、结构体还是指针，都会对传递的参数进行拷贝
+```go
+type MyStruct struct {
+	i int
+}
+
+func myFunction(a MyStruct, b *MyStruct) {
+	a.i = 31
+	b.i = 41
+	fmt.Printf("in my_function - a=(%d, %p) b=(%v, %p)\n", a, &a, b, &b)
+}
+
+func main() {
+	a := MyStruct{i: 30}
+	b := &MyStruct{i: 40}
+	fmt.Printf("before calling - a=(%d, %p) b=(%v, %p)\n", a, &a, b, &b)
+	myFunction(a, b)
+	fmt.Printf("after calling  - a=(%d, %p) b=(%v, %p)\n", a, &a, b, &b)
+}
+
+$ go run main.go
+before calling - a=({30}, 0xc000018178) b=(&{40}, 0xc00000c028)
+in my_function - a=({31}, 0xc000018198) b=(&{41}, 0xc00000c038)
+after calling  - a=({30}, 0xc000018178) b=(&{41}, 0xc00000c028)
+从运行的结果我们可以得出如下结论：
+
+传递结构体时：会对结构体中的全部内容进行拷贝；
+传递结构体指针时：会对结构体指针进行拷贝；
+对结构体指针的修改是改变了指针指向的结构体，b.i 可以被理解成 (*b).i。对传递的指针进行了拷贝，但是可以修改指针指向的结构体
+```
