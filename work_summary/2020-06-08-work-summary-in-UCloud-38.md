@@ -7,3 +7,6 @@ image: /assets/images/post.jpg
 ---
 
 ### TiDB binlog 同步到MySQL时，TiDB会把SQL语句进行重新组装，比如UPADATE 拆分成DELETE 然后REPLACE INTO，这样通过binlog恢复或同步数据会有更高的性能吧。但是如果需要binlog原始操作逻辑进行区分的，这种重组方式就不合适了
+
+### K8s变更远程配置中心内容后，需要重新打tag部署
+因为老的tag已经生成了老的镜像，不打tag生成新的镜像，重新部署用的还是老的镜像，而老的镜像中的配置文件是没有修改的。所以一定要重新打tag后，生成新的镜像，配置变更才同步
