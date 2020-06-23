@@ -17,6 +17,9 @@ By default, sarama's Config.Consumer.Offsets.Initial is set to sarama.OffsetNewe
 
 If you wish to receive all messages (from the start of all messages in the topic) in the event that a consumer does not have any offsets committed to kafka, you need to set Config.Consumer.Offsets.Initial to sarama.OffsetOldest
 
-### 关于分布式事务
+### 关于分布式事务简记
 
 https://github.com/doocs/advanced-java/blob/master/docs/distributed-system/distributed-transaction.md
+
+### Redlock redis分布式锁实现原理
+https://www.cnblogs.com/rgcLOVEyaya/p/RGC_LOVE_YAYA_1003days.html
