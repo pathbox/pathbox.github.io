@@ -48,3 +48,10 @@ if resp.StatusCode == http.StatusOK {
 }
 ```
 我们通过直接将 http.Response 的 Body 丢弃掉就可以了。
+
+### Kafka 的consumer offset数据过大容易导致的启动加载问题
+Kafka内部会有`topic: __consumer_offsets`, 这个topic存储offset信息。当__consumer_offsets分区数据巨大，且分布不均，Kafka启动或重启时，加载__consumer_offsets数据就会非常的慢，很有可能导致启动超时，从而Kafka服务没法启动。
+
+修改__consumer_offsets的cleanup.policy=delete，保留时间为15天，减少topic保存的数据量，减少Kafka加载压力
+
+Kafka在合ZooKeeper连接时，如果由于网络等原因，可能会导致没法连接上ZooKeeper而发生重启。
