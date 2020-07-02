@@ -55,3 +55,6 @@ Kafka内部会有`topic: __consumer_offsets`, 这个topic存储offset信息。�
 修改__consumer_offsets的cleanup.policy=delete，保留时间为15天，减少topic保存的数据量，减少Kafka加载压力
 
 Kafka在合ZooKeeper连接时，如果由于网络等原因，可能会导致没法连接上ZooKeeper而发生重启。
+
+### 使用canal和kafka进行数据库同步
+为每个表配置分区key，每个表对应一个partition，以保证按照binlog数据顺序进行同步。是的这样会牺牲并发性。
