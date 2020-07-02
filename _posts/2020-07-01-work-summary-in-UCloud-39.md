@@ -58,3 +58,6 @@ Kafka在合ZooKeeper连接时，如果由于网络等原因，可能会导致没
 
 ### 使用canal和kafka进行数据库同步
 为每个表配置分区key，每个表对应一个partition，以保证按照binlog数据顺序进行同步。是的这样会牺牲并发性。
+
+### 如何为Kafka集群选择合适的Partitions数量
+>https://blog.csdn.net/oDaiLiDong/article/details/52571901?utm_medium=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase
