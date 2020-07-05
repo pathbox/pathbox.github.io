@@ -61,3 +61,9 @@ Kafka在合ZooKeeper连接时，如果由于网络等原因，可能会导致没
 
 ### 如何为Kafka集群选择合适的Partitions数量
 >https://blog.csdn.net/oDaiLiDong/article/details/52571901?utm_medium=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase
+
+### epoll存在惊群效应
+>惊群效应会影响：多进程/线程的唤醒，涉及到的一个问题是上下文切换问题。频繁的上下文切换带来的一个问题是数据将频繁的在寄存器与运行队列中流转。极端情况下，时间更多的消耗在进程/线程的调度上，而不是执行。
+>accept是队列方式处理，解决了惊群效应，accept确实应该只能被一个进程调用成功，但是epoll的情况就比较复杂，epoll监听的文件描述符，
+除了可能后续被accept调用外，还可能是其他网络IO事件的监听对象，那其他网络IO是否只能由一个进程处理我们是不得知的。
+所以linux对epoll并没有就惊群效应做修复，而是放之，让用户层自己做处理。比如：Nginx accept mutex锁，在请求来的时候只有获得accept mutex锁的worker才会唤醒去处理这个请求
