@@ -87,3 +87,150 @@ SaaS软件即服务:SaaS层为一般用户服务，提供了一套完整可用�
 
 ### 推文简单主页设计思路
 大多数用户发的推文会被扇出写入其所有粉丝主页时间线缓存中。(如消息队列推送给每个粉丝的主页中)但是少数拥有海量粉丝的用户，即大V，会被排除在外。当用户读取主页时间线时，分别获取该用户所关注的每位大V的推文，再与用户的主页时间线缓存合并。这种混合方法能始终如一地提供良好的性能
+
+### GRPC status包使用detail遇到的问题
+涉及的包 `"google.golang.org/grpc/status"`
+定义了一个response.proto
+```
+message Response {
+  int32 Code = 1;
+  string Message = 2;
+}
+
+```
+继续封装了一个包resp
+```go
+type Response struct {
+	*pbresp.Response // protobuf的Response
+	Data interface{} // 附加数据
+
+	msgArgs  []interface{} // 为Message格式化字符串提供参数
+	omitData bool          // 是否忽略Data，当为True时Marshal数据中将不会包含Data字段
+}
+
+```
+这个Response满足protobuf，所以可以这样
+
+```go
+func NewGRPCState(code codes.Code, r *resp.Response) *status.Status {
+	state := status.New(code, r.GetMessage())
+	state, _ = state.WithDetails(r)
+	return state
+}
+```
+
+是的，在WithDetails的时候是不会报错的，但是在解析的时候失败了，并没有得到想要的结果
+因为，传入WithDetails的`r *resp.Response`没有实现 `proto.RegisterType()`方法
+涉及到的三个map没有对应的数据，对应的key是nil的:
+导致在`Details`方法的时候，没能正确反序列化的interface值，而是error，从而没有得到想要的结果
+```go
+  var (
+    protoTypedNils = make(map[string]Message)      // a map from proto names to typed nil pointers
+    protoMapTypes  = make(map[string]reflect.Type) // a map from proto names to map types
+    revProtoTypes  = make(map[reflect.Type]string)
+  )
+
+func (s *Status) Details() []interface{} {
+	if s == nil || s.s == nil {
+		return nil
+	}
+	details := make([]interface{}, 0, len(s.s.Details))
+	for _, any := range s.s.Details {
+		detail := &ptypes.DynamicAny{}
+		if err := ptypes.UnmarshalAny(any, detail); err != nil { // 1. 这里进入反序列化
+			details = append(details, err) // 2. 报错会将错误加入到details
+			continue
+		}
+		details = append(details, detail.Message)
+	}
+	return details
+}
+
+// pb can be a proto.Message, or a *DynamicAny.
+func UnmarshalAny(any *any.Any, pb proto.Message) error {
+	if d, ok := pb.(*DynamicAny); ok {
+		if d.Message == nil {
+			var err error
+			d.Message, err = Empty(any) // 3. 会进行Empty方法操作
+			if err != nil {
+				return err
+			}
+		}
+		return UnmarshalAny(any, d.Message)
+	}
+
+	aname, err := AnyMessageName(any)
+	if err != nil {
+		return err
+	}
+
+	mname := proto.MessageName(pb)
+	if aname != mname {
+		return fmt.Errorf("mismatched message type: got %q want %q", aname, mname)
+	}
+	return proto.Unmarshal(any.Value, pb)
+}
+
+// Empty returns a new proto.Message of the type specified in a
+// google.protobuf.Any message. It returns an error if corresponding message
+// type isn't linked in.
+func Empty(any *any.Any) (proto.Message, error) {
+	aname, err := AnyMessageName(any)
+	if err != nil {
+		return nil, err
+	}
+
+	t := proto.MessageType(aname) // 4.MessageType方法查找aname的key
+	if t == nil {
+		return nil, fmt.Errorf("any: message type %q isn't linked in", aname) // 6.t是nil报错返回，append到了details
+	}
+	return reflect.New(t.Elem()).Interface().(proto.Message), nil
+}
+
+// MessageType returns the message type (pointer to struct) for a named message.
+// The type is not guaranteed to implement proto.Message if the name refers to a
+// map entry.
+func MessageType(name string) reflect.Type {
+	if t, ok := protoTypedNils[name]; ok {
+		return reflect.TypeOf(t)
+	}
+	return protoMapTypes[name] // 5. 没有调用proto.RegisterType()，protoMapTypes map中没有对应的name的值，返回的是nil从而导致报错了
+}
+```
+
+而protobuf 的Response是有调用这个方法的:
+```go
+func init() {
+	proto.RegisterType((*Response)(nil), "pbresp.v1.Response")
+}
+```
+
+所以，我们需要传protobuf 的Response
+
+修改为：
+```go
+func NewGRPCState(code codes.Code, r *resp.Response) *status.Status {
+	state := status.New(code, r.GetMessage())
+	state, _ = state.WithDetails(r.Response) // 传的是*pbresp.Response
+	return state
+}
+```
+
+```go
+func ParseGRPCStateResponse(state *status.Status) (*pbresp.Response, error) {
+	details := state.Details()
+	rOK := &pbresp.Response{
+		RetCode: 0,
+		Message: "OK",
+	}
+	if len(details) == 0 {
+		return rOK, nil
+	}
+	res, ok := details[0].(*pbresp.Response)
+	if !ok {
+		ugin.LOGGER.Error("grpc status detail type error")
+		return nil, errors.New("grpc status detail type error")
+	}
+	return res, nil
+}
+```
