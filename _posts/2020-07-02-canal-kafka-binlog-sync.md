@@ -60,23 +60,7 @@ func Handler(entry protocol.Entry)  {
 
 ### 选择了canal+kafka方案
 我们选择了消息队列的业界标杆: kafka
-UCloud提供了kafka和rocketMQ消息队列产品服务，使用它们能够快速便捷的搭建起一套消息队列系统。加速开发，方便运维。让我们一探究竟。
-
-选择kafka消息队列产品，并申请开通
-![kafka]( /assets/images/canal/kafka1.png "kafka")
-
-开通完成后，在管理界面，创建kafka集群，根据自身需求，选择相应的硬件配置
-![kafka]( /assets/images/canal/kafka2.png "kafka")
-
-一个kafka+ZooKeeper集群就搭建出来了，给力！
-![kafka]( /assets/images/canal/kafka3.png "kafka")
-
-并且包含了节点管理、Topic管理、Consumer Group管理，能够非常方便的直接在控制台对配置进行修改
-
-监控视图方面，监控的数据包括kafka生成和消费QPS，集群监控，ZooKeeper的监控。能够比较完善的提供监控指标。
-![kafka]( /assets/images/canal/kafka4.png "kafka")
-![kafka]( /assets/images/canal/kafka5.png "kafka")
-![kafka]( /assets/images/canal/kafka6.png "kafka")
+UCloud提供了kafka和rocketMQ消息队列产品服务，使用它们能够快速便捷的搭建起一套消息队列系统。加速开发，方便运维。
 
 ### canal的kafka配置
 canal配上kafka也非常的简单。
