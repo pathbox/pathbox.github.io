@@ -255,7 +255,7 @@ func (o *OrderedMap) Delete(key string) {
 	// remove from keys
 	for i, k := range o.keys {
 		if k == key {
-			o.keys = append(o.keys[:i], o.keys[i+1:]...) // 去除当前i的key
+			o.keys = append(o.keys[:i], o.keys[i+1:]...) // 去除当前i的key  这一步时间复杂度很高
 			break
 		}
 	}
@@ -267,3 +267,40 @@ func (o *OrderedMap) Delete(key string) {
 
 另一种方案，keys数组按照二叉搜索树的方式存储，这样写入会是log(n),遍历的时候，对keys进行中序遍历log(n)，能得到排序的key
 但是，二叉搜索树有可能退化成链表，则时间复杂度变成O(n)
+
+或者用链表，链表就是插入或删除的时候，需要先遍历到合适的位置
+如果链表每个node的指针有存在map中，则删除的时候不用先遍历查找到该元素在链表的位置，而是直接用缓存的node节点指针
+进行操作
+```go
+func (om *OrderedMap) Delete(key interface{}) {
+	_, ok := om.store[key]
+	if ok {
+		delete(om.store, key)
+	}
+	root, rootFound := om.mapper[key]
+	if rootFound {
+		prev := root.Prev
+		next := root.Next
+		prev.Next = next
+		next.Prev = prev
+		delete(om.mapper, key)
+	}
+}
+
+```
+
+### 遇到go get 失败的诡异情况
+go get  go mod download 都失败，而go get 老版本提示有cache，到指定目录删除了cache，然后老版本可以get下来了，新版本也可以了。
+解决方法：删除cache中的缓存
+
+报错信息:
+```
+git fetch -f origin refs/heads/*:refs/heads/* refs/tags/*:refs/tags/* in /Users/pathbox/go/pkg/mod/cache/vcs/1bff0296f0b3f48e2a9eb3d733cd696414472b983aade012848e0ba698a2efd8: exit status 128:
+	error: refs/tags/v0.2.0 does not point to a valid object!
+```
+
+### 2>&1 | tee 将stdout stderr 输入到指定文件
+program [arguments...] 2>&1 | tee outfile
+go run main.go 2>&1 | tee info.log
+
+program [arguments...] 2>&1 | tee -a outfile 追加方式
