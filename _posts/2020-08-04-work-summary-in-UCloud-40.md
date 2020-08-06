@@ -6,5 +6,7 @@ categories: Work
 image: /assets/images/post.jpg
 ---
 
-### elasticsearch match,term,match_phrase简记 
+### elasticsearch match,term,match_phrase简记
 https://blog.csdn.net/sinat_29581293/article/details/81486761
+
+### 同步数据跑的脚本要具有幂等性
