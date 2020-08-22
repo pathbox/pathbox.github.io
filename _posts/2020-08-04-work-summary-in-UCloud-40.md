@@ -59,3 +59,10 @@ https://www.jianshu.com/p/07fc95df7e5c
 
 ### epoll本质超好的文章系列
 https://zhuanlan.zhihu.com/p/64138532
+
+### 简记Redis和MongoDB区别
+1. Redis 支持的数据结构丰富，包括hash、set、list等。MongoDB 数据结构比较单一，但是支持丰富的数据表达，索引，最类似关系型数据库，支持的查询语言非常丰富
+2. 当物理内存够用的时候，性能，redis>mongodb>mysql。mongodb可以存储文件，适合存放大量的小文件，内置了GirdFS 的分布式文件系统
+3. MongoDB从1.8版本后，采用binlog方式（MySQL同样采用该方式）支持持久化，增加可靠性；Redis依赖快照进行持久化；AOF增强可靠性；增强可靠性的同时，影响访问性能。可靠性上MongoDB优于Redis
+4. Redis适合做缓存，MongoDB比Redis更适合承担持久化数据库的角色。
+5. 写操作MongoDB会写写入内存再写入磁盘，MySQL是直接写入磁盘，所以在单词写操作上，MySQL不如MongoDB
