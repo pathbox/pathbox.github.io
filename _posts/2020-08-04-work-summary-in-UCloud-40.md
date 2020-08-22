@@ -66,3 +66,9 @@ https://zhuanlan.zhihu.com/p/64138532
 3. MongoDB从1.8版本后，采用binlog方式（MySQL同样采用该方式）支持持久化，增加可靠性；Redis依赖快照进行持久化；AOF增强可靠性；增强可靠性的同时，影响访问性能。可靠性上MongoDB优于Redis
 4. Redis适合做缓存，MongoDB比Redis更适合承担持久化数据库的角色。
 5. 写操作MongoDB会写写入内存再写入磁盘，MySQL是直接写入磁盘，所以在单词写操作上，MySQL不如MongoDB
+
+### Golang中的struct能不能比较
+struct字段属性中有不可比较的类型，则不可以比较，没有则可以
+- 可排序的数据类型有三种，Integer，Floating-point，和String
+- 可比较的数据类型除了上述三种外，还有Boolean，Complex，Pointer，Channel，Interface和Array
+- 不可比较的数据类型包括，Slice, Map, 和Function
