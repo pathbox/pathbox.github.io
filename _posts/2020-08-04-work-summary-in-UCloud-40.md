@@ -72,3 +72,6 @@ struct字段属性中有不可比较的类型，则不可以比较，没有则�
 - 可排序的数据类型有三种，Integer，Floating-point，和String
 - 可比较的数据类型除了上述三种外，还有Boolean，Complex，Pointer，Channel，Interface和Array
 - 不可比较的数据类型包括，Slice, Map, 和Function
+
+### 一个Pod生成经历了什么
+https://mp.weixin.qq.com/s/ctdvbasKE-vpLRxDJjwVMw?
