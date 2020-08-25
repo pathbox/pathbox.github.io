@@ -75,3 +75,8 @@ struct字段属性中有不可比较的类型，则不可以比较，没有则�
 
 ### 一个Pod生成经历了什么
 https://mp.weixin.qq.com/s/ctdvbasKE-vpLRxDJjwVMw?
+https://github.com/jamiehannaford/what-happens-when-k8s/tree/master/zh-cn
+
+### defer after panic
+https://mp.weixin.qq.com/s/XsCTQJWry2UUtAkM4OFbwA
+如果代码panic了，之后的代码不会操作。如果加上defer，即使panic，defer也会操作执行
