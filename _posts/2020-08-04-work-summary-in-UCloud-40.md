@@ -80,3 +80,21 @@ https://github.com/jamiehannaford/what-happens-when-k8s/tree/master/zh-cn
 ### defer after panic
 https://mp.weixin.qq.com/s/XsCTQJWry2UUtAkM4OFbwA
 如果代码panic了，之后的代码不会操作。如果加上defer，即使panic，defer也会操作执行
+
+### Redis Cluster集群的扩容和收缩
+1.集群扩容
+当一个 Redis 新节点运行并加入现有集群后，我们需要为其迁移槽和数据。首先要为新节点指定槽的迁移计划，确保迁移后每个节点负责相似数量的槽，从而保证这些节点的数据均匀。
+首先启动一个 Redis 节点，记为 M4。
+使用 cluster meet 命令，让新 Redis 节点加入到集群中。新节点刚开始都是主节点状态，由于没有负责的>槽，所以不能接受任何读写操作，后续我们就给他迁移槽和填充数据。
+对 M4 节点发送 cluster setslot { slot } importing { sourceNodeId } 命令，让目标节点准备导入槽的数据。 >4) 对源节点，也就是 M1，M2，M3 节点发送 cluster setslot { slot } migrating { targetNodeId } 命令，让源节>点准备迁出槽的数据。
+源节点执行 cluster getkeysinslot { slot } { count } 命令，获取 count 个属于槽 { slot } 的键，然后执行步骤>六的操作进行迁移键值数据。
+在源节点上执行 migrate { targetNodeIp} " " 0 { timeout } keys { key... } 命令，把获取的键通过 pipeline 机制>批量迁移到目标节点，批量迁移版本的 migrate 命令在 Redis 3.0.6 以上版本提供。
+重复执行步骤 5 和步骤 6 直到槽下所有的键值数据迁移到目标节点。
+向集群内所有主节点发送 cluster setslot { slot } node { targetNodeId } 命令，通知槽分配给目标节点。为了>保证槽节点映射变更及时传播，需要遍历发送给所有主节点更新被迁移的槽执行新节点。
+2.集群收缩
+收缩节点就是将 Redis 节点下线，整个流程需要如下操作流程。
+首先需要确认下线节点是否有负责的槽，如果是，需要把槽迁移到其他节点，保证节点下线后整个集群槽节点映射的完整性。
+当下线节点不再负责槽或者本身是从节点时，就可以通知集群内其他节点忘记下线节点，当所有的节点忘记改节点后可以正常关闭。
+下线节点需要将节点自己负责的槽迁移到其他节点，原理与之前节点扩容的迁移槽过程一致。
+迁移完槽后，还需要通知集群内所有节点忘记下线的节点，也就是说让其他节点不再与要下线的节点进行 Gossip 消息交换。
+Redis 集群使用 cluster forget { downNodeId } 命令来讲指定的节点加入到禁用列表中，在禁用列表内的节点不再发送 Gossip 消息。
