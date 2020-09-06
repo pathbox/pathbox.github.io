@@ -117,7 +117,7 @@ C 如果没有路由满足，调用NotFoundHandler的ServeHttp
 ##### Effective ruby tip
 所有的变量代表的值都有可能是nil
 
-浅拷贝只拷贝了对象，对于像Array一样的集合，这意味着仅仅复制了容器本身而没有复制其中的元素。可以在不影响原始集合的情况下增添或移除其中的元素，但修改元素本身则是由影响的。修改任一元素都会影响原始集合本身，同样也会影响到任何引用这一元素的对象。
+浅拷贝只拷贝了对象，对于像Array一样的集合，这意味着仅仅复制了容器本身而没有复制其中的元素。可以在不影响原始集合的情况下增添或移除其中的元素，但修改元素本身则是有影响的。修改任一元素都会影响原始集合本身，同样也会影响到任何引用这一元素的对象。
 
 ##### Golang Slices And The Case Of The Missing Memory
 [文章链接](http://openmymind.net/Go-Slices-And-The-Case-Of-The-Missing-Memory/)
