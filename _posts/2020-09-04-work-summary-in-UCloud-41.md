@@ -86,3 +86,30 @@ JWT 适合一次性的命令认证，颁发一个有效期极短的 JWT，即使
 ### 一种不同数据库的双写方案简记：中间件监听+消息队列
 数据库：Database、Redis、Elasticsearch、HDFS
 对Database进行写操作时，中间件监听写操作，然后将消息写入Kafka消息队列，Redis、Elasticsearch、HDFS三者监听Kafka消息队列，将数据写入。如果kafka对重试机制并不友好，可以换成使用RocketMQ
+
+### Etcd 实现分布式锁的业务流程
+https://tangxusc.github.io/blog/2019/05/etcd-lock%E8%AF%A6%E8%A7%A3/
+假设对某个共享资源设置的锁名为：/lock/mylock
+步骤 1: 准备
+
+客户端连接 Etcd，以 /lock/mylock 为前缀创建全局唯一的 key，假设第一个客户端对应的 key="/lock/mylock/UUID1"，第二个为 key="/lock/mylock/UUID2"；客户端分别为自己的 key 创建租约 - Lease，租约的长度根据业务耗时确定，假设为 15s；
+
+步骤 2: 创建定时任务作为租约的“心跳”
+
+当一个客户端持有锁期间，其它客户端只能等待，为了避免等待期间租约失效，客户端需创建一个定时任务作为“心跳”进行续约。此外，如果持有锁期间客户端崩溃，心跳停止，key 将因租约到期而被删除，从而锁释放，避免死锁。
+
+步骤 3: 客户端将自己全局唯一的 key 写入 Etcd
+
+进行 put 操作，将步骤 1 中创建的 key 绑定租约写入 Etcd，根据 Etcd 的 Revision 机制，假设两个客户端 put 操作返回的 Revision 分别为 1、2，客户端需记录 Revision 用以接下来判断自己是否获得锁。
+
+步骤 4: 客户端判断是否获得锁
+
+客户端以前缀 /lock/mylock 读取 keyValue 列表（keyValue 中带有 key 对应的 Revision），判断自己 key 的 Revision 是否为当前列表中最小的，如果是则认为获得锁；否则监听列表中前一个 Revision 比自己小的 key 的删除事件，一旦监听到删除事件或者因租约失效而删除的事件，则自己获得锁。
+
+步骤 5: 执行业务
+
+获得锁后，操作共享资源，执行业务代码。
+
+步骤 6: 释放锁
+
+完成业务流程后，删除对应的key释放锁
