@@ -113,3 +113,6 @@ https://tangxusc.github.io/blog/2019/05/etcd-lock%E8%AF%A6%E8%A7%A3/
 步骤 6: 释放锁
 
 完成业务流程后，删除对应的key释放锁
+
+### SELECT FOR UPDATE会锁表吗
+如果WHERE条件没有用到索引或主键，则在事务提交前是表锁，否则是行锁。如果WHERE条件比较复杂，MySQL的执行计划有可能选择了非索引的方式查询，会导致锁表
