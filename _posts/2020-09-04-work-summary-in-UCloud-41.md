@@ -123,3 +123,13 @@ https://tangxusc.github.io/blog/2019/05/etcd-lock%E8%AF%A6%E8%A7%A3/
 
 比如：1异步上传了图片，2之后需要拿到该图片进行处理，1的顺序要在2的前面
 
+### 乐观锁的简单实现
+
+```
+1.给表增加version字段
+2.查询出机器信息：
+select resource_id,version from resource where status=0 limit 1;
+3.将该机器分配给该 job：
+update resource set status=<job_id> where resource_id =<刚查出的> and version=<刚查出 version+1>;
+```
+
