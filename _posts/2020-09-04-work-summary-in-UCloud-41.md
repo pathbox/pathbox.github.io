@@ -133,3 +133,9 @@ select resource_id,version from resource where status=0 limit 1;
 update resource set status=<job_id> where resource_id =<刚查出的> and version=<刚查出 version+1>;
 ```
 
+
+
+### for update仅适用于InnoDB，且必须在事务块(BEGIN/COMMIT)中才能生效
+
+for update仅适用于InnoDB，且必须在事务块(BEGIN/COMMIT)中才能生效。在进行事务操作时，通过“for update”语句，[MySQL](https://cloud.tencent.com/product/cdb?from=10680)会对查询结果集中每行数据都添加排他锁，其他线程对该记录的更新与删除操作都会阻塞。排他锁包含行锁、表锁
+
