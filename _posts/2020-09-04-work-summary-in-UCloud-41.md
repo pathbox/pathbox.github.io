@@ -4,9 +4,11 @@ title: 最近工作总结(41)
 date:  2020-09-04 17:30:06
 categories: Work
 image: /assets/images/post.jpg
+
 ---
 
 ### 哈希算法(Hash Algorithm)
+
 哈希算法(Hash Algorithm)又称散列算法、散列函数、哈希函数，是一种从任何一种数据中创建小的数字“指纹”的方法。哈希算法将数据重新打乱混合，重新创建一个哈希值。
 哈希算法主要用来保障数据真实性(即完整性)，即发信人将原始消息和哈希值一起发送，收信人通过相同的哈希函数来校验原始数据是否真实。
 哈希算法通常有以下几个特点：
@@ -78,16 +80,20 @@ JWT 适合一次性的命令认证，颁发一个有效期极短的 JWT，即使
 绝不要以明文形式显示或发送密码，即使是对密码的所有者也应该这样。如果你需要 “忘记密码” 的功能，可以随机生成一个新的 一次性的（这点很重要）密码，然后把这个密码发送给用户
 
 ### 浅拷贝和深拷贝
+
 浅拷贝只复制指向某个对象的指针，而不复制对象本身，新旧对象还是共享同一块内存。但深拷贝会另外创造一个一模一样的对象，新对象跟原对象不共享内存，修改新对象不会改到原对象
 
 ### yml文件读取大数字
+
 一个配置`val:01234567890123432423454353453453543` 读取这个大数字时会按照整数处理而报错。和使用的包中反射有关
 
 ### 一种不同数据库的双写方案简记：中间件监听+消息队列
+
 数据库：Database、Redis、Elasticsearch、HDFS
 对Database进行写操作时，中间件监听写操作，然后将消息写入Kafka消息队列，Redis、Elasticsearch、HDFS三者监听Kafka消息队列，将数据写入。如果kafka对重试机制并不友好，可以换成使用RocketMQ
 
 ### Etcd 实现分布式锁的业务流程
+
 https://tangxusc.github.io/blog/2019/05/etcd-lock%E8%AF%A6%E8%A7%A3/
 假设对某个共享资源设置的锁名为：/lock/mylock
 步骤 1: 准备
@@ -115,6 +121,7 @@ https://tangxusc.github.io/blog/2019/05/etcd-lock%E8%AF%A6%E8%A7%A3/
 完成业务流程后，删除对应的key释放锁
 
 ### SELECT FOR UPDATE会锁表吗
+
 如果WHERE条件没有用到索引或主键，则在事务提交前是表锁，否则是行锁。如果WHERE条件比较复杂，MySQL的执行计划有可能选择了非索引的方式查询，会导致锁表
 
 
@@ -148,4 +155,47 @@ nohup ./cmd 2>&1 | tee cmd_log.log &
 Ctrl c
 ps aux | grep cmd
 ```
+
+### TCP建立连接可以两次握手吗？为什么?
+
+
+
+<details open="" style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary><p style="box-sizing: border-box; margin-top: 0px; margin-bottom: 16px;">不可以。有两个原因：</p><p style="box-sizing: border-box; margin-top: 0px; margin-bottom: 16px;">首先，可能会出现<strong style="box-sizing: border-box; font-weight: 600;">已失效的连接请求报文段又传到了服务器端</strong>。</p><blockquote style="box-sizing: border-box; margin: 0px 0px 16px; padding: 0px 1em; color: rgb(106, 115, 125); border-left: 0.25em solid rgb(223, 226, 229);"><p style="box-sizing: border-box; margin-top: 0px; margin-bottom: 0px;">client 发出的第一个连接请求报文段并没有丢失，而是在某个网络结点长时间的滞留了，以致延误到连接释放以后的某个时间才到达 server。本来这是一个早已失效的报文段。但 server 收到此失效的连接请求报文段后，就误认为是 client 再次发出的一个新的连接请求。于是就向 client 发出确认报文段，同意建立连接。假设不采用 “三次握手”，那么只要 server 发出确认，新的连接就建立了。由于现在 client 并没有发出建立连接的请求，因此不会理睬 server 的确认，也不会向 server 发送数据。但 server 却以为新的运输连接已经建立，并一直等待 client 发来数据。这样，server 的很多资源就白白浪费掉了。采用 “三次握手” 的办法可以防止上述现象发生。例如刚才那种情况，client 不会向 server 的确认发出确认。server 由于收不到确认，就知道 client 并没有要求建立连接。</p></blockquote><p style="box-sizing: border-box; margin-top: 0px; margin-bottom: 16px;">其次，两次握手无法保证Client正确接收第二次握手的报文（Server无法确认Client是否收到），也无法保证Client和Server之间成功互换初始序列号</p></details>
+
+##### 可以采用四次握手吗？为什么？
+
+<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
+
+##### 第三次握手中，如果客户端的ACK未送达服务器，会怎样？
+
+<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
+
+##### 如果已经建立了连接，但客户端出现了故障怎么办？
+
+<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
+
+##### 初始序列号是什么？
+
+<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
+
+### 什么是四次挥手？
+
+[![四次挥手](https://github.com/wolverinn/Waking-Up/raw/master/_v_images/20191129112652915_15481.png)](https://github.com/wolverinn/Waking-Up/blob/master/_v_images/20191129112652915_15481.png)
+
+- 第一次挥手：Client将FIN置为1，发送一个序列号seq给Server；进入FIN_WAIT_1状态；
+- 第二次挥手：Server收到FIN之后，发送一个ACK=1，acknowledge number=收到的序列号+1；进入CLOSE_WAIT状态。此时客户端已经没有要发送的数据了，但仍可以接受服务器发来的数据。
+- 第三次挥手：Server将FIN置1，发送一个序列号给Client；进入LAST_ACK状态；
+- 第四次挥手：Client收到服务器的FIN后，进入TIME_WAIT状态；接着将ACK置1，发送一个acknowledge number=序列号+1给服务器；服务器收到后，确认acknowledge number后，变为CLOSED状态，不再向客户端发送数据。客户端等待2*MSL（报文段最长寿命）时间后，也进入CLOSED状态。完成四次挥手。
+
+##### 为什么不能把服务器发送的ACK和FIN合并起来，变成三次挥手（CLOSE_WAIT状态意义是什么）？
+
+<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
+
+##### 如果第二次挥手时服务器的ACK没有送达客户端，会怎样？
+
+<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
+
+##### 客户端TIME_WAIT状态的意义是什么？
+
+<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
 
