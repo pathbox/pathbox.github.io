@@ -174,11 +174,7 @@ ps aux | grep cmd
 
 <details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
 
-##### 初始序列号是什么？
-
-<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
-
-### 什么是四次挥手？
+###  什么是四次挥手？
 
 [![四次挥手](https://github.com/wolverinn/Waking-Up/raw/master/_v_images/20191129112652915_15481.png)](https://github.com/wolverinn/Waking-Up/blob/master/_v_images/20191129112652915_15481.png)
 
@@ -189,13 +185,36 @@ ps aux | grep cmd
 
 ##### 为什么不能把服务器发送的ACK和FIN合并起来，变成三次挥手（CLOSE_WAIT状态意义是什么）？
 
-<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
+		因为服务器收到客户端断开连接的请求时，可能还有一些数据没有发完，这时先回复ACK，表示接收到了断开连接的请求。等到数据发完之后再发FIN，断开服务器到客户端的数据传送。
+		客户端发起断开请求FIN，客户端能控制自己不再发送数据给服务端，但是tcp是全双工的，客户端不能控制服务端发送数据过来。所以，服务端先回复ACK，表示服务端知道要断开链接了，但是还有正在发送给客户端的数据，等这些数据发完了，服务端就不再发送数据给客户端了，再发送FIN表示服务端这边也可以开始断开链接操纵了
 
 ##### 如果第二次挥手时服务器的ACK没有送达客户端，会怎样？
 
-<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
+客户端没有收到ACK确认，会重新发送FIN请求。
 
 ##### 客户端TIME_WAIT状态的意义是什么？
 
-<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
+第四次挥手时，客户端发送给服务器的ACK有可能丢失，TIME_WAIT状态就是用来重发可能丢失的ACK报文。如果Server没有收到ACK，就会重发FIN，如果Client在2*MSL的时间内收到了FIN，就会重新发送ACK并再次等待2MSL，防止Server没有收到ACK而不断重发FIN
 
+MSL(Maximum Segment Lifetime)，指一个片段在网络中最大的存活时间，2MSL就是一个发送和一个回复所需的最大时间。如果直到2MSL，Client都没有再次收到FIN，那么Client推断ACK已经被成功接收，则结束TCP连接
+
+主要有两个原因：
+1）为了确保两端能完全关闭连接。
+假设A服务器是主动关闭连接方，B服务器是被动方。如果没有TIME_WAIT状态，A服务器发出最后一个ACK就进入关闭状态，如果这个ACK对端没有收到，对端就不能完成关闭。对端没有收到ACK，会重发FIN，此时连接关闭，这个FIN也得不到ACK，而有TIME_WAIT，则会重发这个ACK，确保对端能正常关闭连接。
+2）为了确保后续的连接不会收到“脏数据”
+刚才提到主动端进入TIME_WAIT后，等待2MSL后CLOSE，这里的MSL是指（maximum segment lifetime，我们内核一般是30s，2MSL就是1分钟），网络上数据包最大的生命周期。这是为了使网络上由于重传出现的old duplicate segment都消失后，才能创建参数（四元组，源IP/PORT，目标IP/PORT）相同的连接，如果等待时间不够长，又创建好了一样的连接，再收到old duplicate segment，数据就错乱了
+
+https://developer.aliyun.com/article/745776
+
+
+
+### 为什么是2MSL
+
+随着时间的流逝，A发送给B的ACK报文将会有两种结局：
+
+1. ACK报文在网络中丢失；如前所述，这种情况我们不需要考虑，因为除非多次重传失败，否则AB两端的状态不会发生变化直至某一个ACK不再丢失。
+2. ACK报文被B接收到。我们假设A发送了ACK报文后过了一段时间t之后B才收到该ACK，则有 0 < t <= MSL。因为A并不知道它发送出去的ACK要多久对方才能收到，所以A至少要维持MSL时长的TIME_WAIT状态才能保证它的ACK从网络中消失。同时处于LAST_ACK状态的B因为收到了ACK，所以它直接就进入了CLOSED状态，而不会向网络发送任何报文。所以晃眼一看，A只需要等待1个MSL就够了，但仔细想一下其实1个MSL是不行的，因为在B收到ACK前的一刹那，B可能因为没收到ACK而重传了一个FIN报文，这个FIN报文要从网络中消失最多还需要一个MSL时长，所以A还需要多等一个MSL。
+
+综上所述，TIME_WAIT至少需要持续2MSL时长，这2个MSL中的第一个MSL是为了等自己发出去的最后一个ACK从网络中消失，而第二MSL是为了等在对端收到ACK之前的一刹那可能重传的FIN报文从网络中消失。
+
+2MSL能够保证旧连接发送的报文，在有新的连接建立后，不会被传到新的连接的任意一端。2MSL让旧的报文都在网络中消失
