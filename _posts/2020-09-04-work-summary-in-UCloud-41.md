@@ -218,3 +218,23 @@ https://developer.aliyun.com/article/745776
 综上所述，TIME_WAIT至少需要持续2MSL时长，这2个MSL中的第一个MSL是为了等自己发出去的最后一个ACK从网络中消失，而第二MSL是为了等在对端收到ACK之前的一刹那可能重传的FIN报文从网络中消失。
 
 2MSL能够保证旧连接发送的报文，在有新的连接建立后，不会被传到新的连接的任意一端。2MSL让旧的报文都在网络中消失
+
+
+
+### tcp协议中处于last_ack状态的连接，如果一直收不到对方的ack，最终会进入CLOSED
+
+ 上一张网上搜索的图，更好理解（侵删）
+
+![img](https://pic3.zhimg.com/50/v2-598eee1c80c322c65521c359cb0ba8a1_hd.jpg?source=1940ef5c)![img](https://pic3.zhimg.com/80/v2-598eee1c80c322c65521c359cb0ba8a1_720w.jpg?source=1940ef5c)
+
+这个链接中讲述了三种情况：(2017/10/26 Update:补充了第四种情况 感谢 @似水流年  )  
+下面假设：主动关闭的一端为A，被动关闭的一端为B，  根据B是否收到最后的ACK包分为两种情况
+
+1. B发送FIN，进入LAST_ACK状态，A收到这个FIN包后发送ACK包，***B收到这个ACK包\***，然后进入CLOSED状态
+2. B发送FIN，进入LAST_ACK状态，A收到这个FIN包后发送ACK包，由于某种原因，这个ACK包丢失了，***B没有收到ACK包\***，然后B等待ACK包超时，又向A发送了一个FIN包  
+       a) **假如这个时候，A还是处于TIME_WAIT状态(也就是TIME_WAIT持续的时间在2MSL内)
+   **A收到这个FIN包后向B发送了一个ACK包，B收到这个ACK包进入CLOSED状态  
+       b) **假如这个时候，A已经从TIME_WAIT状态变成了CLOSED状态**  
+           A收到这个FIN包后，认为这是一个错误的连接，向B发送一个**RST**包，当B收到这个RST包，进入CLOSED状态
+       c) **假如这个时候，A挂了（假如这台机器炸掉了）【会经历超时重传，多次重传也失败，重置连接进入CLOSED】**
+           B没有收到A的回应，那么会继续发送FIN包，也就是触发了TCP的重传机制，如果A还是没有回应，B还会继续发送FIN包，直到重传超时(至于这个时间是多长需要仔细研究)，B重置这个连接，进入CLOSED状态，参考链接[看这里](https://link.zhihu.com/?target=https%3A//vincent.bernat.im/en/blog/2014-tcp-time-wait-state-linux%23purpose)
