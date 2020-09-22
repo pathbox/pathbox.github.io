@@ -239,6 +239,8 @@ net.ipv4.tcp_tw_reuse = 1
 
 net.ipv4.tcp_tw_recycle = 0 （**不要开启，现在互联网NAT结构很多，可能直接无法三次握手**）
 
+4.x后移除的tcp_tw_recycle是依赖timestamp配置，timestamp在nat下有包混乱的问题
+
 开启后在3.5*RTO(RTO时间是根据RTT时间计算而来)内回收TIME_WAIT，并60s内同一源ip主机的socket connect请求中的timestamp必须是递增的，对于服务端，同一个源ip可能会是NAT后很多机器，这些机器timestamp递增性无可保证，服务器会拒绝非递增请求连接，直接导致不能三次握手
 
 ### tcp协议中处于last_ack状态的连接，如果一直收不到对方的ack，最终会进入CLOSED
@@ -298,3 +300,13 @@ We applied the changes to our clients and server (as others have mentioned, the 
 - 最后一个是ack的batchId在服务端被清理了ps. 服务端发生清理只有两个原因：
   - client发起过一次rollback
   - server端发生过一次instance的重启，比如scan=true时发现文件变化自动restart了
+
+### 如何实现可靠数据传输
+
+可靠传输一般包含两个方面，数据不会丢失，数据保证顺序；
+
+1. 数据不丢失依靠发送方的重传策略；
+2. 数据保证顺序需要通信双方维护序列号；
+
+遵循以上的两个策略就能实现一个最基本的可靠传输协议
+
