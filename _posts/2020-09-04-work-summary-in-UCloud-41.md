@@ -219,7 +219,27 @@ https://developer.aliyun.com/article/745776
 
 2MSL能够保证旧连接发送的报文，在有新的连接建立后，不会被传到新的连接的任意一端。2MSL让旧的报文都在网络中消失
 
+2）修改系统回收参数
+设置以下参数
+net.ipv4.tcp_timestamps = 1
+net.ipv4.tcp_tw_recycle = 1
+设置该参数会带来什么问题？
+net.ipv4.tcp_timestamps = 1
+net.ipv4.tcp_tw_recycle = 1
+如果这两个参数同时开启，会校验源ip过来的包携带的timestamp是否递增，如果不是递增的话，则会导致三次握手建联不成功，具体表现为抓包的时候看到syn发出，server端不响应syn ack
+通俗一些来讲就是，一个局域网有多个客户端访问您，如果有客户端的时间比别的客户端时间慢，就会建联不成功
 
+下面再说一下linux里TIME_WAIT专有的优化参数reuse、recycle，默认也都是关闭的，这两个参数必须在timestamps打开的前提下才能生效使用：
+
+net.ipv4.tcp_timestamps = 1
+
+net.ipv4.tcp_tw_reuse = 1
+
+机器作为客户端时起作用，开启后time_wait在一秒内回收
+
+net.ipv4.tcp_tw_recycle = 0 （**不要开启，现在互联网NAT结构很多，可能直接无法三次握手**）
+
+开启后在3.5*RTO(RTO时间是根据RTT时间计算而来)内回收TIME_WAIT，并60s内同一源ip主机的socket connect请求中的timestamp必须是递增的，对于服务端，同一个源ip可能会是NAT后很多机器，这些机器timestamp递增性无可保证，服务器会拒绝非递增请求连接，直接导致不能三次握手
 
 ### tcp协议中处于last_ack状态的连接，如果一直收不到对方的ack，最终会进入CLOSED
 
@@ -238,3 +258,34 @@ https://developer.aliyun.com/article/745776
            A收到这个FIN包后，认为这是一个错误的连接，向B发送一个**RST**包，当B收到这个RST包，进入CLOSED状态
        c) **假如这个时候，A挂了（假如这台机器炸掉了）【会经历超时重传，多次重传也失败，重置连接进入CLOSED】**
            B没有收到A的回应，那么会继续发送FIN包，也就是触发了TCP的重传机制，如果A还是没有回应，B还会继续发送FIN包，直到重传超时(至于这个时间是多长需要仔细研究)，B重置这个连接，进入CLOSED状态，参考链接[看这里](https://link.zhihu.com/?target=https%3A//vincent.bernat.im/en/blog/2014-tcp-time-wait-state-linux%23purpose)
+
+### 查询tcp各状态下的数量
+
+```
+netstat -ant|awk '/^tcp/ {++S[$NF]} END {for(a in S) print (a,S[a])}'
+```
+
+
+
+### GRPC stream fail rpc error: code = Unavailable desc = transport is closing
+
+```
+GRPC_TRACE=all
+GRPC_VERBOSITY=DEBUG
+GRPC_GO_LOG_VERBOSITY_LEVEL=2
+GRPC_GO_LOG_SEVERITY_LEVEL=info
+```
+
+What we were experiencing were random `transport is closing` errors on the client when making unary RPCs to our server (usually after ~5 minutes of inactivity). Most of the time, our server would not even get the request from the client, so we thought some other component in between should be causing the connections to be closed.
+
+After some digging, we eventually found this section in the [AWS network load balancer docs](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/network-load-balancers.html#connection-idle-timeout):
+
+> For each request that a client makes through a Network Load Balancer, the state of that connection is tracked. The connection is terminated by the target. If no data is sent through the connection by either the client or target for longer than the idle timeout, the connection is closed. If a client sends data after the idle timeout period elapses, it receives a TCP RST packet to indicate that the connection is no longer valid.
+
+> Elastic Load Balancing sets the idle timeout value to 350 seconds. You cannot modify this value. Your targets can use TCP keepalive packets to reset the idle timeout.
+
+Immediately after seeing this, we decided to start using keepalive pings from the client. You can easily enable this on the client as a dial option (`keepalive.ClientParameters`) and on the server (`grpc.KeepaliveEnforcementPolicy`) as a server option which forces clients to comply with the keepalive policy.
+
+Since we just use *unary* RPCs, we had to set `PermitWithoutStream=true`, so that the client sends keepalive pings while not streaming. We also made sure that the enforcement policy has a `KeepaliveEnforcementPolicy.MinTime=1 * time.Minute` (it *has* to be lower than the LB's connection idle timeout of 350s) and the client would submit keepalive pings every 2 minutes (`ClientParameters.Time=2 * time.Minute`). As long as `Time > MinTime`, we're [good](https://github.com/grpc/grpc-go/blob/master/internal/transport/http2_server.go#L683)!
+
+We applied the changes to our clients and server (as others have mentioned, the clients must comply with the server policy, otherwise you'll have more connectivity issues) and the `transport is closing` issue is now totally gone, as the client will keep the connections alive.
