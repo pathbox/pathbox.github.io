@@ -289,3 +289,12 @@ Immediately after seeing this, we decided to start using keepalive pings from th
 Since we just use *unary* RPCs, we had to set `PermitWithoutStream=true`, so that the client sends keepalive pings while not streaming. We also made sure that the enforcement policy has a `KeepaliveEnforcementPolicy.MinTime=1 * time.Minute` (it *has* to be lower than the LB's connection idle timeout of 350s) and the client would submit keepalive pings every 2 minutes (`ClientParameters.Time=2 * time.Minute`). As long as `Time > MinTime`, we're [good](https://github.com/grpc/grpc-go/blob/master/internal/transport/http2_server.go#L683)!
 
 We applied the changes to our clients and server (as others have mentioned, the clients must comply with the server policy, otherwise you'll have more connectivity issues) and the `transport is closing` issue is now totally gone, as the client will keep the connections alive.
+
+### Canal报错：batchId:73 is not the firstly:72 或 clientId:1001 batchId:50560 is not exist , please check
+
+导致没有消息再推到kafka。简单理解：batchId不对应，使得后续的操作没法继续进行
+
+- 第一个原因是client在ack的问题，前两个异常是client没有按照顺序ack对应的batchId
+- 最后一个是ack的batchId在服务端被清理了ps. 服务端发生清理只有两个原因：
+  - client发起过一次rollback
+  - server端发生过一次instance的重启，比如scan=true时发现文件变化自动restart了
