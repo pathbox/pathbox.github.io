@@ -366,3 +366,30 @@ Redis启动数据加载流程：
 
 ### DNS原理简记
 
+> https://draveness.me/dns-coredns/
+
+
+
+![dns-namespace](https://img.draveness.me/2018-11-07-dns-namespace.png)
+
+
+
+```bash
+dig -t A draveness.me +trace
+```
+
+1. `13 组根域名服务器`发出请求获取`顶级域名`的地址,可以看到是 `.root-servers.net`
+2. 访问这些`顶级域名`服务器其中的一台 `b2.nic.me` 获取`权威 DNS 的服务器`的地址了：
+3. 这里的`权威 DNS 服务`是在域名提供商进行配置的，当有客户端请求 `draveness.me` 域名对应的 IP 地址时，其实会使用的 DNS 服务商 DNSPod 处请求服务的 IP 地址
+
+```
+draveness.me.		600	IN	A	34.96.168.17
+draveness.me.		86400	IN	NS	ns3.dnsv2.com.
+draveness.me.		86400	IN	NS	ns4.dnsv2.com.
+;; Received 111 bytes from 111.30.142.15#53(ns4.dnsv2.com) in 32 ms
+```
+
+*34.96.168.17* 就是域名所指服务器的IP地址
+
+可以了解一下根域名服务器的域名和对应的 IP 地址 https://www.iana.org/domains/root/servers
+
