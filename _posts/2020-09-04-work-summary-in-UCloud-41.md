@@ -393,3 +393,6 @@ draveness.me.		86400	IN	NS	ns4.dnsv2.com.
 
 可以了解一下根域名服务器的域名和对应的 IP 地址 https://www.iana.org/domains/root/servers
 
+### Linux IO同步函数:sync、fsync、fdatasync
+
+http://byteliu.com/2019/03/09/Linux-IO%E5%90%8C%E6%AD%A5%E5%87%BD%E6%95%B0-sync%E3%80%81fsync%E3%80%81fdatasync/
