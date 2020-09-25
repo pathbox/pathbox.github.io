@@ -396,3 +396,7 @@ draveness.me.		86400	IN	NS	ns4.dnsv2.com.
 ### Linux IO同步函数:sync、fsync、fdatasync
 
 http://byteliu.com/2019/03/09/Linux-IO%E5%90%8C%E6%AD%A5%E5%87%BD%E6%95%B0-sync%E3%80%81fsync%E3%80%81fdatasync/
+
+### 一次磁盘IO需要的时间
+
+根据Wikipedia的数据，当前硬盘驱动的平均寻道时间（Average seek time）大约是3~15ms，7200RPM硬盘的平均旋转延迟（Average rotational latency）大约为4ms，因此一次IO操作的耗时大约为10ms左右
