@@ -413,3 +413,10 @@ http://byteliu.com/2019/03/09/Linux-IO%E5%90%8C%E6%AD%A5%E5%87%BD%E6%95%B0-sync%
 - 2.每次log文件创建时，先写文件的最后1个page，将log文件扩展为10MB大小
 - 3.向log文件中追加记录时，由于文件的尺寸不发生变化，使用fdatasync可以大大优化写log的效率
 - 4.如果一个log文件写满了，则新建一个log文件，也只有一次同步metadata的开销
+
+### 统计词频
+
+```
+cat words.txt | xargs -n 1 | sort | uniq -c | sort -nr | awk '{print $2" "$1}'
+```
+
