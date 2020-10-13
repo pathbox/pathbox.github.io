@@ -71,3 +71,35 @@ TiDB和MySQL悲观锁中的差异之一:
 对JWT的续期方式：
 
 后端对每次请求校验JWT现在的过期时间如果还有10分钟就过期了，告知网关(或者在后端进行处理)，网关重新分配新的JWT添加到header中，返回给客户端。客户端将新的JWT存入header中
+
+
+
+### 由于物理设备电缆不稳定导致的grpc长连接关闭问题
+
+近来服务时不时忽然大量报错: `code = Unavailable desc = transport is closing`。导致grpc的请求失败。如果failfast 设置为false的话，应该会重试的；并且 连接关闭之后grpc.clientConn也会维护这个状态，所以不应该出现这个问题才对。
+
+网上的一个解决方案：
+
+```go
+服务端
+grpc.KeepaliveParams(keepalive.ServerParameters{
+  MaxConnectionIdle: 5 * time.Minute, //这个连接最大的空闲时间，超过就释放，解决proxy等到网络问题（不通知grpc的client和server）
+}
+
+grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
+  MinTime:             5 * time.Second,
+  PermitWithoutStream: true,
+})
+     
+客户端
+grpc.WithKeepaliveParams(keepalive.ClientParameters{
+  // send pings every 10 seconds if there is no activity
+  Time: 10 * time.Second,
+  // wait 1 second for ping ack before considering the connection dead
+  Timeout: time.Second,
+  // send pings even without active streams
+  PermitWithoutStream: true,
+})
+```
+
+问题没有解决。最后运维部门排查出是由于k8s服务集群机房的某根电缆不够稳定，导致网络传输上出现异常问题。换了这根电缆，观察两周时间，报错不再发生
