@@ -103,3 +103,69 @@ grpc.WithKeepaliveParams(keepalive.ClientParameters{
 ```
 
 问题没有解决。最后运维部门排查出是由于k8s服务集群机房的某根电缆不够稳定，导致网络传输上出现异常问题。换了这根电缆，观察两周时间，报错不再发生
+
+
+
+### kubelet启动失败
+
+(k8s v.1.19)执行kubectl的各个命令报错：
+
+```sh
+The connection to the server 10.23.192.27:6443 was refused - did you specify the right host or port?
+```
+
+之后查资料排查下来，是kubelet启动失败。
+
+systemctl status kubelet 得到PID 23993
+
+journalctl _PID=23993 | vim - 命令查看报错日志
+
+```
+kubelet cgroup driver: “cgroupfs” is different from docker cgroup driver: “systemd”
+```
+
+vim /etc/docker/daemon.json
+
+```json
+{
+  "registry-mirrors": ["https://registry.docker-cn.com"],
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ]
+```
+
+
+
+kubelet和docker二者的cgroup driver不一致。kubelet使用的是cgroupfs，而docker中配置的是systemd。
+
+##### cgroupfs 和systemd的区别
+
+>cgroups 的全称是 Linux Control Groups，主要作用是限制、记录和隔离进程组（process groups）使用的物理资源（cpu、memory、IO 等）cgroup 内核功能没有提供任何的系统调用接口，而是对 linux vfs 的一个实现，因此可以用类似文件系统的方式进行操作systemd、lxc、docker 这些封装了 cgroups 的软件也能让你通过它们定义的接口控制 cgroups 的内容
+
+ 新版的k8s建议使用systemd的配置
+
+修改kubelet 的cgroup driver为：systemd
+
+1. **vim /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf** 
+
+   在KUBELET_KUBECONFIG_ARGS 后面追加 --cgroup-driver=systemd
+
+2. **vim /var/lib/kubelet/config.yaml**
+
+   配置cgroupDriver: systemd
+
+3. **vim /var/lib/kubelet/kubeadm-flags.env(这一步不操作也可以)**
+
+KUBELET_KUBEADM_ARGS="--cgroup-driver=systemd --network-plugin=cni --pod-infra-container-image=registry.aliyuncs.com/google_containers/pause:3.2"
+
+https://my.oschina.net/comics/blog/3158924
+
+https://www.thegeekdiary.com/troubleshooting-kubectl-error-the-connection-to-the-server-x-x-x-x6443-was-refused-did-you-specify-the-right-host-or-port/
+
+https://blog.csdn.net/Andriy_dangli/article/details/85062983
