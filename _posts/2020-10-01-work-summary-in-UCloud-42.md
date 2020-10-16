@@ -169,3 +169,15 @@ https://my.oschina.net/comics/blog/3158924
 https://www.thegeekdiary.com/troubleshooting-kubectl-error-the-connection-to-the-server-x-x-x-x6443-was-refused-did-you-specify-the-right-host-or-port/
 
 https://blog.csdn.net/Andriy_dangli/article/details/85062983
+
+
+
+### 保证幂等性的思考
+
+从发送端和消费端两方面思考
+
+1. 同一个请求避免并发重复发送
+2. 同一个消息体避免因为服务重启等原因重复发送
+3. 在消息体中设置唯一ID表示，这样在消费端可根据该标识来识别是否处理过该消息
+4. 消费端的代码逻辑尽量做到能够兼容幂等性
+5. 对并发的消息可能以加锁的方式进行处理
