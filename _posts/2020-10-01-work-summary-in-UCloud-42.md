@@ -292,3 +292,12 @@ https://zhuanlan.zhihu.com/p/67192901
 >
 > https://gocn.vip/topics/11108
 
+### TiDB Int类型限制超过，使用BIGINT
+
+```
+线上报错：Error 1690: constant 2147483647 overflows int
+是因为数据超过了TiDB int类型的限制。
+INTEGER` 类型，别名 `INT`。占4个字节，2^(4*8)=4294967296，有符号数的范围是 `[-2147483648, 2147483647]`。无符号数的范围是 `[0, 4294967295]，并且即使修改int的长度也没有效果。
+需要修改为BIGINT类型，占8个字节2^(8*8)=18446744073709551616：alter table t_user_opt_log modify column mycloumn BIGINT(20); 可以online DDL 不会锁表，耗时1s
+```
+
