@@ -121,3 +121,14 @@ Redis 是跑在单线程中的，所有的操作都是按照顺序线性执行�
 
 > https://coolshell.cn/articles/17416.html
 
+### 在容器中如何修改/etc/hosts文件并生效
+
+大部分容器镜像中比如：busybox，没有/etc/nsswitch.conf 文件，所以总是优先使用DNS解析，忽略了 /etc/hosts 文件。如果只是修改了/etc/hosts 并不会生效，DNS解析的时候，还是会先进行DNS服务器的解析。
+
+解决办法很简单，给镜像添加 /etc/nsswitch.conf 文件指定解析顺序即可
+
+```
+hosts: files dns
+```
+
+表示files的优先级在dns前面，就会先去找/etc/hosts的域名对应关系
