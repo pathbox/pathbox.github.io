@@ -1,4 +1,6 @@
 ---
+
+
 layout: post
 title: 最近工作总结(43)
 date:  2020-11-05 20:15:06
@@ -132,3 +134,25 @@ hosts: files dns
 ```
 
 表示files的优先级在dns前面，就会先去找/etc/hosts的域名对应关系
+
+
+
+### Redlock简记
+
+> https://www.cnblogs.com/rgcLOVEyaya/p/RGC_LOVE_YAYA_1003days.html
+
+加锁命令
+
+```
+SET key_name my_random_value NX PX 30000                  # NX 表示if not exist 就设置并返回True，否则不设置并返回False   PX 表示过期时间用毫秒级， 30000 表示这些毫秒时间后此key过期
+```
+
+```
+if redis.call("get",KEYS[1]) == ARGV[1] then
+    return redis.call("del",KEYS[1])
+else
+    return 0
+end
+```
+
+解锁方式使用执行Lua脚本，因为这种方式可以原子化操作
