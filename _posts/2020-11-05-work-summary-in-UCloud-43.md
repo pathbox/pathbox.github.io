@@ -156,3 +156,57 @@ end
 ```
 
 解锁方式使用执行Lua脚本，因为这种方式可以原子化操作
+
+### 一个反射的报错：panic: reflect: call of reflect.Value.NumField on int Value
+
+遇到了一个关于反射的报错:
+
+```go
+panic: reflect: call of reflect.Value.NumField on int Value
+```
+
+代码追踪到：
+
+```go
+// mustBe panics if f's kind is not expected.
+// Making this a method on flag instead of on Value
+// (and embedding flag in Value) means that we can write
+// the very clear v.mustBe(Bool) and have it compile into
+// v.flag.mustBe(Bool), which will only bother to copy the
+// single important word for the receiver.
+func (f flag) mustBe(expected Kind) {
+	if f.kind() != expected {
+		panic(&ValueError{methodName(), f.kind()})
+	}
+}
+
+
+```
+
+知道这是个要接收期待的kind才能成功运行的方法，于是就去看看传入这个方法的kind是什么
+
+```go
+// NumField returns the number of fields in the struct v.
+// It panics if v's Kind is not Struct.
+func (v Value) NumField() int {
+	v.mustBe(Struct)
+	tt := (*structType)(unsafe.Pointer(v.typ))
+	return len(tt.fields)
+}
+```
+
+v需要的是结构体struct，而我传入的是count &int 指针
+
+修改，构造一个结构体
+
+```go
+type MyCount struct {
+	Count int
+}
+
+mco := &MyCount{}
+mco代入方法中，取到的值会赋值给mco.Count 
+```
+
+小结: 需要的是一个struct指针，而不是int指针
+
