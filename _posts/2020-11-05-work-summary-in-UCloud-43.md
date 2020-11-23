@@ -210,3 +210,56 @@ mco代入方法中，取到的值会赋值给mco.Count
 
 小结: 需要的是一个struct指针，而不是int指针
 
+
+
+###  shell脚本实现分析nginx日志，自动封单个访问量大于指定值的IP
+
+##### 1.在nginx的nginx.conf中http段或者server段中引入拒绝访问的IP列表
+
+```
+include /usr/local/nginx/conf/blockip/*/*/*.conf;
+```
+
+##### 2.写shell脚本实现分析访问日志，将国外IP写入到拒绝访问的IP列表
+
+```sh
+#!/bin/bash
+
+#当单个IP访问量大于这个值得时候，封IP
+max=1000 
+
+#nginx访问日志文件路径
+logDir=/usr/local/nginx/logs/*.log 
+
+basePath='/usr/local/nginx/conf/blockip/'
+month=$(date -d yesterday +"%Y%m")
+day=$(date -d yesterday +"%d")
+mkdir -p $basePath/$month/$day
+#nginx封锁配置文件路径
+confDir=$basePath/$month/$day/${day}.conf
+
+#截取IP段
+cat $logDir|awk '{print $1}'|sort|uniq -c|sort -n|while read line 
+
+do
+a=(`echo $line`) 
+#比较每个访问IP是否大于设定的max值
+if [ $a -ge $max ] 
+then
+ #判断是否是IP地址格式,这里并非严格意义上的判断
+ echo ${a[1]}|egrep -q '([0-9]+\.){3}[0-9]+' 
+ if [ $? -eq 0 ]; then
+ curlResult=`curl http://ip-api.com/json/${a[1]}`
+ chinaStr=China
+ successStr=success
+ if [[ $curlResult =~ $successStr && ! $curlResult =~ $chinaStr ]] 
+ then
+ #把“deny IP；”语句写入封锁配置文件中
+ echo "deny ${a[1]};">>$confDir 
+ fi
+ fi
+fi
+done
+/usr/local/nginx/sbin/nginx -s reload
+```
+
