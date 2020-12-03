@@ -371,3 +371,16 @@ overseer添加了Fetcher，当Fetcher返回有效的二进位流(io.Reader) 时�
 Fetcher运行在一个goroutine中，预先会配置好检查的间隔时间。Fetcher支持File、GitHub、HTTP和S3的方式。详细可查看包package fetcher
 
 overseer添加了一个主进程管理平滑重启。子进程处理连接，能够保持主进程pid不变
+
+
+
+### OAuth2.0 授权码方式
+
+`OAuth2.0`四种授权中授权码方式是最为复杂，但也是安全系数最高的，比较常用的一种方式。这种方式适用于兼具前后端的`Web`项目，因为有些项目只有后端或只有前端，并不适用授权码模式。
+
+下图我们以用`WX`登录掘金为例，详细看一下授权码方式的整体流程。
+
+![img](https://mmbiz.qpic.cn/mmbiz_png/0OzaL5uW2aPZTPST4c2Sfuialibia2ibByLoEKLCm6IR0MA2OVpG7L6p0hgZKb3Bhtric6UbTicQ5LtEDXIgkNZ12SCA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+
+用户选择`WX`登录掘金，掘金会向`WX`发起授权请求，**接下来 `WX`询问用户是否同意授权（常见的弹窗授权、扫码授权），这里和密码模式不同的是，用户输入账号密码给掘金，掘金再用账号密码去wx那验证授权，账号密码就暴露给掘金了**。`response_type` 为 `code` 要求返回授权码，`scope` 参数表示本次授权范围为只读权限，`redirect_uri` 重定向地址。
+
