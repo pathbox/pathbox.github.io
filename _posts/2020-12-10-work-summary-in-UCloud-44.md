@@ -35,5 +35,8 @@ func main() {
 
 https://kingsamchen.github.io/2019/11/09/src-study-uber-automaxprocs/
 
+https://kingsamchen.github.io/2019/11/09/src-study-uber-automaxprocs/
 
 
+
+### TiDB对join 连表加order by的查询方式优化不好，经常导致索引失效而产生慢查询
