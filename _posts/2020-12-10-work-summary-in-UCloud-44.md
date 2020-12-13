@@ -40,3 +40,10 @@ https://kingsamchen.github.io/2019/11/09/src-study-uber-automaxprocs/
 
 
 ### TiDB对join 连表加order by的查询方式优化不好，经常导致索引失效而产生慢查询
+
+
+
+### KMP算法的nextArr数组
+
+nextArr[i]的含义是在match[i]之前的字符串match[0..i-1]中，必须以match[i-1]结尾的后缀子串(不能包含match[0])与以match[0]开头的前缀子串(不包含match[i-1])最大匹配长度是多少。这个长度就是nextArr的值
+
