@@ -85,3 +85,22 @@ nextArr[i]的含义是在match[i]之前的字符串match[0..i-1]中，必须以m
    由于mysql会自动关闭超时连接，所以database/sql的SetConnMaxLifetime()不能设置为永久有效，要不然连接已经被mysql关闭了，但还是拿着失效的连接使用就会报invalid connection。
 
    解决的方案就是SetConnMaxLifetime()设置的时间小于wait_timeout就行，一般建议wait_timeout/2
+
+### INSERT IGNORE、INSERT...ON DUPLICATE KEY UPDATE、REPLACE
+
+- Inserting a duplicate key in columns with `PRIMARY KEY` or `UNIQUE` constraints.
+- Inserting a NULL into a column with a `NOT NULL` constraint.
+- Inserting a row to a partitioned table, but the values you insert don't map to a partition.
+
+`INSERT IGNORE`:then the row won't actually be inserted if it results in a duplicate key. But the statement won't generate an error. It generates a warning instead. 不会报error报错，而是一个warning
+
+`INSERT...ON DUPLICATE KEY UPDATE`: 会更新对应的字段
+
+`REPLACE`: 实际的操作是 DELETE 之后再INSERT。这样会引起一些情况:
+
+- A new auto-increment ID is allocated.
+- Dependent rows with foreign keys may be deleted (if you use cascading foreign keys) or else prevent the `REPLACE`.
+- Triggers that fire on `DELETE` are executed unnecessarily.
+- Side effects are propagated to replicas too
+
+> https://stackoverflow.com/questions/548541/insert-ignore-vs-insert-on-duplicate-key-update
