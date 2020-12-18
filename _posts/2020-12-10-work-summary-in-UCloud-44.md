@@ -76,3 +76,12 @@ nextArr[i]的含义是在match[i]之前的字符串match[0..i-1]中，必须以m
 
 ### 修改完hosts文件之后，浏览器需要重启才能在浏览器生效
 
+### 数据库(Mysql)连接无效(invalid connection)解决方案
+
+一般连接数据库的代码库都有实现连接池，如golang语言database/sql库，其中SetConnMaxLifetime(d time.Duration)是用来设置连接池里每条连接关闭的时间，当d <= 0时，连接池里的连接永久重用,即永远都在连接池里，拿来就用，不管此连接是否真的有效(这里有问题，下面讲)。当d > 0时，到了时间d才会关闭连接，把连接移出连接池，但这并不是时间一到就关闭，因为当连接还在使用时会等连接完成之后，等下一个清理连接周期(周期为d)时会关闭连接，移出连接池。
+
+   Mysql为了防止空闲连接过多，超过了参数mysql_connection之后会拒绝新连接，mysql会自动关闭空闭连接超过wait_timeout参数的时间，会关闭使用中超过interactive_timeout参数的连接。
+
+   由于mysql会自动关闭超时连接，所以database/sql的SetConnMaxLifetime()不能设置为永久有效，要不然连接已经被mysql关闭了，但还是拿着失效的连接使用就会报invalid connection。
+
+   解决的方案就是SetConnMaxLifetime()设置的时间小于wait_timeout就行，一般建议wait_timeout/2
