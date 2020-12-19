@@ -60,6 +60,14 @@ https://www.jianshu.com/p/07fc95df7e5c
 ### epoll本质超好的文章系列
 https://zhuanlan.zhihu.com/p/64138532
 
+### select有三弊，epoll有三优
+
+>select底层采用数组来管理套接字描述符，同时管理的数量有上限，一般不超过几千个，epoll使用树和链表来管理，同时管理数量可以很大。
+>
+>select不会告诉你到底哪个套接字来了消息，你需要一个个去询问。epoll直接告诉你谁来了消息，不用轮询。
+>
+>select进行系统调用时还需要把套接字列表在用户空间和内核空间来回拷贝，循环中调用select时简直浪费。epoll统一在内核管理套接字描述符，无需来回拷贝
+
 ### 简记Redis和MongoDB区别
 1. Redis 支持的数据结构丰富，包括hash、set、list等。MongoDB 数据结构比较单一，但是支持丰富的数据表达，索引，最类似关系型数据库，支持的查询语言非常丰富
 2. 当物理内存够用的时候，性能，redis>mongodb>mysql。mongodb可以存储文件，适合存放大量的小文件，内置了GirdFS 的分布式文件系统
