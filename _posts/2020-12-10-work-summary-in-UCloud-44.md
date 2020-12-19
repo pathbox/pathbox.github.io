@@ -117,3 +117,20 @@ PS: 如果hashmap底层不是用链表的方式存储冲突value，而是[开发
 
 > http://alishangtian.com/2020/09/25/hashmap-deadcricle/
 
+### 10大高性能开发tip
+
+```
+- I/O优化：零拷贝技术
+- I/O优化：多路复用技术
+- 线程池技术
+- 无锁编程技术
+- 进程间通信技术
+- RPC && 序列化技术
+- 数据库索引技术
+- 缓存技术 && 布隆过滤器
+- 全文搜索技术
+- 负载均衡技术
+```
+
+> http://alishangtian.com/2020/09/22/demond/
+
