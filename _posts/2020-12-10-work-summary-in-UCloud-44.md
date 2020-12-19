@@ -104,3 +104,16 @@ nextArr[i]的含义是在match[i]之前的字符串match[0..i-1]中，必须以m
 - Side effects are propagated to replicas too
 
 > https://stackoverflow.com/questions/548541/insert-ignore-vs-insert-on-duplicate-key-update
+
+###  Java HashMap的死循环问题
+
+HashMap在并发的情况，发生扩容时，可能会产生循环链表，在执行get的时候，会触发死循环，引起CPU的100%问题，所以一定要避免在并发环境下使用HashMap。
+
+生产环境无特殊情况建议使用ConcurrentHashmap
+
+PS: 如果hashmap底层不是用链表的方式存储冲突value，而是[开发地址生成法](https://en.wikipedia.org/wiki/Open_addressing) 用的是数组而不是链表存储，则不会出现死循环的问题
+
+在Golang中，同样的使用Golang的`map`的时候必须要使用锁，`sync.Map`可以不用，不过`sync.Map`更加适合读多写少的场景，`Concurrentmap`也是不错的选择
+
+> http://alishangtian.com/2020/09/25/hashmap-deadcricle/
+
