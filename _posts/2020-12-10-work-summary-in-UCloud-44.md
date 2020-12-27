@@ -173,3 +173,44 @@ PS: 如果hashmap底层不是用链表的方式存储冲突value，而是[开发
 
 实际上就是无法按照索引的排序规律，使用索引的排序进行快速的二分查找，从而变成可能需要全表扫描等方式获取数据。
 
+### MySQL的行锁、表锁、间隙锁对SQL的性能影响
+
+InnoDB一般加的都是行锁，行锁粒度小，并发性能最高。但如果SQL没有使用到任何索引和主键或者导致了索引失效，就会触发为表锁。比如：
+
+```sql
+UPDATE user SET name = "test" WHERE name = 'foo' OR name = 'bar' 
+```
+
+上面即使name有索引，因为OR导致索引失效，从而导致UPDATE操作加的是表锁
+
+间隙锁一般发生在WHERE一个范围中 ,比如：
+
+```sql
+UPDATE user SET age = 20 WHERE age > 0 AND age < 100
+INSERT user VALUES(30)
+```
+
+第一个UPDATE语句在 age > 0 AND age < 100的数据之间加上了间隙锁
+
+第二个INSERT age 30 的语句是会一直阻塞的，30在0-100之间，直到第一个语句的间隙锁释放了
+
+总结：间隙锁和表锁对性能的影响都是很大的，所以WHERE 语句要避免表锁发生，尽量避免间隙锁的发生。让WHERE使用到索引，并且减少范围情况下的更新修改等
+
+一个有用的语句：
+
+```sql
+SHOW status LIKE 'innodb_row_lock%'
+```
+
+可以得到数据库锁使用的情况
+
+```
+Innodb_row_lock_current_waits
+Innodb_row_lock_time
+Innodb_row_lock_time_avg
+Innodb_row_lock_time_max
+Innodb_row_lock_waits
+
+如果这几个数据的值都很大，说明数据库当前锁的性能影响比较大。如果数据库性能很低，可以从这几个地方考虑一下
+```
+
