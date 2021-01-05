@@ -217,3 +217,4 @@ Innodb_row_lock_waits
 ## # 提高golang写日志的性能
 
 golang 需要频繁写日志的时候，使用更高性能的json库，要么使用text format ，要么json format 的时候，特别主要下序列化的对象,使用struct， 序列化map的性能比较低
+
