@@ -41,3 +41,9 @@ docker 重启后，会恢复正常。但是容器都没有了，需要重新创�
 
 ### 如果是将没有值的缓存key的值存为null，则相关数据新增时，要将对应的缓存删除，否则取到的缓存有可能还是null
 
+
+
+### mysql错误Every derived table must have its own alias解决
+
+把MySQL语句改成：select * from (select * from ……) as 别名
+
