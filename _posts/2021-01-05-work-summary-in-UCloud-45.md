@@ -47,3 +47,5 @@ docker 重启后，会恢复正常。但是容器都没有了，需要重新创�
 
 把MySQL语句改成：select * from (select * from ……) as 别名
 
+### 注意redis key 前后不要有空格
+
