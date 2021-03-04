@@ -70,3 +70,4 @@ PID: 进程唯一id号，是一个整数,标识进程唯一性
 主库有一个log dump线程，将binlog传给从库
 从库有两个线程，一个I/O线程，一个SQL线程，I/O线程读取主库传过来的binlog内容并写入到relay log,
 SQL线程从relay log里面读取内容，写入从库的数据库。
+

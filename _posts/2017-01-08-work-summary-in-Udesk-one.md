@@ -31,8 +31,8 @@ func init() {
     MyDB, err = gorm.Open("mysql", dsn)
     // 连接池
      if err == nil {
-       MyDB.DB().SetMaxIdleConns(200)
-       MyDB.DB().SetMaxOpenConns(500)
+       MyDB.DB().SetMaxIdleConns(20)
+       MyDB.DB().SetMaxOpenConns(50)
        MyDB.DB().Ping()
        MyDB.LogMode(true)
      } else {

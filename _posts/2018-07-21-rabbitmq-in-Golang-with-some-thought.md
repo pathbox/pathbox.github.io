@@ -7,6 +7,7 @@ image: /assets/images/post.jpg
 ---
 
 ### 环境
+
 Mac OSX rabbitmq-server -detached 启动一个rabbitmq服务
 
 ### Publisher

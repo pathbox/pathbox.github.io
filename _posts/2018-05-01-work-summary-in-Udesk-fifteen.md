@@ -265,11 +265,17 @@ m["name"] = p.GetName()
 ```
 
 ##### Golang func()类型变量之间转换
+
+```go
 type JobFunc func()
 
-func (j JobFunc) Run() {
+func (j JobFunc) Run() { // 实际作用就是执行JobFunc这个函数逻辑
 	j()
 }
+
+```
+
+
 
 JobFunc 这个 adapter 的设计很有技巧。首先，JobFunc也是一种类型，和struct是同等的，类型就是 func()JobFunc 实现了Run 方法，复合Job接口，这样就实现了Job接口，所以可以赋值给Corn
 

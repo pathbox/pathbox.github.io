@@ -114,6 +114,7 @@ end
 把二进制命令放入 /usr/bin目录中，你就可以在终端使用这个命令啦～
 
 ##### includes + map tip
+
 ```ruby
 current_user.user_groups.includes(:users).map(&:users).flatten
 ```

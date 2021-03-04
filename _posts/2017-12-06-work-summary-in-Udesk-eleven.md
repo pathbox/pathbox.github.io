@@ -324,7 +324,7 @@ type argsKV struct {
     value []byte
 }
 
-// net.http中使用了map[string]string来存储各种其他参数，这就需要alloc，为了达成zero alloc，fasthttp采用了遍历所有header参数来返回
+// net.http中使用了map[string]string来存储各种其他参数，这就需要alloc，为了达成zero alloc，fasthttp采用了遍历所有header参数来返回。fasthttp将header信息都存为了[]byte,等真正需要使用的地方,再转为string
 
 ```
 

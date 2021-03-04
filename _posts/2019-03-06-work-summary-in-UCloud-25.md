@@ -265,9 +265,10 @@ spec:
 
 ### K8s port 简单理解
 
-- port: 集群内client访问服务(内网)
-- nodePort: 集群外client访问服务(外网)
-- targetPod: pod容器用的端口
+- port: 集群内client访问服务(内网)   clusterIP:port
+- nodePort: 集群外client访问服务(外网) nodeIP:nodePort 
+- targetPod: pod容器用的端口  podIP:targetPod
+- containerPort是在pod控制器中定义的、pod中的容器需要暴露的端口
 
 从这两个端口到来的数据都需要经过反向代理kube-proxy流入后端pod的targetPod，从而到达pod上的容器内
 
