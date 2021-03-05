@@ -237,7 +237,7 @@ ln -s /etc/nginx/sites-available/cap_puma cap_puma.conf
 
 ##### puma.rb
 
-`/web/www/udesk_vcall/shared/puma.rb`
+`/web/www/my_vcall/shared/puma.rb`
 
 config the puma.rb for environment  
 
@@ -270,7 +270,7 @@ end
 ##### cap test_puma deploy
 Then error happen.
 
-create `database.yml` `property.yml` `secrets.yml` in `/web/www/udesk_vcall/shared/config`
+create `database.yml` `property.yml` `secrets.yml` in `/web/www/my_vcall/shared/config`
 to fix the error
 
 

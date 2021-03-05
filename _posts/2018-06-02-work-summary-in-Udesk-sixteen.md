@@ -54,7 +54,7 @@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build main.go
 
 #写到Makefile中
 
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ${LDFLAGS} -o bin/udesk_ivr udesk/ivr
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ${LDFLAGS} -o bin/my_ivr my/ivr
 ```
 
 ##### 一致性hash算法总结

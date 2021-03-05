@@ -124,7 +124,7 @@ end
 # ====================
 #    (2.3ms)  ROLLBACK
 # RuntimeError: now it is raise
-# from /home/user/Documents/udesk_proj/app/models/city.rb:10:in `raise_test'
+# from /home/user/Documents/proj/app/models/city.rb:10:in `raise_test'
 # [5] pry(main)> c
 # => #<City id: 3, code: 1000, name: "nono", province_id: nil>
 

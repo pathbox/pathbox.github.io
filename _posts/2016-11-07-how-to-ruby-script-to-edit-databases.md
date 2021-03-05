@@ -202,13 +202,13 @@ STDOUT.sync = true
 
 #coding: utf-8
 # 第一次的时候，要确保有对应的索引存在
-# rake udesk_es_sync:sync_data_es from=2016-03-04 to=2016-09-08 table=Ticket company_id=x batch_size=1000
-# 支持 并发 rake parallel=1/4  udesk_es_sync:sync_data_es form=2016-03-04 table=Ticket
+# rake es_sync:sync_data_es from=2016-03-04 to=2016-09-08 table=Ticket company_id=x batch_size=1000
+# 支持 并发 rake parallel=1/4 es_sync:sync_data_es form=2016-03-04 table=Ticket
 # batch_size=1000 批量取的数量
 # 公司参数可传可不传
 # table 参数要是对应model的名称 如: Ticket, to 和conpany_id 可以不传
 # 对于有自定义字段的同步，可以在最后加 es_sync=true 优化自定义字段的同步速度，暂时对ticket有效
-namespace :udesk_es_sync do
+namespace :es_sync do
 
   desc 'MySQL 数据记录同步到ES'
   task sync_data_es: :environment do
@@ -227,7 +227,7 @@ namespace :udesk_es_sync do
 
     time = s.strftime("%Y%m%d%H%M%S")
     log_name = "es_sync_error_log_#{time}_#{model}_#{lot_num}.log"
-    LOGGER = create_udesk_logger(log_name)
+    LOGGER = create_logger(log_name)
     if model.blank?
       LOGGER.record do |title, log|
         title << "ES Sync Mysql"
@@ -342,7 +342,7 @@ namespace :udesk_es_sync do
     end
   end
 
-# rake udesk_es_sync:check_sync_data_es from=2016-03-04 to=2016-09-08 table=Ticket company_id=x
+# rake es_sync:check_sync_data_es from=2016-03-04 to=2016-09-08 table=Ticket company_id=x
 # 公司参数可传可不传
 # table 参数要是对应model的名称 如: Ticket
 # 同步数量小于5w的不适合用本脚本，直接使用import force:true 不断同步就可以

@@ -235,13 +235,13 @@ config/jvm.options
 #
 # Use a descriptive name for your cluster:
 #
-cluster.name: udesk_proj_production
+cluster.name: proj_production
 #
 # ------------------------------------ Node ------------------------------------
 #
 # Use a descriptive name for the node:
 #
-node.name: udesk_proj_es01
+node.name: proj_es01
 node.master: true
 node.data: true
 #

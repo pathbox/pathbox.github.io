@@ -64,7 +64,7 @@ Showing top 10 nodes out of 83 (cum >= 43.01MB)
    96.51MB  5.16% 69.57%    97.51MB  5.21%  context.WithCancel
    82.52MB  4.41% 73.98%   703.77MB 37.62%  net/http.readRequest
    45.51MB  2.43% 76.41%   454.68MB 24.30%  net/textproto.(*Reader).ReadMIMEHeader
-   44.74MB  2.39% 78.80%    55.25MB  2.95%  _/home/user/Documents/udesk_vistor_go/app/controllers.SocketConnection
+   44.74MB  2.39% 78.80%    55.25MB  2.95%  _/home/user/Documents/vistor_go/app/controllers.SocketConnection
    43.01MB  2.30% 81.10%    43.01MB  2.30%  net/url.parse
 ```
 上面列出了现在系统哪些包和库的函数的内存使用量，可以使用 list lib_name　来定位到具体代码的位置。
