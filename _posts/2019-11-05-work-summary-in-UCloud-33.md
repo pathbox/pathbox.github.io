@@ -35,7 +35,7 @@ fmt.Sprintf("SELECT user_id,user_email FROM user WHERE company_id = %d AND user_
 流程:
 1、替换可执行文件或修改配置文件
 2、发送信号量 SIGHUP
-3、拒绝新连接请求旧进程，但要保证已有连接正常
+3、拒绝新连接请求旧进程，但要保证已有连接正常执行结束
 4、启动新的子进程
 5、新的子进程开始 Accet
 6、系统将新的请求转交新的子进程

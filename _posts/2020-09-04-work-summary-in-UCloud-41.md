@@ -162,19 +162,7 @@ ps aux | grep cmd
 
 <details open="" style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary><p style="box-sizing: border-box; margin-top: 0px; margin-bottom: 16px;">不可以。有两个原因：</p><p style="box-sizing: border-box; margin-top: 0px; margin-bottom: 16px;">首先，可能会出现<strong style="box-sizing: border-box; font-weight: 600;">已失效的连接请求报文段又传到了服务器端</strong>。</p><blockquote style="box-sizing: border-box; margin: 0px 0px 16px; padding: 0px 1em; color: rgb(106, 115, 125); border-left: 0.25em solid rgb(223, 226, 229);"><p style="box-sizing: border-box; margin-top: 0px; margin-bottom: 0px;">client 发出的第一个连接请求报文段并没有丢失，而是在某个网络结点长时间的滞留了，以致延误到连接释放以后的某个时间才到达 server。本来这是一个早已失效的报文段。但 server 收到此失效的连接请求报文段后，就误认为是 client 再次发出的一个新的连接请求。于是就向 client 发出确认报文段，同意建立连接。假设不采用 “三次握手”，那么只要 server 发出确认，新的连接就建立了。由于现在 client 并没有发出建立连接的请求，因此不会理睬 server 的确认，也不会向 server 发送数据。但 server 却以为新的运输连接已经建立，并一直等待 client 发来数据。这样，server 的很多资源就白白浪费掉了。采用 “三次握手” 的办法可以防止上述现象发生。例如刚才那种情况，client 不会向 server 的确认发出确认。server 由于收不到确认，就知道 client 并没有要求建立连接。</p></blockquote><p style="box-sizing: border-box; margin-top: 0px; margin-bottom: 16px;">其次，两次握手无法保证Client正确接收第二次握手的报文（Server无法确认Client是否收到），也无法保证Client和Server之间成功互换初始序列号</p></details>
 
-##### 可以采用四次握手吗？为什么？
-
-<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
-
-##### 第三次握手中，如果客户端的ACK未送达服务器，会怎样？
-
-<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
-
-##### 如果已经建立了连接，但客户端出现了故障怎么办？
-
-<details style="box-sizing: border-box; display: block; margin-top: 0px; margin-bottom: 16px;"><summary style="box-sizing: border-box; display: list-item; cursor: pointer;">展开</summary></details>
-
-###  什么是四次挥手？
+###   什么是四次挥手？
 
 [![四次挥手](https://github.com/wolverinn/Waking-Up/raw/master/_v_images/20191129112652915_15481.png)](https://github.com/wolverinn/Waking-Up/blob/master/_v_images/20191129112652915_15481.png)
 
@@ -243,13 +231,21 @@ net.ipv4.tcp_tw_recycle = 0 （**不要开启，现在互联网NAT结构很多�
 
 开启后在3.5*RTO(RTO时间是根据RTT时间计算而来)内回收TIME_WAIT，并60s内同一源ip主机的socket connect请求中的timestamp必须是递增的，对于服务端，同一个源ip可能会是NAT后很多机器，这些机器timestamp递增性无可保证，服务器会拒绝非递增请求连接，直接导致不能三次握手
 
+https://www.cnxct.com/coping-with-the-tcp-time_wait-state-on-busy-linux-servers-in-chinese-and-dont-enable-tcp_tw_recycle/
+
+
+
+recycle：对于服务端，同一个src ip，可能会是NAT后很多机器，这些机器timestamp递增性无可保证，服务器会拒绝非递增请求连接
+
+**其实TIME_WAIT状态的链接对业务程序带来的影响远小于CLOSE_WAIT一个TIME_WAIT链接会占用几K的内存资源（现在的服务器动辄上百G内存）和一个临时端口资源，一个CLOSE_WAIT链接除了占用内存资源还占用一个文件描述符；对于临时端口资源可以开启tcp_tw_reuse选项去重用，而文件描述符却不可以重用，所以CLOSE_WAIT状态的链接的危害远大于TIME_WAIT**
+
 ### tcp协议中处于last_ack状态的连接，如果一直收不到对方的ack，最终会进入CLOSED
 
  上一张网上搜索的图，更好理解（侵删）
 
-![img](https://pic3.zhimg.com/50/v2-598eee1c80c322c65521c359cb0ba8a1_hd.jpg?source=1940ef5c)![img](https://pic3.zhimg.com/80/v2-598eee1c80c322c65521c359cb0ba8a1_720w.jpg?source=1940ef5c)
+![img](https://pic3.zhimg.com/80/v2-598eee1c80c322c65521c359cb0ba8a1_720w.jpg?source=1940ef5c)
 
-这个链接中讲述了三种情况：(2017/10/26 Update:补充了第四种情况 感谢 @似水流年  )  
+这个链接中讲述了三种情况：  
 下面假设：主动关闭的一端为A，被动关闭的一端为B，  根据B是否收到最后的ACK包分为两种情况
 
 1. B发送FIN，进入LAST_ACK状态，A收到这个FIN包后发送ACK包，***B收到这个ACK包\***，然后进入CLOSED状态

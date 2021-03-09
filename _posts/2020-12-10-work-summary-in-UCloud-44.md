@@ -183,6 +183,15 @@ UPDATE user SET name = "test" WHERE name = 'foo' OR name = 'bar'
 
 上面即使name有索引，因为OR导致索引失效，从而导致UPDATE操作加的是表锁
 
+不如修改为:
+
+```sql
+UPDATE user SET name = "test" WHERE name = 'foo'  
+UPDATE user SET name = "test" WHERE name = 'bar'
+```
+
+
+
 间隙锁一般发生在WHERE一个范围中 ,比如：
 
 ```sql
@@ -214,7 +223,7 @@ Innodb_row_lock_waits
 如果这几个数据的值都很大，说明数据库当前锁的性能影响比较大。如果数据库性能很低，可以从这几个地方考虑一下
 ```
 
-## # 提高golang写日志的性能
+### 提高golang写日志的性能
 
 golang 需要频繁写日志的时候，使用更高性能的json库，要么使用text format ，要么json format 的时候，特别主要下序列化的对象,使用struct， 序列化map的性能比较低
 

@@ -17,3 +17,4 @@ image: /assets/images/post.jpg
 第三阶段: 该节点主机的磁盘IO率不高，但比其他节点主机高不少，从该节点主机上迁移走别的库的kv节点，磁盘IO率降低，观察几天，INSERT 的SLOW_QUERY 记录几乎不再出现，SELECT的慢日志数量也降低
 
 现阶段：仍有INSERT的SLOW LOG，每天大概在30条左右，执行时间是在0.3-1.5s之间,观察TiDB监控图的延迟信息，不会有急剧的高峰
+

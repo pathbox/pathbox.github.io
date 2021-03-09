@@ -179,3 +179,4 @@ binlog_format        = MIXED                 //binlog日志格式
 log_bin              =目录/mysql-bin.log    //binlog日志名
 expire_logs_days     = 7                //binlog过期清理时间
 max_binlog_size      100m                    //binlog每个日志文件大小
+
