@@ -295,15 +295,7 @@ int main()
 
 # [1分钟内的Linux性能分析法](https://isites.github.io/timeline/60-linux/)
 
-------
 
-Table of Contents
-
-[总结](https://isites.github.io/timeline/60-linux/#总结)[uptime](https://isites.github.io/timeline/60-linux/#uptime)[dmesg | tail](https://isites.github.io/timeline/60-linux/#dmesg--tail)[vmstat 1](https://isites.github.io/timeline/60-linux/#vmstat-1)[mpstat -P ALL 1](https://isites.github.io/timeline/60-linux/#mpstat--p-all-1)[pidstat 1](https://isites.github.io/timeline/60-linux/#pidstat-1)[iostat -xz 1](https://isites.github.io/timeline/60-linux/#iostat--xz-1)[free -m](https://isites.github.io/timeline/60-linux/#free--m)[sar -n DEV 1](https://isites.github.io/timeline/60-linux/#sar--n-dev-1)[sar -n TCP,ETCP 1](https://isites.github.io/timeline/60-linux/#sar--n-tcpetcp-1)[top](https://isites.github.io/timeline/60-linux/#top)
-
-------
-
-> 本着“拿来主义”的精神，吸收他人长处为己用。老许翻译一篇Linux性能分析相关的文章分享给各位读者，同时也加深自己的印象。
 
 你登录到具有性能问题的Linux服务器时，第一分钟要检查什么？
 
@@ -601,3 +593,8 @@ top的缺点是随着时间推移不能看到相关变化，像vmstat和pidstat�
 
 
 
+###Golang map作为函数参数时在函数参数内部对 map 的操作会影响 map 自身
+
+makemap 和 makeslice 的区别，带来一个不同点：当 map 和 slice 作为函数参数时，在函数参数内部对 map 的操作会影响 map 自身；而对 slice 却不会（之前讲 slice 的文章里有讲过）。
+
+主要原因：一个是指针（`*hmap`），一个是结构体（`slice`）。**Go 语言中的函数传参都是值传递，在函数内部，参数会被 copy 到本地。`*hmap`指针 copy 完之后，仍然指向同一个 map，因此函数内部对 map 的操作会影响实参**。而 slice 被 copy 后，会成为一个新的 slice，对它进行的操作不会影响到实参
