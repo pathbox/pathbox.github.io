@@ -611,3 +611,21 @@ makemap 和 makeslice 的区别，带来一个不同点：当 map 和 slice 作�
          a / (2^n) 等价于 a>> n
         例: 12/8 == 12>>3
  a % 2 等价于 a & 1    
+
+### gRPC在K8s中的负载均衡问题
+
+> However, gRPC also breaks the standard connection-level load balancing, including what’s provided by Kubernetes. This is because gRPC is built on HTTP/2, and HTTP/2 is designed to have a single long-lived TCP connection, across which all requests are multiplexed—meaning multiple requests can be active on the same connection at any point in time. Normally, this is great, as it reduces the overhead of connection management. However, it also means that (as you might imagine) connection-level balancing isn’t very useful. Once the connection is established, there’s no more balancing to be done. All requests will get pinned to a single destination pod …
+
+
+
+解决方案：
+
+- Linkerd
+- Nginx
+- Istio
+
+选择使用了内部的Istio方案
+
+[gRPC Load Balancing on Kubernetes without Tears](https://kubernetes.io/blog/2018/11/07/grpc-load-balancing-on-kubernetes-without-tears/)
+
+https://pandaychen.github.io/2020/06/01/K8S-LOADBALANCE-WITH-KUBERESOLVER/
