@@ -629,3 +629,19 @@ makemap 和 makeslice 的区别，带来一个不同点：当 map 和 slice 作�
 [gRPC Load Balancing on Kubernetes without Tears](https://kubernetes.io/blog/2018/11/07/grpc-load-balancing-on-kubernetes-without-tears/)
 
 https://pandaychen.github.io/2020/06/01/K8S-LOADBALANCE-WITH-KUBERESOLVER/
+
+
+
+### 分布式定时任务实现方式
+
+- 分布式锁处理分布式一致性
+- 使用Redis的有序集合（Sorted Set）将要执行任务的ID和毫秒时间戳ZAdd到有序集合中
+- 定时1秒去执行消费定任务任务方法
+- 消费方法加分布式锁，避免重复消息，通过死循环获取有序集合最小的时间戳与当前时间戳做对比，如果小于则执行，如果大于等线程等待100ms后继续下一次循环
+
+
+elastic-job、Quartz一类分布式调度架构也可以实现
+
+MQ消息队列
+
+简单的算法数据结构设计是：小顶堆、时间轮算法
