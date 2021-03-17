@@ -645,3 +645,45 @@ elastic-job、Quartz一类分布式调度架构也可以实现
 MQ消息队列
 
 简单的算法数据结构设计是：小顶堆、时间轮算法
+
+
+
+### 递归与回溯的区别
+
+回溯是递归的一个子集， 回溯在递归的代码逻辑中还有for循环的部分
+
+```go
+// 全排列的例子
+
+var res [][]int
+
+func permute(nums []int) [][]int {
+  res = make([][]int, 0)
+  used := make(map[int]struct{})
+  dfs(nums, []int{}, 0, used)
+  return res 
+}
+
+func dfs(nums, tmp []int, start int, used map[int]struct{}) {
+    if len(tmp) == len(nums) {
+        cp := make([]int, len(tmp))
+        copy(cp, tmp)
+        res = append(res, cp)
+        return 
+    }
+
+  // 回溯需要used 来过滤重复数字的情况，如果数字可以重复使用则不需要used
+    for i := 0; i < len(nums); i++ {
+        if _, ok := used[nums[i]]; ok {
+            continue 
+        }
+        tmp = append(tmp, nums[i])
+        used[nums[i]] = struct{}{}
+        dfs(nums, tmp, i+1, used)
+        tmp = tmp[:len(tmp)-1]
+        delete(used, nums[i])
+
+    }
+}
+```
+
