@@ -189,10 +189,19 @@ MSL(Maximum Segment Lifetime)，指一个片段在网络中最大的存活时间
 主要有两个原因：
 1）为了确保两端能完全关闭连接。
 假设A服务器是主动关闭连接方，B服务器是被动方。如果没有TIME_WAIT状态，A服务器发出最后一个ACK就进入关闭状态，如果这个ACK对端没有收到，对端就不能完成关闭。对端没有收到ACK，会重发FIN，此时连接关闭，这个FIN也得不到ACK，而有TIME_WAIT，则会重发这个ACK，确保对端能正常关闭连接。
+
+另外一个作用是，当最后一个ACK丢失时，远程连接进入LAST-ACK状态，它可以确保远程已经关闭当前TCP连接。如果没有TIME-WAIT状态，当远程仍认为这个连接是有效的，则会继续与其通讯，导致这个连接会被重新打开。当远程收到一个SYN 时，会回复一个RST包，因为这SEQ不对，那么新的连接将无法建立成功，报错终止。
+[![last-ack](https://image.cnxct.com/2015/07/last-ack.png)](https://image.cnxct.com/2015/07/last-ack.png)
+如果远程因为最后一个ACK包丢失，导致停留在LAST-ACK状态，将影响新建立具有相同四元组的TCP连接。
+
+(被断开方还没CLOSED处于LAST_ACK等待主动断开方发送ACK，如果TIME_WAIT时间过短,使得主动断开方已经CLOSED了,然后主动断开方可以使用这个端口:a和IP:b,建立新的连接,发送SYN请求就会发到被动端开方还在LAST_ACK状态等待ACK没关闭的连接上，之前与主动断开方端口:a和IP:b是建立连接的，此时它们的SEQ序号是不一致的，就会导致被动断开方发送RST，此次建立连接失败。主动断开方又会重新发送建立连接请求，这样看是一种资源消耗)
+
 2）为了确保后续的连接不会收到“脏数据”
 刚才提到主动端进入TIME_WAIT后，等待2MSL后CLOSE，这里的MSL是指（maximum segment lifetime，我们内核一般是30s，2MSL就是1分钟），网络上数据包最大的生命周期。这是为了使网络上由于重传出现的old duplicate segment都消失后，才能创建参数（四元组，源IP/PORT，目标IP/PORT）相同的连接，如果等待时间不够长，又创建好了一样的连接，再收到old duplicate segment，数据就错乱了
 
 https://developer.aliyun.com/article/745776
+
+https://www.cnxct.com/coping-with-the-tcp-time_wait-state-on-busy-linux-servers-in-chinese-and-dont-enable-tcp_tw_recycle/
 
 
 
