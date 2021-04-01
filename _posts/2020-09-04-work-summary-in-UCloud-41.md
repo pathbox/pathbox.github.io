@@ -238,6 +238,16 @@ net.ipv4.tcp_tw_recycle = 0 （**不要开启，现在互联网NAT结构很多�
 
 4.x后移除的tcp_tw_recycle是依赖timestamp配置，timestamp在nat下有包混乱的问题
 
+```
+1. 同时开启tcp_timestamp和tcp_tw_recycle会启用TCP/IP协议栈的per-host的PAWS机制
+2. 经过同一NAT转换后的来自不同真实client的数据流，在服务端看来是于同一host打交道
+3. 虽然经过同一NAT转化，但由于不同真实client会携带各自的timestamp值
+因而无法保证整过NAT转化后的数据包携带的timestamp值严格递增
+4. 当服务器的per-host PAWS机制被触发后，会丢弃timestamp值不符合递增条件的数据包
+```
+
+
+
 开启后在3.5*RTO(RTO时间是根据RTT时间计算而来)内回收TIME_WAIT，并60s内同一源ip主机的socket connect请求中的timestamp必须是递增的，对于服务端，同一个源ip可能会是NAT后很多机器，这些机器timestamp递增性无可保证，服务器会拒绝非递增请求连接，直接导致不能三次握手
 
 https://www.cnxct.com/coping-with-the-tcp-time_wait-state-on-busy-linux-servers-in-chinese-and-dont-enable-tcp_tw_recycle/

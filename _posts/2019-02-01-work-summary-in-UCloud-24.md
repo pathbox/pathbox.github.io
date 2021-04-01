@@ -124,6 +124,7 @@ TCP滑动窗口为了解决:`可靠传输以及包乱序（reordering）的问�
 4.快速恢复
 
 ### 连接的五元组
+
 同一个连接需要五元组来确定（src_ip, src_port, dst_ip, dst_port）和协议(TCP、UDP)
 
 

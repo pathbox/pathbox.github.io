@@ -735,3 +735,10 @@ http://www.cs.columbia.edu/~nahum/w6998/papers/ton97-timing-wheels.pdf
 
 docker的老版本容器内访问IPv6地址有问题，无法成功。这个bug已经在新版本修复
 
+### TiDB的ORDER BY  与MySQL的不同
+
+比如 MySQL ORDER BY created_at 操作，每次得到的结果顺序都是一致的，而TiDB当记录的created_at 值相同的时候，得到的结果顺序会有几率不同，原本A记录在B记录的前面，下一次查询，A记录在B记录后面。这样会导致分页的时候出现问题。在点击当前页的时候，A记录在最后一个记录，点击第二页的时候，A记录又出现在了第一个记录位置。
+
+个人理解是MySQL在最后返回数据时，还会根据主键来排序，再返回，而TiDB没有。
+
+TiDB要完全避免这种情况可以这样：ORDER BY created_at,id  加上主键一起ORDER BY
