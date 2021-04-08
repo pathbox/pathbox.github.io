@@ -182,7 +182,7 @@ ps aux | grep cmd
 
 ##### 客户端TIME_WAIT状态的意义是什么？
 
-第四次挥手时，客户端发送给服务器的ACK有可能丢失，TIME_WAIT状态就是用来重发可能丢失的ACK报文。如果Server没有收到ACK，就会重发FIN，如果Client在2*MSL的时间内收到了FIN，就会重新发送ACK并再次等待2MSL，防止Server没有收到ACK而不断重发FIN
+第四次挥手时，客户端发送ACK有可能丢失，TIME_WAIT状态就是用来重发可能丢失的ACK报文。如果Server没有收到ACK，就会重发FIN，如果Client在2*MSL的时间内收到了FIN，就会重新发送ACK并再次等待2MSL，防止Server没有收到ACK而不断重发FIN
 
 MSL(Maximum Segment Lifetime)，指一个片段在网络中最大的存活时间，2MSL就是一个发送和一个回复所需的最大时间。如果直到2MSL，Client都没有再次收到FIN，那么Client推断ACK已经被成功接收，则结束TCP连接
 
@@ -213,6 +213,8 @@ https://www.cnxct.com/coping-with-the-tcp-time_wait-state-on-busy-linux-servers-
 2. ACK报文被B接收到。我们假设A发送了ACK报文后过了一段时间t之后B才收到该ACK，则有 0 < t <= MSL。因为A并不知道它发送出去的ACK要多久对方才能收到，所以A至少要维持MSL时长的TIME_WAIT状态才能保证它的ACK从网络中消失。同时处于LAST_ACK状态的B因为收到了ACK，所以它直接就进入了CLOSED状态，而不会向网络发送任何报文。所以晃眼一看，A只需要等待1个MSL就够了，但仔细想一下其实1个MSL是不行的，因为在B收到ACK前的一刹那，B可能因为没收到ACK而重传了一个FIN报文，这个FIN报文要从网络中消失最多还需要一个MSL时长，所以A还需要多等一个MSL。
 
 综上所述，TIME_WAIT至少需要持续2MSL时长，这2个MSL中的第一个MSL是为了等自己发出去的最后一个ACK从网络中消失，而第二MSL是为了等在对端收到ACK之前的一刹那可能重传的FIN报文从网络中消失。
+
+(由于网络慢原因，可能在MSL时间A发的ACK才到达B，而此时B刚好重发了FIN,这个FIN实质上对A来说是没有用了，上一个FIN A收到了。要让这第二个FIN失效，也需要MSL时间，所以一共需要2MSL时间，才能让网络中旧的报文完全失效)
 
 2MSL能够保证旧连接发送的报文，在有新的连接建立后，不会被传到新的连接的任意一端。2MSL让旧的报文都在网络中消失
 
