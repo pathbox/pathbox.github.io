@@ -38,3 +38,11 @@ image: /assets/images/post.jpg
 - 对应前置内部网关是否有问题
 - 调用方部门的服务是否部署到了别的地域导致不再同一个局域网内
 
+
+
+### go context cancel不执行会怎样
+
+If you fail to cancel the context, the [goroutine that WithCancel or WithTimeout created](https://golang.org/src/context/context.go?s=9162:9288) will be retained in memory indefinitely (until the program shuts down), causing a memory leak. If you do this a lot, your memory will balloon significantly. It's best practice to use a `defer cancel()` immediately after calling `WithCancel()` or `WithTimeout()`
+
+很有可能会导致内存泄漏(goroutine没有关闭,goroutine泄漏)
+
