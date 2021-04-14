@@ -44,5 +44,41 @@ image: /assets/images/post.jpg
 
 If you fail to cancel the context, the [goroutine that WithCancel or WithTimeout created](https://golang.org/src/context/context.go?s=9162:9288) will be retained in memory indefinitely (until the program shuts down), causing a memory leak. If you do this a lot, your memory will balloon significantly. It's best practice to use a `defer cancel()` immediately after calling `WithCancel()` or `WithTimeout()`
 
-很有可能会导致内存泄漏(goroutine没有关闭,goroutine泄漏)
+很有可能会导致内存泄漏
+
+在goroutine中往channel写入数据，很可能由于读取channel的逻辑错误而没法执行到读取channel而导致写入channel的goroutine一直阻塞,造成goroutine泄漏，GC也不会将其回收。该阻塞的goroutine实际上被认为还在使用
+
+### go 内存逃逸示例
+
+`golang程序变量`会携带有一组校验数据，用来证明它的整个生命周期是否在运行时完全可知。如果变量通过了这些校验，它就可以在`栈上`分配。否则就说它 `逃逸` 了，必须在`堆上分配`。
+
+能引起变量逃逸到堆上的**典型情况**：
+
+- **在方法内把局部变量指针返回** 局部变量原本应该在栈中分配，在栈中回收。但是由于返回时被外部引用，因此其生命周期大于栈，则溢出。
+- **发送指针或带有指针的值到 channel 中。** 在编译时，是没有办法知道哪个 goroutine 会在 channel 上接收数据。所以编译器没法知道变量什么时候才会被释放。
+- **在一个切片上存储指针或带指针的值。** 一个典型的例子就是 []*string 。这会导致切片的内容逃逸。尽管其后面的数组可能是在栈上分配的，但其引用的值一定是在堆上。
+- **slice 的背后数组被重新分配了，因为 append 时可能会超出其容量( cap )。** slice 初始化的地方在编译时是可以知道的，它最开始会在栈上分配。如果切片背后的存储要基于运行时的数据进行扩充，就会在堆上分配。
+- **在 interface 类型上调用方法。** 在 interface 类型上调用方法都是动态调度的 —— 方法的真正实现只能在运行时知道。想像一个 io.Reader 类型的变量 r , 调用 r.Read(b) 会使得 r 的值和切片b 的背后存储都逃逸掉，所以会在堆上分配
+
+```go
+package main
+import "fmt"
+type A struct {
+ s string
+}
+// 这是上面提到的 "在方法内把局部变量指针返回" 的情况
+func foo(s string) *A {
+ a := new(A) 
+ a.s = s
+ return a //返回局部变量a,在C语言中妥妥野指针，但在go则ok，但a会逃逸到堆
+}
+func main() {
+ a := foo("hello")
+ b := a.s + " world"
+ c := b + "!"
+ fmt.Println(c)
+}
+
+// go build -gcflags=-m main.go
+```
 

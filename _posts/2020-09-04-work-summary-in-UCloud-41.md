@@ -151,10 +151,12 @@ for update仅适用于InnoDB，且必须在事务块(BEGIN/COMMIT)中才能生�
 ### Linux 后台运行命令
 
 ```shell
-nohup ./cmd 2>&1 | tee cmd_log.log &
+nohup ./cmd 2>&1 >> cmd_log.log &
 Ctrl c
 ps aux | grep cmd
 ```
+
+
 
 ### TCP建立连接可以两次握手吗？为什么?
 

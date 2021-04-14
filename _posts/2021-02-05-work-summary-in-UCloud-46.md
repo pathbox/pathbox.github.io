@@ -76,3 +76,14 @@ redis缓存操作超时，该操作并非异步处理，而超时时间达到了
 - 屏蔽底层实现细节
 - 替换底层的时候，调用放改动小，方便替换
 - 方便实现统一供暖
+
+
+
+### Docker的限制
+
+Docker支持64位系统比如 X86 AMD64的操作系统，不支持32位系统。 对Linux系统核心需要较新的平台，一般3.2版本以上。
+
+Docker底层是依赖于namespace和cgroup，所以仅仅支持有namespace和cgroup技术的操作系统。对于windows和macOS是通过中间工具来启动使用Docker
+
+低版本的Docker部署的容器不支持请求IPv6的地址和域名
+
