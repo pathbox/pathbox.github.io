@@ -715,7 +715,11 @@ Go 的编译器会通过**逃逸分析**将大部分新生对象存储在栈上�
 
 尽管 STW 如今已经优化到了半毫秒级别以下，但这个程序被卡死原因是由于需要进入 STW 导致的。原因在于，GC 在需要进入 STW 时，需要通知并让所有的用户态代码停止，但是 `for {}` 所在的 goroutine 永远都不会被中断，从而始终无法进入 STW 阶段。实际实践中也是如此，当程序的某个 goroutine 长时间得不到停止，强行拖慢进入 STW 的时机，这种情况下造成的影响（卡死）是非常可怕的。好在自 Go 1.14 之后，这类 goroutine 能够被异步地抢占，从而使得进入 STW 的时间不会超过抢占信号触发的周期，程序也不会因为仅仅等待一个 goroutine 的停止而停顿在进入 STW 之前的操作上
 
+根节点root数据指的是全局变量和函数栈
+
 https://golang.design/go-questions/memgc/principal/
+
+https://studygolang.com/articles/27243
 
 https://www.jianshu.com/p/bfc3c65c05d1?utm_source=wechat_session
 
