@@ -108,7 +108,7 @@ func main() {
 
  
 
-### Trie树对Hash表
+###Trie树对Hash表
 
 > Trie树，即字典树，又称单词查找树或键树，是一种树形结构，是一种哈希树的变种。典型应用是用于统计和排序大量的字符串（但不仅限于字符串），所以经常被搜索引擎系统用于文本词频统计。它的优点是：最大限度地减少无谓的字符串比较，查询效率比哈希表高。
 >
@@ -119,4 +119,51 @@ func main() {
 > - 每个节点的所有子节点包含的字符都不相同
 
  
+
+### 使用redis为kv存储实现索引
+
+kv中的数据是这样的： id => {status}_xxx_{created_at} 
+
+定义status有10中状态值：1-10
+
+希望实现的索引，能够根据status搜索，并且可以按照created_at排序(倒序)输出。还能实现分页功能
+
+1. 实现一个B+树（这个方法比较复杂）
+2. 使用redis的zset有序集合
+
+使用redis的zset有序集合可以实现一个类似"倒排索引"的索引结构
+
+```
+ZADD {status} {created_at} id
+
+ZREVRANGE {status} 0 10 withscores
+```
+
+这样就根据created_at值倒序输出10个值
+
+zset可以方便的实现根据score排序和分页
+
+- 页面总数为：`ZCOUNT`命令
+- 当前页内容：`ZRANGE`命令
+- 若以倒序排列：`ZREVRANGE`命令
+
+zset也有移除操作，可以方便移除索引值
+
+根据status进行搜索输出可否实现呢？
+
+比如：需要得到status > 3 的结果。
+
+1. 遍历 4-10的key，把所有结果找出来，再合并，再根据created_at排序
+
+2. 使用zset的zunionstore：对给定的有序集合执行类似于集合的并集运算。
+
+但是，使用zunionstore会有一个问题，当member 这里是status相同的话，会将score进行合并计算，这样就改变了原有的created_at值。因为zunionstore本质是进行交集合并操作。所以zunionstore的方法适合一个id只有一个status值的情况，这样合并的时候，status是不会有冲突重复的，合并后得到新的zset的created_at值是保留原始值，不会是合并值而更改。然后得到合并后新的zset可以进行分页，对created_at排序输出。
+
+3. 如果一个id可以有多个status呢？比如分页大小是10，需要遍历4-10的key，每个key根据created_at排序得到10个值，将这10个值放到一个数组中，再排序，再最后输出10个值。这步的操作和redis的命令几乎无关了，实际实现的效率可能就会差一些
+
+https://segmentfault.com/a/1190000009821423
+
+
+
+
 
