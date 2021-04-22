@@ -65,6 +65,7 @@ UCloud提供了kafka和rocketMQ消息队列产品服务，使用它们能够快�
 ### canal的kafka配置
 canal配上kafka也非常的简单。
 vi /usr/local/canal/conf/canal.properties
+
 ```
 # ...
 # 可选项: tcp(默认), kafka, RocketMQ
