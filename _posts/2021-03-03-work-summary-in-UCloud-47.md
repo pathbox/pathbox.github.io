@@ -733,7 +733,7 @@ https://yfscfs.gitee.io/post/%E4%BB%A4%E4%BA%BA%E6%83%8A%E8%89%B3%E7%9A%84%E6%97
 
 http://www.cs.columbia.edu/~nahum/w6998/papers/ton97-timing-wheels.pdf
 
-
+https://blog.csdn.net/xinzhongtianxia/article/details/86221241
 
 ### Docker 版本太低导致容器内访问IPv6地址失败
 

@@ -72,7 +72,7 @@ where name = 'foo' and age = 10 or age = 20
 ```
 表示MySQL在表中找到所需行的方式，又称“访问类型”。
 
-常用的类型有： ALL, index,  range, ref, eq_ref, const, system, NULL（从左到右，性能从差到好）
+常用的类型有： ALL, index,  range, ref, eq_ref, const, system, NULL（从左到右，性能从差到好）一般来说，range以及之后的类型性能才是比较合适的
 
 ALL：Full Table Scan， MySQL将遍历全表以找到匹配的行
 
