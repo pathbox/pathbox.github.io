@@ -313,3 +313,11 @@ TCP/IP协议隆重出场，RFC1700规定使用“大端”字节序为网络字�
 如果你的接口，消息消费不是幂等的，一定要在业务上进行去重，比如有唯一标识，能根据唯一标识进行去重复识别。
 
 不能单纯依靠系统或消息队列的去重能力
+
+
+
+### 使用base64.RawURLEncondig.DecodeString
+
+Golang中进行base64解码操作请使用base64.RawURLEncondig.DecodeString
+
+https://blog.csdn.net/u014270740/article/details/91038606
