@@ -69,6 +69,7 @@ Redis::CommandError: CROSSSLOT Keys in request don’t hash to the same slot
 -  redis 采用非阻塞IO多路复用技术（尽量减少网络IO的时间消耗）来实现网络并发操作，epoll
 
 ### Golang的逃逸分析简记
+
 逃逸分析这种“骚操作”把变量合理地分配到它该去的地方，“找准自己的位置”。即使你是用new申请到的内存，如果我发现你竟然在退出函数后没有用了，那么就把你丢到栈上，毕竟栈上的内存分配比堆上快很多；反之，即使你表面上只是一个普通的变量，但是经过逃逸分析后发现在退出函数之后还有其他地方在引用，那我就把你分配到堆上。真正地做到“按需分配”，提前实现共产主义！
 
 当发现变量的作用域没有跑出函数范围，就可以在栈上，反之则必须分配在堆
@@ -134,6 +135,7 @@ go tool compile -S escape.go | grep escape.go:10
 堆heap数据量太多会导致GC压力增大
 
 ### UUID 通用唯一识别码
+
 Universally Unique Identifier
 https://zh.wikipedia.org/wiki/%E9%80%9A%E7%94%A8%E5%94%AF%E4%B8%80%E8%AF%86%E5%88%AB%E7%A0%81
 
