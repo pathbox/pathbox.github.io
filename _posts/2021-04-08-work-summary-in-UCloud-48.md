@@ -666,3 +666,58 @@ Kafka 和 Nginx 都有实现零拷贝技术，这将大大提高文件传输的�
 在 Nginx 里，可以通过配置，设定一个文件大小阈值，针对大文件使用异步 IO 和直接 IO，而对小文件使用零拷贝
 
 https://zhuanlan.zhihu.com/p/258513662
+
+
+
+### fasthttp ListenAndServe 默认是监听tcp4，导致IPv6的域名服务地址无法使用
+
+```go
+fasthttp.ListenAndServe(addr, handler)
+```
+
+默认只支持tcp4，如果是用在IPv6环境下的服务，会导致请求被拒绝。查看其源码：
+
+```go
+// ListenAndServe serves HTTP requests from the given TCP4 addr.
+//
+// Pass custom listener to Serve if you need listening on non-TCP4 media
+// such as IPv6.
+//
+// Accepted connections are configured to enable TCP keep-alives.
+func (s *Server) ListenAndServe(addr string) error {
+	ln, err := net.Listen("tcp4", addr)
+	if err != nil {
+		return err
+	}
+	if tcpln, ok := ln.(*net.TCPListener); ok {
+		return s.Serve(tcpKeepaliveListener{
+			TCPListener:     tcpln,
+			keepalive:       s.TCPKeepalive,
+			keepalivePeriod: s.TCPKeepalivePeriod,
+		})
+	}
+	return s.Serve(ln)
+}
+```
+
+从这里得知要想listening on non-TCP4 media，需要自己定义Listener
+
+方法:
+
+```go
+ln, err := net.Listen("tcp", address) // 需要是tcp,这样才能兼容IPv6的域名服务
+if err != nil {
+  panic(err)
+}
+if err := fasthttp.Serve(ln, router.Handler); err != nil {
+  panic(err)
+}
+```
+
+查看监听地址，以下的为满足IPv6域名环境
+
+```
+netstat -anltp
+tcp6       0      0 :::3000                :::*                    LISTEN      1/./server
+```
+
