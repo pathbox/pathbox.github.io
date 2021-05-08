@@ -78,8 +78,15 @@ https://developer.aliyun.com/article/224132
 
   
 
-  
-
 https://www.cnblogs.com/huangrenhui/p/13893903.html
 
 https://www.cnblogs.com/he1m4n6a/p/10256163.html
+
+### Rabbitmq死信队列存在的问题
+
+如果使用在消息属性上设置TTL的方式，消息可能并不会按时“死亡“，因为RabbitMQ只会检查第一个消息是否过期，如果过期则丢到死信队列，索引如果第一个消息的延时时长很长，而第二个消息的延时时长很短，则第二个消息并不会优先得到执行
+
+**利用RabbitMQ插件实现延迟队列**
+上文中提到的问题，确实是一个硬伤，如果不能实现在消息粒度上添加TTL，并使其在设置的TTL时间及时死亡，就无法设计成一个通用的延时队列。
+那如何解决这个问题呢？不要慌，安装一个插件即可：[https://www.rabbitmq.com/community-plugins.html](https://link.zhihu.com/?target=https%3A//www.rabbitmq.com/community-plugins.html) ，下载rabbitmq_delayed_message_exchange插件，然后解压放置到RabbitMQ的插件目录。
+接下来，进入RabbitMQ的安装目录下的sbin目录，执行下面命令让该插件生效，然后重启RabbitMQ
