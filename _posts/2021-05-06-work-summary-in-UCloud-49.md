@@ -90,3 +90,15 @@ https://www.cnblogs.com/he1m4n6a/p/10256163.html
 上文中提到的问题，确实是一个硬伤，如果不能实现在消息粒度上添加TTL，并使其在设置的TTL时间及时死亡，就无法设计成一个通用的延时队列。
 那如何解决这个问题呢？不要慌，安装一个插件即可：[https://www.rabbitmq.com/community-plugins.html](https://link.zhihu.com/?target=https%3A//www.rabbitmq.com/community-plugins.html) ，下载rabbitmq_delayed_message_exchange插件，然后解压放置到RabbitMQ的插件目录。
 接下来，进入RabbitMQ的安装目录下的sbin目录，执行下面命令让该插件生效，然后重启RabbitMQ
+
+
+
+### JWT相对session的优势
+
+session依赖缓存和数据库的存储，如果缓存和数据库挂了，很有可能导致用户无法登入
+
+而JWT没有这种存储依赖，缓存和数据库挂了，在登入方面理论上依然可以正常进行
+
+但jwt的缺点是：由于服务器不保存 session 状态，因此无法在使用过程中废止某个 token，或者更改 token 的权限。也就是说，一旦 JWT 签发了，在到期之前就会始终有效，除非服务器部署额外的逻辑。
+
+所以，要实现登出功能，还是需要存储JWT滴
