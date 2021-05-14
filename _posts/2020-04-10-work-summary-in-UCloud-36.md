@@ -92,6 +92,12 @@ func waitTimeout(wg *sync.WaitGroup, timeout time.Duration) bool {
 
 不要随便打印输出context，因为context底层是map存储，go的map读写不加锁有并发问题，而在外层用fmt 或没有锁的log打印和无锁read一样，会报并发读写崩溃
 
+
+
+Context的作用：通过引入Context包，一个request范围内所有goroutine运行时的取消可以得到有效的控制。但是这种解决方式却不够优雅。
+
+一旦代码中某处用到了Context，传递Context变量（通常作为函数的第一个参数）会像病毒一样蔓延在各处调用它的地方。比如在一个request中实现数据库事务或者分布式日志记录，创建的context，会作为参数传递到任何有数据库操作或日志记录需求的函数代码处。即每一个相关函数都必须增加一个context.Context类型的参数，且作为第一个参数，这对无关代码完全是侵入式的
+
 ### 二叉搜索树的特性：BST 的中序遍历是升序序列
 
 ### grpc超时传递

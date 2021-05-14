@@ -344,3 +344,15 @@ net/http: request canceled (Client.Timeout exceeded while awaiting headers)
 的报错
 
 正确使用方式参数值为: `30 * time.Second`
+
+### Time Stamp Counter时间戳计数器
+
+The **Time Stamp Counter** (**TSC**) **时间戳计数器**（**TSC**）是一个64位[寄存器](https://en.wikipedia.org/wiki/Processor_register)存在于所有[86](https://en.wikipedia.org/wiki/X86)自处理器[奔腾](https://en.wikipedia.org/wiki/Intel_P5)。它计算自复位以来的CPU[周期](https://en.wikipedia.org/wiki/Clock_rate)数。该指令`RDTSC`以EDX：EAX返回TSC。在[x86-64](https://en.wikipedia.org/wiki/X86-64)模式下，`RDTSC`还清除[RAX](https://en.wikipedia.org/wiki/RAX_register)和[RDX](https://en.wikipedia.org/wiki/RDX_register)的高32位。是一种更高性能的基于CPU获取时间戳的方式。它记录了 CPU 供电重设后到当前时刻所经过的 CPU 时钟周期数。在 CPU 时钟周期速率相同的条件下，经过测量和换算即可用于高精度计时。对于需要大量获取时间戳的操作，比如分布式链式追踪(opentracing)，日志打印等，如果能够使用这种方式获取时间戳信息，那么能够大大提升性能
+
+https://en.wikipedia.org/wiki/Time_Stamp_Counter
+
+https://github.com/dterei/gotsc
+
+https://github.com/tikv/minitrace-go
+
+https://www.jianshu.com/p/d57b12d18c98
