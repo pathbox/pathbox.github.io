@@ -102,3 +102,27 @@ session依赖缓存和数据库的存储，如果缓存和数据库挂了，很�
 但jwt的缺点是：由于服务器不保存 session 状态，因此无法在使用过程中废止某个 token，或者更改 token 的权限。也就是说，一旦 JWT 签发了，在到期之前就会始终有效，除非服务器部署额外的逻辑。
 
 所以，要实现登出功能，还是需要存储JWT滴
+
+### time.Duration 作为timeout参数类型，别传整数
+
+在一些方法需要传入超时参数值，超时参数的类型是 time.Duration,当你传比如30，这不是表示30s超时，而是30纳秒，这样你的client请求可能还没进行第一次握手就超时了，这时会收到
+
+```go
+net/http: request canceled (Client.Timeout exceeded while awaiting headers)
+```
+
+的报错
+
+正确使用方式参数值为: `30 * time.Second`
+
+### Time Stamp Counter时间戳计数器
+
+The **Time Stamp Counter** (**TSC**) **时间戳计数器**（**TSC**）是一个64位[寄存器](https://en.wikipedia.org/wiki/Processor_register)存在于所有[86](https://en.wikipedia.org/wiki/X86)自处理器[奔腾](https://en.wikipedia.org/wiki/Intel_P5)。它计算自复位以来的CPU[周期](https://en.wikipedia.org/wiki/Clock_rate)数。该指令`RDTSC`以EDX：EAX返回TSC。在[x86-64](https://en.wikipedia.org/wiki/X86-64)模式下，`RDTSC`还清除[RAX](https://en.wikipedia.org/wiki/RAX_register)和[RDX](https://en.wikipedia.org/wiki/RDX_register)的高32位。是一种更高性能的基于CPU获取时间戳的方式。它记录了 CPU 供电重设后到当前时刻所经过的 CPU 时钟周期数。在 CPU 时钟周期速率相同的条件下，经过测量和换算即可用于高精度计时。对于需要大量获取时间戳的操作，比如分布式链式追踪(opentracing)，日志打印等，如果能够使用这种方式获取时间戳信息，那么能够大大提升性能
+
+https://en.wikipedia.org/wiki/Time_Stamp_Counter
+
+https://github.com/dterei/gotsc
+
+https://github.com/tikv/minitrace-go
+
+https://www.jianshu.com/p/d57b12d18c98
