@@ -532,5 +532,28 @@ https://www.zhihu.com/column/c_1185131592262148096
 
 https://zhuanlan.zhihu.com/p/26559480
 
-###流量控制与拥塞控制的区别
+### 流量控制与拥塞控制的区别
 
+
+
+### Redis cluster master挂了，从节点通过选举升级为主
+
+**1.slave发现自己的master变为FAIL**
+
+**2.发起选举前，slave先给自己的epoch（即currentEpoch）增一，然后请求其它master给自己投票。slave是通过广播FAILOVER_AUTH_REQUEST包给集中的每一个masters。**
+
+**3.slave发起投票后，会等待至少两倍NODE_TIMEOUT时长接收投票结果，不管NODE_TIMEOUT何值，也至少会等待2秒。**
+
+**4.master接收投票后给slave响应FAILOVER_AUTH_ACK，并且在（NODE_TIMEOUT\*2）时间内不会给同一master的其它slave投票。**
+
+**5.如果slave收到FAILOVER_AUTH_ACK响应的epoch值小于自己的epoch，则会直接丢弃。一旦slave收到多数master的FAILOVER_AUTH_ACK，则声明自己赢得了选举。**
+
+**6.如果slave在两倍的NODE_TIMEOUT时间内（至少2秒）未赢得选举，则放弃本次选举，然后在四倍NODE_TIMEOUT时间（至少4秒）后重新发起选举。**
+
+只所以强制延迟至少**0.5秒**选举，是为确保master的fail状态在整个集群内传开，否则可能只有小部分master知晓，而master只会给处于fail状态的master的slaves投票。如果一个slave的master状态不是fail，则其它master不会给它投票，Redis通过八卦协议（即Gossip协议，也叫谣言协议）传播fail。而在固定延迟上再加一个随机延迟，是为了避免多个slaves同时发起选举。
+
+延迟计算公式：
+
+DELAY = 500ms + random(0 ~ 500ms) + SLAVE_RANK * 1000ms
+
+SLAVE_RANK表示此slave已经从master复制数据的总量的rank。Rank越小代表已复制的数据越新。这种方式下，持有最新数据的slave将会首先发起选举（理论上）
