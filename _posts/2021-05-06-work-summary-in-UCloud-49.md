@@ -536,7 +536,7 @@ https://zhuanlan.zhihu.com/p/26559480
 
 
 
-### Redis cluster master挂了，从节点通过选举升级为主
+### Redis cluster master挂了，从节点通过投票选举升级为主
 
 **1.slave发现自己的master变为FAIL**
 
@@ -557,3 +557,58 @@ https://zhuanlan.zhihu.com/p/26559480
 DELAY = 500ms + random(0 ~ 500ms) + SLAVE_RANK * 1000ms
 
 SLAVE_RANK表示此slave已经从master复制数据的总量的rank。Rank越小代表已复制的数据越新。这种方式下，持有最新数据的slave将会首先发起选举（理论上）
+
+### goroutine调度对for阻塞和channel阻塞CPU不同的表现
+
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+)
+
+func main() {
+	// ch := make(chan int)
+	for i := 0; i < runtime.NumCPU()-1; i++ {
+		go func() {
+			for {
+			}
+			// ch <- 1
+			fmt.Println("here")
+		}()
+	}
+	go func() {
+		fmt.Print("A")
+	}()
+	fmt.Print("B")
+	for {
+	}
+}
+
+// go version go1.14 会打印出A B 说明，在goroutine调度上，对for这种阻塞goroutine会切换出来，避免阻塞CPU 避免阻塞M。 但是，CPU会因为for循环任务的执行，而导致达到100%  而如果是channel的阻塞,是不会让CPU达到100%。因为在goroutine调度中，如果有channel的阻塞，会将该goroutine切换出去，放到goroutine的末尾，继续执行其他goroutine
+
+// 如果是下面这样的for+select+no default 的情况，CPU不会被打满
+go func() {
+  for {
+    select {
+      case <-ch:
+      	fmt.Println(1)
+    }
+  }
+  fmt.Println("here")
+}()
+
+// 如果是下面这样的for+select+default 的情况，CPU会被打满
+go func() {
+  for {
+    select {
+      case <-ch:
+      	fmt.Println(1)
+      default:
+    }
+  }
+  fmt.Println("here")
+}()
+```
+
