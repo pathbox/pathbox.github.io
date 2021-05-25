@@ -261,10 +261,10 @@ Write Back 套路就是，在更新数据的时候，只更新缓存，不更新
 
 MySQL中，存储引擎实现事务的通用方式是基于 redo log 和 undo log。
 
-简单来说，redo log 记录事务修改后的数据, undo log 记录事务前的原始数据
+简单来说，redo log 记录事务修改后的数据, undo log 记录事务前的原始数据。二者应该同时进行记录
 
 开启了 binlog 的事务执行：
-- 先记录 undo/redo log， 确保日志刷到磁盘上持久存储
+- 先记录 undo和redo log， 确保日志刷到磁盘上持久存储
 - 更新数据记录，缓存操作并异步刷盘
 - 将事务日志持久化到binlog
 - 提交事务，在redo log中写入commit记录
@@ -328,6 +328,15 @@ MVCC的全称是多版本并发控制，它使得在使用READ COMMITTD、REPEAT
 对应的还有“当前读”。类似UPDATE、DELETE、INSERT、SELECT...LOCK IN SHARE MODE、SELECT...FOR UPDATE这些操作就是当前读。为什么叫当前读？就是它读取的是记录的最新版本，读取时还要保证其他并发事务不能修改当前记录，会对读取的记录进行加锁
 
 
+
+MySQL实现事务ACID特性的方式总结如下：
+
+- 原子性：使用 undo log来实现，如果事务执行过程中出错或者用户执行了rollback，系统通过undo log日志返回事务开始的状态。
+- 持久性：使用 redo log来实现，只要redo log日志持久化了，当系统崩溃，即可通过redo log把数据恢复。
+- 隔离性：通过锁以及MVCC来实现。
+- 一致性：通过回滚、恢复以及并发情况下的隔离性，从而实现一致性
+
+https://mp.weixin.qq.com/s?__biz=MzU0MzQ5MDA0Mw==&mid=2247489849&idx=1&sn=cbac2a6ad99ac466f2ba8d69507fd2fe&chksm=fb0bf3adcc7c7abb565a9865e14b357888f7b7b78874b74c18bfdc5a4278ec2503b258c27730&scene=21#wechat_redirect
 
 关于WAL性能优化问题：
 
