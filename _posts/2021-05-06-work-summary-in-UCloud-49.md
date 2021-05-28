@@ -669,3 +669,33 @@ Redis 抽象了一套 AE 事件模型，将 IO 事件和时间事件融入一起
 - 主线程执行命令 - 单线程（如果命令没有接收完毕，会等 IO 下次继续）
 - 主线程阻塞等待 IO 线程将数据回写 socket 完毕（一次没写完，会等下次再写）
 - 解除绑定，清空等待队列
+
+
+
+### Go Channel发送和接收具体逻辑简记
+
+我们在这里可以简单梳理和总结一下使用 `ch <- i` 表达式向 Channel 发送数据时遇到的几种情况：
+
+1. 如果当前 Channel 的 `recvq` 上存在已经被阻塞的 Goroutine，那么会直接将数据发送给当前 Goroutine 并将其设置成下一个运行的 Goroutine；
+2. 如果 Channel 存在缓冲区并且其中还有空闲的容量，我们会直接将数据存储到缓冲区 `sendx` 所在的位置上；
+3. 如果不满足上面的两种情况，会创建一个 [`runtime.sudog`](https://draveness.me/golang/tree/runtime.sudog) 结构并将其加入 Channel 的 `sendq` 队列中，当前 Goroutine 也会陷入阻塞等待其他的协程从 Channel 接收数据；
+
+发送数据的过程中包含几个会触发 Goroutine 调度的时机：
+
+1. 发送数据时发现 Channel 上存在等待接收数据的 Goroutine，立刻设置处理器的 `runnext` 属性，但是并不会立刻触发调度；
+2. 发送数据时并没有找到接收方并且缓冲区已经满了，这时会将自己加入 Channel 的 `sendq` 队列并调用 [`runtime.goparkunlock`](https://draveness.me/golang/tree/runtime.goparkunlock) 触发 Goroutine 的调度让出处理器的使用权
+
+我们梳理一下从 Channel 中接收数据时可能会发生的五种情况：
+
+1. 如果 Channel 为空，那么会直接调用 [`runtime.gopark`](https://draveness.me/golang/tree/runtime.gopark) 挂起当前 Goroutine；
+2. 如果 Channel 已经关闭并且缓冲区没有任何数据，[`runtime.chanrecv`](https://draveness.me/golang/tree/runtime.chanrecv) 会直接返回；
+3. 如果 Channel 的 `sendq` 队列中存在挂起的 Goroutine，会将 `recvx` 索引所在的数据拷贝到接收变量所在的内存空间上并将 `sendq` 队列中 Goroutine 的数据拷贝到缓冲区；
+4. 如果 Channel 的缓冲区中包含数据，那么直接读取 `recvx` 索引对应的数据；
+5. 在默认情况下会挂起当前的 Goroutine，将 [`runtime.sudog`](https://draveness.me/golang/tree/runtime.sudog) 结构加入 `recvq` 队列并陷入休眠等待调度器的唤醒；
+
+我们总结一下从 Channel 接收数据时，会触发 Goroutine 调度的两个时机：
+
+1. 当 Channel 为空时；
+2. 当缓冲区中不存在数据并且也不存在数据的发送者时
+
+https://draveness.me/golang/docs/part3-runtime/ch06-concurrency/golang-channel/

@@ -64,6 +64,21 @@ get(lockkey) 获取值 oldExpireTime ，并将这个 value 值与当前的系统
 判断 currentExpireTime 与 oldExpireTime 是否相等，如果相等，说明当前 getset 设置成功，获取到了锁。如果不相等，说明这个锁又被别的请求获取走了，那么当前请求可以直接返回失败，或者继续重试。
 在获取到锁之后，当前线程可以开始自己的业务处理，当处理完毕后，比较自己的处理时间和对于锁设置的超时时间，如果小于锁设置的超时时间，则直接执行 delete 释放锁；如果大于锁设置的超时时间，则不需要再锁进行处理。
 
+
+
+```lua
+// 加锁
+String uuid = UUID.randomUUID().toString().replaceAll("-","");
+SET key uuid NX EX 30
+// 解锁
+if (redis.call('get', KEYS[1]) == ARGV[1])
+    then return redis.call('del', KEYS[1])
+else return 0
+end
+```
+
+
+
 基于 Redlock 做分布式锁
 Redlock 是 Redis 的作者 antirez 给出的集群模式的 Redis 分布式锁，它基于 N 个完全独立的 Redis 节点（通常情况下 N 可以设置成 5）。
 
