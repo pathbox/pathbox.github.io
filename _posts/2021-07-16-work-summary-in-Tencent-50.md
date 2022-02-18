@@ -63,3 +63,6 @@ https://github.com/OneSizeFitsQuorum/raft-thesis-zh_cn/blob/master/raft-thesis-z
 前端的特征是混乱、嘈杂、易变，因为这些都是最终用户的特征，前端需要匹配用户。如果你不适应混乱、嘈杂、易变的开发，你就很难适应前端。
 后端涉及到计算科学、语音设计、编译原理等高深内容，想要搞懂这些东西，绝非易事。
 ```
+
+### 封装DAO层进行数据操作，避免在业务逻辑中写SQL
+这样也能方便mock测试
