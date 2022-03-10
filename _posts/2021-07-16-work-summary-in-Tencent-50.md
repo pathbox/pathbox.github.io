@@ -66,3 +66,31 @@ https://github.com/OneSizeFitsQuorum/raft-thesis-zh_cn/blob/master/raft-thesis-z
 
 ### 封装DAO层进行数据操作，避免在业务逻辑中写SQL
 这样也能方便mock测试
+
+### 简单的概率抽奖算法PHP
+
+```php
+/**
+    * 概率抽奖算法
+    // TODO 测试50%概率
+    // $proArr = [
+    //     1 => 5000,
+    //     2 => 5000,
+    // ];
+    */
+    function run_get_rand($proArr) 
+    {
+        $prize = '';
+        $proSum = array_sum($proArr);
+        foreach($proArr as $key => $proCur) {
+            $randNum = mt_rand(1, $proSum);
+            if($randNum <= $proCur) {
+                $prize = $key;
+                break;
+            } else {
+                $proSum -= $proCur;
+            }
+        }
+        return $prize;
+    }
+```
