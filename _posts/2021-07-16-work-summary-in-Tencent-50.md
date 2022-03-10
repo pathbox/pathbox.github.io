@@ -94,3 +94,39 @@ https://github.com/OneSizeFitsQuorum/raft-thesis-zh_cn/blob/master/raft-thesis-z
         return $prize;
     }
 ```
+
+```php
+$a = 0;
+$b = 0;
+$p = [
+  1 => 30,
+  2 => 60
+];
+
+for($i=1;$i<=1000;$i++){
+    if (run_get_rand($p)==1){
+            $a++;
+    } else {
+            $b++;
+    }
+}
+
+echo $a; // 得到的$a的值大概是300-350之间，占1000的三分之一左右
+
+
+function run_get_rand($proArr)
+    {
+        $prize = '';
+        $proSum = array_sum($proArr);
+        foreach($proArr as $key => $proCur) {
+            $randNum = mt_rand(1, $proSum);
+            if($randNum <= $proCur) {
+                $prize = $key;
+                break;
+            } else {
+                $proSum -= $proCur;
+            }
+        }
+        return $prize;
+    }
+```
