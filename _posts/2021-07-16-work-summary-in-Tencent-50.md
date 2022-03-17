@@ -130,3 +130,47 @@ function run_get_rand($proArr)
         return $prize;
     }
 ```
+
+### InnoDB 的 MVCC 是如何实现的
+InnoDB 是如何存储记录多个版本的？这些数据是 事务版本号，行记录中的隐藏列和Undo Log。
+
+事务版本号
+每开启一个日志，都会从数据库中获得一个事务ID（也称为事务版本号），这个事务 ID 是自增的，通过 ID 大小，可以判断事务的时间顺序。
+
+行记录的隐藏列
+row_id :隐藏的行 ID ,用来生成默认的聚集索引。如果创建数据表时没指定聚集索引，这时 InnoDB 就会用这个隐藏 ID 来创建聚集索引。采用聚集索引的方式可以提升数据的查找效率。
+trx_id: 操作这个数据事务 ID ，也就是最后一个对数据插入或者更新的事务 ID 。
+roll_ptr:回滚指针，指向这个记录的 Undo Log 信息。
+
+Undo Log 事务前的备份记录，用于事务回滚
+InnoDB 将行记录快照保存在 Undo Log 里。
+
+数据行通过快照记录都通过链表的结构的串联了起来，每个快照都保存了 trx_id 事务ID，如果要找到历史快照，就可以通过遍历回滚指针的方式进行查找。
+
+Read View 是啥？
+如果一个事务要查询行记录，需要读取哪个版本的行记录呢？ Read View 就是来解决这个问题的。Read View 可以帮助我们解决可见性问题。 Read View 保存了当前事务开启时所有活跃的事务列表。换个角度，可以理解为: Read View 保存了不应该让这个事务看到的其他事务 ID 列表。
+
+trx_ids 系统当前正在活跃的事务ID集合。
+low_limit_id ,活跃事务的最大的事务 ID。
+up_limit_id 活跃的事务中最小的事务 ID。
+creator_trx_id，创建这个 ReadView 的事务ID。
+ReadView
+
+如果当前事务的 creator_trx_id 想要读取某个行记录，这个行记录ID 的trx_id ，这样会有以下的情况：
+
+如果 trx_id < 活跃的最小事务ID（up_limit_id）,也就是说这个行记录在这些活跃的事务创建前就已经提交了，那么这个行记录对当前事务是可见的。
+如果trx_id > 活跃的最大事务ID（low_limit_id），这个说明行记录在这些活跃的事务之后才创建，说明这个行记录对当前事务是不可见的。
+如果 up_limit_id < trx_id <low_limit_id,说明该记录需要在 trx_ids 集合中，可能还处于活跃状态，因此我们需要在 trx_ids 集合中遍历 ，如果trx_id 存在于 trx_ids 集合中，证明这个事务 trx_id 还处于活跃状态，不可见，否则 ，trx_id 不存在于 trx_ids 集合中，说明事务trx_id 已经提交了，这行记录是可见的。
+如何查询一条记录
+获取事务自己的版本号，即 事务ID
+获取 Read View
+查询得到的数据，然后 Read View 中的事务版本号进行比较。
+如果不符合 ReadView 规则， 那么就需要 UndoLog 中历史快照；
+最后返回符合规则的数据
+InnoDB 实现多版本控制 （MVCC）是通过 ReadView+ UndoLog 实现的，UndoLog 保存了历史快照，ReadView 规则帮助判断当前版本的数据是否可见。
+
+总结
+如果事务隔离级别是 ReadCommit ，一个事务的每一次 Select 都会去查一次ReadView ，每次查询的Read View 不同，就可能会造成不可重复读或者幻读的情况。
+如果事务的隔离级别是可重读，为了避免不可重读读，一个事务只在第一次 Select 的时候会获取一次Read View ，然后后面索引的Select 会复用这个 ReadView.
+
+https://zhuanlan.zhihu.com/p/147372839
