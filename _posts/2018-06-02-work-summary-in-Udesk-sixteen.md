@@ -299,7 +299,7 @@ redo log和undo log来保证事务的原子性、一致性和持久性，同时�
 
 ### redo log
 
-redo log 又称为重做日志，它包含两部分：一是内存中的日志缓冲(redo log buffer)，该部分日志是易失性的；二是磁盘上的重做日志文件(redo log file)，该部分日志是持久的。
+redo log 又称为重做日志，保证数据的可靠性。它包含两部分：一是内存中的日志缓冲(redo log buffer)，该部分日志是易失性的；二是磁盘上的重做日志文件(redo log file)，该部分日志是持久的。
 
 当需要修改事务中的数据时，先将对应的redo log写入到redo log buffer中，然后才在内存中执行相关的数据修改操作。InnoDB通过“force log at commit”机制实现事务的持久性，即在事务提交的时候，必须先将该事务的所有redo log都写入到磁盘上的redo log file中，然后待事务的commit操作完成才算整个事务操作完成。
 
