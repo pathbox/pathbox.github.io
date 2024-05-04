@@ -120,7 +120,7 @@ select non_key_column from tb where pk_column=val
 
 1select non_key_column fromtb where pk_column in (rest_sort)
 
-在不使用 MRR 时，优化器需要根据二级索引返回的记录来进行“回表”，这个过程一般会有较多的随机IO, 使用MRR时，SQL语句的执行过程是这样的：
+在不使用 MRR 时，优化器需要根据二级索引返回的记录来进行“回表”（将索引得到是数据根据id进行回表得到数据，这样一次id查找数据就是一次随机IO），这个过程一般会有较多的随机IO, 使用MRR时，SQL语句的执行过程是这样的：
 
 优化器将二级索引查询到的记录放到一块缓冲区中
 
