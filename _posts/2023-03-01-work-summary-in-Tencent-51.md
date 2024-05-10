@@ -151,4 +151,14 @@ SELECT * FROM t WHEREkey_part1 >= 1000 ANDkey_part1 < 2000ANDkey_part2 = 1000
 Redis 之所以如此设计它的多线程网络模型，我认为主要的原因是为了保持兼容性，因为以前 Redis 是单线程的，所有的客户端命令都是在单线程的事件循环里执行的，也因此 Redis 里所有的数据结构都是非线程安全的，现在引入多线程，如果按照标准的 Multi-Reactors/Master-Workers 模式来实现，则所有内置的数据结构都必须重构成线程安全的，这个工作量无疑是巨大且麻烦的
 
 ### FlatBuffers
+编码性能：flatbuf 的编码性能要比 protobuf 低。在 JSON、protobuf 和 flatbuf 之中，flatbuf 编码性能最差，JSON 介于二者之间。
+
+编码后的数据长度：由于通常情况下，传输的数据都会做压缩。在不压缩的情况下，flatbuffer 的数据长度是最长的，理由也很简单，因为二进制流内部填充了很多字节对齐的 0，并且原始数据也没有采取特殊的压缩处理，整个数据膨胀的更大了。不管压不压缩，flatbuffer 的数据长度都是最长的。JSON 经过压缩以后，数据长度会近似于 protocol buffer。protocol buffer 由于自身编码就有压缩，再经过 GZIP 这些压缩算法压缩以后，长度始终维持最小。
+
+解码性能：flatbuffer 是一种无需解码的二进制格式，因而解码性能要高许多，大概要比 protobuf 快几百倍的样子，因而比 JSON 快的就更多了
+
 FlatBuffers 和 Protobuf 一样具有数据不可读性，必须进行数据解析后才能可视化数据。但是相比其它的序列化工具，FlatBuffers最大的优势是反序列化速度极快，或者说无需解码。如果使用场景是需要经常解码序列化的数据，则有可能从 FlatBuffers 的特性中获得巨大收益。
+
+
+#  file1.csv   中存在但  file2.csv   中不存在的行输出到名为  diff.csv   的新文件中。
+awk 'FNR==NR {a[$1]; next} !($1 in a)' file1.csv file2.csv > diff.csv
