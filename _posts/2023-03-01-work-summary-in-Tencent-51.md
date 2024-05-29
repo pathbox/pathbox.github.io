@@ -162,3 +162,6 @@ FlatBuffers 和 Protobuf 一样具有数据不可读性，必须进行数据解�
 
 #  file1.csv   中存在但  file2.csv   中不存在的行输出到名为  diff.csv   的新文件中。
 awk 'FNR==NR {a[$1]; next} !($1 in a)' file1.csv file2.csv > diff.csv
+
+### 释放MySQL存储空间需要drop table
+delete 操作一般不会释放存储空间，需要drop table。如果希望保留一部分数据，可以导出一部分数据和表结构，然后drop table，然后再导入回sql文件，这样存储空间就释放了
