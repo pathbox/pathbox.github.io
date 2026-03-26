@@ -166,4 +166,8 @@ awk 'FNR==NR {a[$1]; next} !($1 in a)' file1.csv file2.csv > diff.csv
 ### 释放MySQL存储空间需要drop table
 delete 操作一般不会释放存储空间，需要drop table。如果希望保留一部分数据，可以导出一部分数据和表结构，然后drop table，然后再导入回sql文件，这样存储空间就释放了
 
+<<<<<<< HEAD
 ###  在mac系统中浏览器的主题颜色是深色或随系统是深色，会导致前端相关背景是黑色，比如文本编辑区域
+=======
+### update sql 无论表多大都要加索引，不然很容易在并发请求时导致慢查询
+>>>>>>> c6f07469d09d3410bef63bb526a89c509506e931
